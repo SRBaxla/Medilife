@@ -37,11 +37,13 @@ export default function Booking() {
   const [patientPhone, setPatientPhone] = useState('')
   const [patientEmail, setPatientEmail] = useState('')
   const [patientPassword, setPatientPassword] = useState('')
-
+  const [registerPassword, setRegisterPassword] = useState('')
+  
   // Submission / Overlay States
   const [bookingLoading, setBookingLoading] = useState(false)
   const [bookingError, setBookingError] = useState(null)
   const [showLoginIntercept, setShowLoginIntercept] = useState(false)
+  const [showRegisterIntercept, setShowRegisterIntercept] = useState(false)
 
   // Tenant Context Resolution
   const [resolvedTenant, setResolvedTenant] = useState(null)
@@ -109,12 +111,28 @@ export default function Booking() {
         return;
       }
 
-      // 3. User does not exist: provision new user via signUp
-      const tempPassword = 'TempBooking' + Math.random().toString(36).slice(-8) + '1!';
+      // 3. User does not exist: intercept UI to request password creation
+      setShowRegisterIntercept(true);
+      setBookingLoading(false);
+    } catch (err) {
+      console.error("Booking verification error:", err);
+      setBookingError(err.message || "An unexpected error occurred during booking.");
+      setBookingLoading(false);
+    }
+  };
 
+  const handleRegisterAndConfirm = async (e) => {
+    if (e) e.preventDefault();
+    setBookingLoading(true);
+    setBookingError(null);
+
+    try {
+      const tenantId = resolvedTenant?.id || DEFAULT_TENANT_ID;
+
+      // 1. Sign up new user with chosen password
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: patientEmail,
-        password: tempPassword,
+        password: registerPassword,
         options: {
           data: {
             full_name: patientName,
@@ -126,9 +144,9 @@ export default function Booking() {
       if (authError) throw authError;
 
       const userId = authData.user?.id;
-      if (!userId) throw new Error("Failed to retrieve generated user ID.");
+      if (!userId) throw new Error("Failed to register new account.");
 
-      // 4. Insert booking
+      // 2. Insert booking
       console.log("Tenant ID being inserted:", tenantId);
       const { error: insertError } = await supabase
         .from('bookings')
@@ -142,10 +160,11 @@ export default function Booking() {
 
       if (insertError) throw insertError;
 
+      setShowRegisterIntercept(false);
       setSubmitted(true);
     } catch (err) {
-      console.error("Booking submission error:", err);
-      setBookingError(err.message || "An unexpected error occurred during booking.");
+      console.error("Register/booking submission error:", err);
+      setBookingError(err.message || "Failed to create account or confirm booking.");
     } finally {
       setBookingLoading(false);
     }
@@ -503,6 +522,76 @@ export default function Booking() {
                     disabled={bookingLoading}
                   >
                     {bookingLoading ? 'Verifying...' : 'Log In & Book'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showRegisterIntercept && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-lg bg-black/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-surface-container-lowest max-w-md w-full rounded-2xl border border-outline-variant/30 p-xl shadow-clinical relative"
+            >
+              <button 
+                type="button"
+                onClick={() => setShowRegisterIntercept(false)} 
+                className="absolute top-md right-md text-on-surface-variant hover:text-on-surface"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+
+              <div className="flex flex-col items-center text-center mb-lg">
+                <div className="w-12 h-12 rounded-full bg-secondary-container text-primary flex items-center justify-center mb-md">
+                  <span className="material-symbols-outlined">person_add</span>
+                </div>
+                <h3 className="text-headline-md font-bold text-on-surface">Create Account</h3>
+                <p className="text-body-md text-on-surface-variant mt-xs">
+                  Create a secure password to protect your patient account and view pathology reports online.
+                </p>
+              </div>
+
+              <form onSubmit={handleRegisterAndConfirm} className="space-y-md">
+                <div>
+                  <label className="text-label-md text-on-surface-variant mb-xs block">Choose Password</label>
+                  <input 
+                    required 
+                    type="password" 
+                    className="input-field" 
+                    placeholder="Choose a password (min 6 characters)"
+                    value={registerPassword}
+                    onChange={(e) => setRegisterPassword(e.target.value)}
+                  />
+                </div>
+
+                {bookingError && (
+                  <div className="flex gap-xs text-error text-label-md p-md bg-error-container/10 rounded-xl border border-error/20">
+                    <span className="material-symbols-outlined text-[16px] text-error">error</span>
+                    <span>{bookingError}</span>
+                  </div>
+                )}
+
+                <div className="flex gap-md mt-lg">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowRegisterIntercept(false)} 
+                    className="btn-outline flex-1 justify-center"
+                    disabled={bookingLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn-primary flex-1 justify-center bg-primary text-on-primary"
+                    disabled={bookingLoading}
+                  >
+                    {bookingLoading ? 'Registering...' : 'Register & Book'}
                   </button>
                 </div>
               </form>
