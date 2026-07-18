@@ -40,7 +40,7 @@ export default function Login() {
         console.warn("Tenant lookup failed, falling back to mock Jhansi context for offline support:", err)
         // Secure offline preview context fallback
         setResolvedTenant({
-          id: '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e',
+          id: import.meta.env.VITE_PUBLIC_CURRENT_TENANT_ID || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e',
           name: 'Jhansi Medilife Pathology Lab',
           subdomain: 'jhansi-medilife-tenant-01'
         })

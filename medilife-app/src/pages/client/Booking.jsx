@@ -16,7 +16,7 @@ const sampleTests = [
   { name: 'Kidney Function Test', price: 549 },
 ]
 
-const DEFAULT_TENANT_ID = import.meta.env.VITE_DEFAULT_TENANT_ID || import.meta.env.VITE_PUBLIC_CURRENT_TENANT_ID || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e';
+const DEFAULT_TENANT_ID = import.meta.env.VITE_PUBLIC_CURRENT_TENANT_ID || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e';
 
 export default function Booking() {
   const navigate = useNavigate()

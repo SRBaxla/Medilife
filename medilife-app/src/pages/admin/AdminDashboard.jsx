@@ -58,7 +58,7 @@ export default function AdminDashboard() {
         } else {
           // Mock UUID mappings for Delhi, Mumbai, and Jhansi to keep demo clean
           const mockUuids = {
-            'jhansi-medilife-tenant-01': '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e',
+            'jhansi-medilife-tenant-01': import.meta.env.VITE_PUBLIC_CURRENT_TENANT_ID || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e',
             'tenant-delhi-01': '88e89f81-55c3-4c5b-af5e-cc27b8a9708f',
             'tenant-mumbai-02': '99f99f81-33d3-4c5b-af5e-cc27b8a9709a'
           }

@@ -23,7 +23,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     const checkAuthentication = async () => {
       try {
         // 1. Resolve tenantSlug to UUID first
-        let resolvedId = '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e' // Default fallback Jhansi UUID
+        let resolvedId = import.meta.env.VITE_PUBLIC_CURRENT_TENANT_ID || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e' // Default fallback Jhansi UUID
         
         try {
           const { data: tenant, error: tenantErr } = await supabase
