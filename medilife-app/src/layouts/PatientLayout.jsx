@@ -1,28 +1,30 @@
 import { useState } from 'react'
-import { NavLink, Outlet, Link } from 'react-router-dom'
+import { NavLink, Outlet, Link, useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import ScrollToTop from '../components/common/ScrollToTop'
 
-const mainNav = [
-  { to: '/portal', icon: 'dashboard', label: 'Dashboard', end: true },
-  { to: '/portal/reports', icon: 'description', label: 'Reports' },
-  { to: '/portal/statistics', icon: 'insights', label: 'Statistics' },
-  { to: '/portal/profile', icon: 'person', label: 'Profile' },
-]
-const bottomNav = [
-  { to: '/portal', icon: 'dashboard', label: 'Dashboard', end: true },
-  { to: '/portal/reports', icon: 'description', label: 'Reports' },
-  { to: '/portal/statistics', icon: 'insights', label: 'Stats' },
-  { to: '/portal/profile', icon: 'person', label: 'Profile' },
-  { to: '/portal/settings', icon: 'settings', label: 'Settings' },
-]
-const footerNav = [
-  { to: '/portal/settings', icon: 'settings', label: 'Settings' },
-  { to: '/portal/help', icon: 'help', label: 'Help' },
-]
-
 export default function PatientLayout() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const { tenantSlug } = useParams()
+  const activeSlug = tenantSlug || 'jhansi-medilife-tenant-01'
+
+  const mainNav = [
+    { to: `/${activeSlug}/patient/dashboard`, icon: 'dashboard', label: 'Dashboard', end: true },
+    { to: `/${activeSlug}/patient/reports`, icon: 'description', label: 'Reports' },
+    { to: `/${activeSlug}/patient/statistics`, icon: 'insights', label: 'Statistics' },
+    { to: `/${activeSlug}/patient/profile`, icon: 'person', label: 'Profile' },
+  ]
+  const bottomNav = [
+    { to: `/${activeSlug}/patient/dashboard`, icon: 'dashboard', label: 'Dashboard', end: true },
+    { to: `/${activeSlug}/patient/reports`, icon: 'description', label: 'Reports' },
+    { to: `/${activeSlug}/patient/statistics`, icon: 'insights', label: 'Stats' },
+    { to: `/${activeSlug}/patient/profile`, icon: 'person', label: 'Profile' },
+    { to: `/${activeSlug}/patient/settings`, icon: 'settings', label: 'Settings' },
+  ]
+  const footerNav = [
+    { to: `/${activeSlug}/patient/settings`, icon: 'settings', label: 'Settings' },
+    { to: `/${activeSlug}/patient/help`, icon: 'help', label: 'Help' },
+  ]
 
   return (
     <div className="min-h-screen flex bg-surface text-on-surface font-sans selection:bg-primary-container selection:text-on-primary-container">
@@ -77,6 +79,10 @@ export default function PatientLayout() {
               <span className="material-symbols-outlined">{icon}</span>{label}
             </NavLink>
           ))}
+          <Link to={`/${activeSlug}/patient/login`} className="flex items-center gap-md px-md py-sm rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low transition-all">
+            <span className="material-symbols-outlined">logout</span>
+            Log Out
+          </Link>
           <Link to="/" className="flex items-center gap-md px-md py-sm rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low transition-all">
             <span className="material-symbols-outlined">home</span>
             Back to Site

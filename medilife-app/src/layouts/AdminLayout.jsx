@@ -1,24 +1,26 @@
 import { useState } from 'react'
-import { NavLink, Outlet, Link } from 'react-router-dom'
+import { NavLink, Outlet, Link, useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import ScrollToTop from '../components/common/ScrollToTop'
 
-const adminNavItems = [
-  { to: '/admin', icon: 'how_to_reg', label: 'Check-in', end: true },
-  { to: '/admin/send-report', icon: 'send', label: 'Send Reports' },
-  { to: '/admin/analytics', icon: 'insights', label: 'Business Analytics' },
-  { to: '/admin/schedule', icon: 'calendar_today', label: 'Day Schedule' },
-]
-
-const bottomNavItems = [
-  { to: '/admin', icon: 'how_to_reg', label: 'Check-in' },
-  { to: '/admin/send-report', icon: 'send', label: 'Reports' },
-  { to: '/admin/analytics', icon: 'insights', label: 'Analytics' },
-  { to: '/admin/schedule', icon: 'calendar_today', label: 'Schedule' },
-]
-
 export default function AdminLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { tenantSlug } = useParams()
+  const activeSlug = tenantSlug || 'jhansi-medilife-tenant-01'
+
+  const adminNavItems = [
+    { to: `/${activeSlug}/admin/dashboard`, icon: 'how_to_reg', label: 'Check-in', end: true },
+    { to: `/${activeSlug}/admin/reports`, icon: 'send', label: 'Send Reports' },
+    { to: `/${activeSlug}/admin/analytics`, icon: 'insights', label: 'Business Analytics' },
+    { to: `/${activeSlug}/admin/schedule`, icon: 'calendar_today', label: 'Day Schedule' },
+  ]
+
+  const bottomNavItems = [
+    { to: `/${activeSlug}/admin/dashboard`, icon: 'how_to_reg', label: 'Check-in' },
+    { to: `/${activeSlug}/admin/reports`, icon: 'send', label: 'Reports' },
+    { to: `/${activeSlug}/admin/analytics`, icon: 'insights', label: 'Analytics' },
+    { to: `/${activeSlug}/admin/schedule`, icon: 'calendar_today', label: 'Schedule' },
+  ]
 
   return (
     <div className="admin-portal min-h-screen flex bg-admin-bg text-admin-on-background font-sans">
@@ -74,7 +76,7 @@ export default function AdminLayout() {
         <ul className="flex flex-col gap-2 border-t border-white/10 pt-4">
           {[{ icon: 'settings', label: 'Settings' }, { icon: 'logout', label: 'Log Out' }].map(({ icon, label }) => (
             <li key={label}>
-              <Link to="/login" className="flex items-center gap-3 px-4 py-2 text-admin-on-surface-variant hover:bg-white/5 rounded-lg transition-colors text-label-sm">
+              <Link to={`/${activeSlug}/admin/login`} className="flex items-center gap-3 px-4 py-2 text-admin-on-surface-variant hover:bg-white/5 rounded-lg transition-colors text-label-sm">
                 <span className="material-symbols-outlined text-[18px]">{icon}</span>
                 {label}
               </Link>

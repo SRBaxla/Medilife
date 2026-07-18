@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 
 // Layouts
@@ -16,6 +16,8 @@ import Booking from './pages/client/Booking'
 
 // Auth
 import Login from './pages/auth/Login'
+import Unauthorized from './pages/auth/Unauthorized'
+import ProtectedRoute from './components/common/ProtectedRoute'
 
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -33,6 +35,7 @@ import Help from './pages/patient/Help'
 
 function AnimatedRoutes() {
   const location = useLocation()
+  
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
@@ -46,26 +49,51 @@ function AnimatedRoutes() {
           <Route path="/booking" element={<Booking />} />
         </Route>
 
-        {/* Auth */}
-        <Route path="/login" element={<Login />} />
+        {/* Multi-Tenant Public Login routes */}
+        <Route path="/:tenantSlug/admin/login" element={<Login />} />
+        <Route path="/:tenantSlug/patient/login" element={<Login />} />
+        
+        {/* Global Fallback paths redirecting to Default Tenant Jhansi */}
+        <Route path="/login" element={<Navigate to="/jhansi-medilife-tenant-01/patient/login" replace />} />
+        <Route path="/admin/login" element={<Navigate to="/jhansi-medilife-tenant-01/admin/login" replace />} />
+        <Route path="/patient/login" element={<Navigate to="/jhansi-medilife-tenant-01/patient/login" replace />} />
+        <Route path="/403" element={<Unauthorized />} />
 
-        {/* Admin Portal */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="send-report" element={<SendReport />} />
+        {/* Protected Admin Portal (Requires 'admin' or 'lab_tech' roles) */}
+        <Route 
+          path="/:tenantSlug/admin" 
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'lab_tech']}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="reports" element={<SendReport />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="schedule" element={<DaySchedule />} />
         </Route>
 
-        {/* Patient Portal */}
-        <Route path="/portal" element={<PatientLayout />}>
-          <Route index element={<PatientDashboard />} />
+        {/* Protected Patient Portal (Requires 'patient' role) */}
+        <Route 
+          path="/:tenantSlug/patient" 
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <PatientLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<PatientDashboard />} />
           <Route path="reports" element={<Reports />} />
           <Route path="statistics" element={<Statistics />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
           <Route path="help" element={<Help />} />
         </Route>
+
+        {/* Redirect empty portals to dashboard */}
+        <Route path="/admin" element={<Navigate to="/jhansi-medilife-tenant-01/admin/dashboard" replace />} />
+        <Route path="/portal" element={<Navigate to="/jhansi-medilife-tenant-01/patient/dashboard" replace />} />
       </Routes>
     </AnimatePresence>
   )

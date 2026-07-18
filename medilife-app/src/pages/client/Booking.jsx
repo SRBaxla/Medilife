@@ -1,7 +1,9 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageTransition from '../../components/common/PageTransition'
+import TimeSlotPicker from '../../components/client/TimeSlotPicker';
+import { supabase } from '../../supabaseClient'
 
 const steps = ['Select Tests', 'Collection Method', 'Schedule', 'Patient Details', 'Confirm']
 
@@ -14,11 +16,182 @@ const sampleTests = [
   { name: 'Kidney Function Test', price: 549 },
 ]
 
+const DEFAULT_TENANT_ID = import.meta.env.VITE_DEFAULT_TENANT_ID || import.meta.env.NEXT_PUBLIC_CURRENT_TENANT_ID || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e';
+
 export default function Booking() {
+  const navigate = useNavigate()
+  const { tenantSlug } = useParams()
+  
   const [step, setStep] = useState(0)
   const [selected, setSelected] = useState([])
   const [collection, setCollection] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [selectedSlot, setSelectedSlot] = useState('')
+  const [bookedAppointments, setBookedAppointments] = useState([])
+  const [technicianCount, setTechnicianCount] = useState(3)
+
+  // Patient Input States
+  const [patientName, setPatientName] = useState('')
+  const [patientAge, setPatientAge] = useState('')
+  const [patientGender, setPatientGender] = useState('Male')
+  const [patientPhone, setPatientPhone] = useState('')
+  const [patientEmail, setPatientEmail] = useState('')
+  const [patientPassword, setPatientPassword] = useState('')
+  
+  // Submission / Overlay States
+  const [bookingLoading, setBookingLoading] = useState(false)
+  const [bookingError, setBookingError] = useState(null)
+  const [showLoginIntercept, setShowLoginIntercept] = useState(false)
+
+  // Tenant Context Resolution
+  const [resolvedTenant, setResolvedTenant] = useState(null)
+
+  useEffect(() => {
+    const resolveActiveTenant = async () => {
+      try {
+        const activeSlug = tenantSlug || 'jhansi-medilife-tenant-01'
+        const { data, error } = await supabase
+          .from('tenants')
+          .select('id, name, subdomain')
+          .eq('subdomain', activeSlug)
+          .single()
+        if (error) throw error
+        setResolvedTenant(data)
+      } catch (err) {
+        console.warn("Tenant lookup in Booking failed, fallback to default:", err)
+        setResolvedTenant({
+          id: DEFAULT_TENANT_ID,
+          name: 'Jhansi Medilife Pathology Lab',
+          subdomain: 'jhansi-medilife-tenant-01'
+        })
+      }
+    }
+    resolveActiveTenant()
+  }, [tenantSlug])
+
+  const getLocalDateStr = (d) => {
+    const yyyy = d.getFullYear()
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const dd = String(d.getDate()).padStart(2, '0')
+    return `${yyyy}-${mm}-${dd}`
+  }
+
+  const todayStr = getLocalDateStr(new Date())
+  const maxDate = new Date()
+  maxDate.setDate(maxDate.getDate() + 3)
+  const maxStr = getLocalDateStr(maxDate)
+
+  const [selectedDate, setSelectedDate] = useState(todayStr)
+
+  const handleConfirmBooking = async (e) => {
+    if (e) e.preventDefault();
+    setBookingLoading(true);
+    setBookingError(null);
+
+    try {
+      const tenantId = resolvedTenant?.id || DEFAULT_TENANT_ID;
+
+      // 1. Invoke RPC check_user_exists
+      const { data: checkData, error: checkError } = await supabase.rpc('check_user_exists', {
+        p_email: patientEmail,
+        p_phone: patientPhone,
+        p_tenant_id: tenantId
+      });
+
+      if (checkError) throw checkError;
+
+      const userExists = checkData && checkData.length > 0 && checkData[0].user_exists;
+
+      if (userExists) {
+        // 2. User exists: intercept UI to request credentials
+        setShowLoginIntercept(true);
+        setBookingLoading(false);
+        return;
+      }
+
+      // 3. User does not exist: provision new user via signUp
+      const tempPassword = 'TempBooking' + Math.random().toString(36).slice(-8) + '1!';
+      
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: patientEmail,
+        password: tempPassword,
+        options: {
+          data: {
+            full_name: patientName,
+            tenant_id: tenantId
+          }
+        }
+      });
+
+      if (authError) throw authError;
+
+      const userId = authData.user?.id;
+      if (!userId) throw new Error("Failed to retrieve generated user ID.");
+
+      // 4. Insert booking
+      console.log("Tenant ID being inserted:", tenantId);
+      const { error: insertError } = await supabase
+        .from('bookings')
+        .insert({
+          tenant_id: tenantId,
+          patient_id: userId,
+          booking_date: selectedDate,
+          time_slot: selectedSlot,
+          status: 'pending'
+        });
+
+      if (insertError) throw insertError;
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Booking submission error:", err);
+      setBookingError(err.message || "An unexpected error occurred during booking.");
+    } finally {
+      setBookingLoading(false);
+    }
+  };
+
+  const handleLoginAndConfirm = async (e) => {
+    if (e) e.preventDefault();
+    setBookingLoading(true);
+    setBookingError(null);
+
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: patientEmail,
+        password: patientPassword
+      });
+
+      if (authError) throw authError;
+
+      const userId = authData.user?.id;
+      if (!userId) throw new Error("Failed to sign in.");
+
+      const tenantId = resolvedTenant?.id || DEFAULT_TENANT_ID;
+
+      // Insert booking using existing user UUID
+      console.log("Tenant ID being inserted:", tenantId);
+      const { error: insertError } = await supabase
+        .from('bookings')
+        .insert({
+          tenant_id: tenantId,
+          patient_id: userId,
+          booking_date: selectedDate,
+          time_slot: selectedSlot,
+          status: 'pending'
+        });
+
+      if (insertError) throw insertError;
+
+      setShowLoginIntercept(false);
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Sign-in/booking submission error:", err);
+      setBookingError(err.message || "Invalid credentials or booking failed.");
+    } finally {
+      setBookingLoading(false);
+    }
+  };
 
   const toggle = (name) =>
     setSelected((prev) => prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name])
@@ -72,6 +245,40 @@ export default function Booking() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-xl">
           {/* Main step content */}
           <div className="lg:col-span-2">
+            {/* Form navigation at the top */}
+            <div className="flex gap-md mb-xl items-center pb-md border-b border-outline-variant/30">
+              {step > 0 && (
+                <button onClick={() => setStep((s) => s - 1)} className="btn-outline flex items-center gap-xs">
+                  <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+                  Back
+                </button>
+              )}
+              <div className="text-label-md text-on-surface-variant font-medium ml-xs">
+                Step {step + 1} of {steps.length}: <span className="text-on-surface font-bold">{steps[step]}</span>
+              </div>
+              {step < steps.length - 1 ? (
+                <button onClick={() => setStep((s) => s + 1)} className="btn-primary ml-auto flex items-center gap-xs"
+                  disabled={
+                    (step === 0 && selected.length === 0) || 
+                    (step === 2 && (!selectedDate || !selectedSlot)) ||
+                    (step === 3 && (!patientName || !patientAge || !patientPhone || !patientEmail))
+                  }
+                >
+                  Next
+                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </button>
+              ) : (
+                <button 
+                  onClick={handleConfirmBooking} 
+                  className="btn-primary ml-auto bg-emerald-600 hover:opacity-90 flex items-center gap-xs"
+                  disabled={bookingLoading}
+                >
+                  {bookingLoading ? 'Processing...' : 'Confirm Booking'}
+                  <span className="material-symbols-outlined text-[18px]">check</span>
+                </button>
+              )}
+            </div>
+
             <AnimatePresence mode="wait">
               <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
 
@@ -124,13 +331,19 @@ export default function Booking() {
                 {step === 2 && (
                   <div className="space-y-md">
                     <h2 className="text-headline-md font-bold text-on-surface">Choose a Time Slot</h2>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-sm">
-                      {['7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM'].map((slot) => (
-                        <button key={slot} className="py-sm px-md rounded-xl border border-outline-variant/30 bg-surface-container-lowest text-label-md text-on-surface hover:bg-secondary-container hover:text-primary hover:border-primary transition-all">
-                          {slot}
-                        </button>
-                      ))}
+                    {/* Date Picker for selecting appointment date */}
+                    <div className="mb-md">
+                      <label className="text-label-md text-on-surface-variant mb-xs block">Select Date</label>
+                      <input type="date" className="input-field" value={selectedDate} min={todayStr} max={maxStr} onChange={(e) => setSelectedDate(e.target.value)} />
                     </div>
+                    <TimeSlotPicker
+                      slots={['7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM']}
+                      booked={bookedAppointments}
+                      technicianCount={technicianCount}
+                      selected={selectedSlot}
+                      onSelect={setSelectedSlot}
+                      selectedDate={selectedDate}
+                    />
                   </div>
                 )}
 
@@ -138,13 +351,30 @@ export default function Booking() {
                   <div className="space-y-md">
                     <h2 className="text-headline-md font-bold text-on-surface">Patient Details</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-                      <div><label className="text-label-md text-on-surface-variant mb-xs block">Full Name *</label><input className="input-field" placeholder="Patient name" /></div>
-                      <div><label className="text-label-md text-on-surface-variant mb-xs block">Age *</label><input type="number" className="input-field" placeholder="Age" /></div>
-                      <div><label className="text-label-md text-on-surface-variant mb-xs block">Gender *</label>
-                        <select className="input-field"><option>Male</option><option>Female</option><option>Other</option></select>
+                      <div>
+                        <label className="text-label-md text-on-surface-variant mb-xs block">Full Name *</label>
+                        <input required className="input-field" placeholder="Patient name" value={patientName} onChange={(e) => setPatientName(e.target.value)} />
                       </div>
-                      <div><label className="text-label-md text-on-surface-variant mb-xs block">Phone *</label><input type="tel" className="input-field" placeholder="+91 xxxxxxxxxx" /></div>
-                      <div className="sm:col-span-2"><label className="text-label-md text-on-surface-variant mb-xs block">Email</label><input type="email" className="input-field" placeholder="email@example.com" /></div>
+                      <div>
+                        <label className="text-label-md text-on-surface-variant mb-xs block">Age *</label>
+                        <input required type="number" className="input-field" placeholder="Age" value={patientAge} onChange={(e) => setPatientAge(e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="text-label-md text-on-surface-variant mb-xs block">Gender *</label>
+                        <select className="input-field" value={patientGender} onChange={(e) => setPatientGender(e.target.value)}>
+                          <option>Male</option>
+                          <option>Female</option>
+                          <option>Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-label-md text-on-surface-variant mb-xs block">Phone *</label>
+                        <input required type="tel" className="input-field" placeholder="+91 xxxxxxxxxx" value={patientPhone} onChange={(e) => setPatientPhone(e.target.value)} />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="text-label-md text-on-surface-variant mb-xs block">Email *</label>
+                        <input required type="email" className="input-field" placeholder="email@example.com" value={patientEmail} onChange={(e) => setPatientEmail(e.target.value)} />
+                      </div>
                     </div>
                   </div>
                 )}
@@ -152,6 +382,12 @@ export default function Booking() {
                 {step === 4 && (
                   <div className="space-y-md">
                     <h2 className="text-headline-md font-bold text-on-surface">Confirm Booking</h2>
+                    {bookingError && !showLoginIntercept && (
+                      <div className="flex gap-xs text-error text-label-md p-md bg-error-container/10 rounded-xl border border-error/20">
+                        <span className="material-symbols-outlined text-[16px] text-error">error</span>
+                        <span>{bookingError}</span>
+                      </div>
+                    )}
                     <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 p-lg space-y-md">
                       <div className="flex gap-sm items-center">
                         <span className="material-symbols-outlined text-primary">science</span>
@@ -160,6 +396,14 @@ export default function Booking() {
                       <div className="flex gap-sm items-center">
                         <span className="material-symbols-outlined text-primary">{collection === 'home' ? 'home' : 'local_hospital'}</span>
                         <span className="font-label-md text-on-surface">Collection: <span className="font-bold capitalize">{collection || 'Not selected'}</span></span>
+                      </div>
+                      <div className="flex gap-sm items-center">
+                        <span className="material-symbols-outlined text-primary">calendar_month</span>
+                        <span className="font-label-md text-on-surface">Date: <span className="font-bold">{selectedDate || 'Not selected'}</span></span>
+                      </div>
+                      <div className="flex gap-sm items-center">
+                        <span className="material-symbols-outlined text-primary">schedule</span>
+                        <span className="font-label-md text-on-surface">Time Slot: <span className="font-bold">{selectedSlot || 'Not selected'}</span></span>
                       </div>
                       <div className="border-t border-outline-variant/30 pt-md flex justify-between items-center">
                         <span className="font-bold text-headline-md text-on-surface">Total</span>
@@ -171,28 +415,6 @@ export default function Booking() {
 
               </motion.div>
             </AnimatePresence>
-
-            <div className="flex gap-md mt-xl">
-              {step > 0 && (
-                <button onClick={() => setStep((s) => s - 1)} className="btn-outline">
-                  <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-                  Back
-                </button>
-              )}
-              {step < steps.length - 1 ? (
-                <button onClick={() => setStep((s) => s + 1)} className="btn-primary ml-auto"
-                  disabled={step === 0 && selected.length === 0}
-                >
-                  Next
-                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-                </button>
-              ) : (
-                <button onClick={() => setSubmitted(true)} className="btn-primary ml-auto bg-emerald-600 hover:opacity-90">
-                  Confirm Booking
-                  <span className="material-symbols-outlined text-[18px]">check</span>
-                </button>
-              )}
-            </div>
           </div>
 
           {/* Order summary sidebar */}
@@ -219,6 +441,75 @@ export default function Booking() {
           </div>
         </div>
       </div>
+      <AnimatePresence>
+        {showLoginIntercept && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-lg bg-black/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-surface-container-lowest max-w-md w-full rounded-2xl border border-outline-variant/30 p-xl shadow-clinical relative"
+            >
+              <button 
+                type="button"
+                onClick={() => setShowLoginIntercept(false)} 
+                className="absolute top-md right-md text-on-surface-variant hover:text-on-surface"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+
+              <div className="flex flex-col items-center text-center mb-lg">
+                <div className="w-12 h-12 rounded-full bg-secondary-container text-primary flex items-center justify-center mb-md">
+                  <span className="material-symbols-outlined">lock</span>
+                </div>
+                <h3 className="text-headline-md font-bold text-on-surface">Account Exists</h3>
+                <p className="text-body-md text-on-surface-variant mt-xs">
+                  An account is already linked with <span className="font-semibold text-primary">{patientEmail}</span>. Please verify your password to finalize your booking.
+                </p>
+              </div>
+
+              <form onSubmit={handleLoginAndConfirm} className="space-y-md">
+                <div>
+                  <label className="text-label-md text-on-surface-variant mb-xs block">Password</label>
+                  <input 
+                    required 
+                    type="password" 
+                    className="input-field" 
+                    placeholder="Enter your account password"
+                    value={patientPassword}
+                    onChange={(e) => setPatientPassword(e.target.value)}
+                  />
+                </div>
+
+                {bookingError && (
+                  <div className="flex gap-xs text-error text-label-md p-md bg-error-container/10 rounded-xl border border-error/20">
+                    <span className="material-symbols-outlined text-[16px] text-error">error</span>
+                    <span>{bookingError}</span>
+                  </div>
+                )}
+
+                <div className="flex gap-md mt-lg">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowLoginIntercept(false)} 
+                    className="btn-outline flex-1 justify-center"
+                    disabled={bookingLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn-primary flex-1 justify-center bg-primary text-on-primary"
+                    disabled={bookingLoading}
+                  >
+                    {bookingLoading ? 'Verifying...' : 'Log In & Book'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </PageTransition>
   )
 }
