@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pathology Care - Statistics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#eceef0",
+                        "surface": "#f7f9fb",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-dim": "#d8dadc",
+                        "on-background": "#191c1e",
+                        "secondary-container": "#d4e6e5",
+                        "background": "#f7f9fb",
+                        "primary-fixed": "#a3eeff",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "secondary": "#516161",
+                        "primary-container": "#008092",
+                        "inverse-primary": "#63d6ec",
+                        "outline": "#6d797c",
+                        "on-primary-container": "#f8fdff",
+                        "outline-variant": "#bcc9cc",
+                        "tertiary-fixed": "#dae2fd",
+                        "on-tertiary-fixed": "#131b2e",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#545c72",
+                        "secondary-fixed": "#d4e6e5",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#004e5a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "on-surface": "#191c1e",
+                        "on-secondary-container": "#576867",
+                        "surface-tint": "#006877",
+                        "on-tertiary-container": "#fefcff",
+                        "tertiary-container": "#6c748b",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "primary-fixed-dim": "#63d6ec",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#006574",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface-variant": "#3d494b",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary-fixed": "#001f25",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "64px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #F8FAFC;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-xxl">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-surface-variant dark:border-outline-variant shadow-sm flex justify-between items-center px-lg py-sm max-w-container-max mx-auto">
+<div class="flex items-center gap-sm">
+<img class="w-8 h-8 rounded-full object-cover" data-alt="A clean, minimalist portrait of a patient profile picture. Soft, diffused lighting typical of a high-end medical clinic environment. The background is a pure, sterile white to maintain the clinical aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOt3PBfPNq0yrAbC0ZVspcEvNQSh38An9-8VcI9kgk06zSkU7zOukXAbPI3ZRFjSEjM4dqSFq7lxkGwQy8y-vt358aeFUgV8EgJAoT9EwQrE68EX_u1QOz-ns9cfJxiY-F5Qck5gPw3YnQl64NczmO6eHwde-8xDdfpIrGbs7MNrmyJmEo13GIVvYvE0L-2E4o0RE28B0E55O_TwbIDnz_npmthRFGlEIWtZmAw9g2Fw6aQZBRAGd8"/>
+</div>
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Pathology Care</div>
+<button class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-150 ease-in-out p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-[72px] px-md md:px-lg max-w-container-max mx-auto md:hidden">
+<!-- Header & Date Chips -->
+<div class="py-lg">
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-surface mb-md">Health Stats</h1>
+<div class="flex gap-sm overflow-x-auto pb-2 scrollbar-hide">
+<button class="whitespace-nowrap px-4 py-2 rounded-xl bg-secondary-container text-on-secondary-container font-label-md text-label-md active:scale-95 transition-transform">Last 30 Days</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-xl bg-surface-container-low text-on-surface-variant font-label-md text-label-md border border-surface-variant active:scale-95 transition-transform">3 Months</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-xl bg-surface-container-low text-on-surface-variant font-label-md text-label-md border border-surface-variant active:scale-95 transition-transform">6 Months</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-xl bg-surface-container-low text-on-surface-variant font-label-md text-label-md border border-surface-variant active:scale-95 transition-transform">1 Year</button>
+</div>
+</div>
+<!-- Vertical Stack of Charts -->
+<div class="flex flex-col gap-lg">
+<!-- Hemoglobin Chart Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-surface-variant p-md shadow-[0_4px_12px_rgba(15,23,42,0.05)] relative overflow-hidden">
+<div class="flex justify-between items-start mb-md relative z-10">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Hemoglobin</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">g/dL</p>
+</div>
+<div class="bg-secondary-container px-3 py-1 rounded-xl flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">arrow_upward</span>
+<span class="font-label-sm text-label-sm text-primary">Normal</span>
+</div>
+</div>
+<div class="h-48 w-full flex items-end gap-2 relative z-10 px-2 pb-6 pt-4 border-b border-surface-variant/50">
+<!-- Chart Bars placeholder -->
+<div class="w-full bg-surface-container rounded-t-sm h-[60%] hover:bg-secondary-container transition-colors relative group">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface shadow-sm border border-surface-variant px-2 py-1 rounded font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity">13.2</div>
+</div>
+<div class="w-full bg-surface-container rounded-t-sm h-[65%] hover:bg-secondary-container transition-colors relative group">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface shadow-sm border border-surface-variant px-2 py-1 rounded font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity">13.5</div>
+</div>
+<div class="w-full bg-surface-container rounded-t-sm h-[55%] hover:bg-secondary-container transition-colors relative group">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface shadow-sm border border-surface-variant px-2 py-1 rounded font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity">12.9</div>
+</div>
+<div class="w-full bg-primary/80 rounded-t-sm h-[70%] relative group">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary shadow-sm px-2 py-1 rounded font-label-sm text-label-sm">14.1</div>
+</div>
+</div>
+<div class="flex justify-between mt-2 font-label-sm text-label-sm text-on-surface-variant px-2">
+<span>Oct 1</span>
+<span>Oct 8</span>
+<span>Oct 15</span>
+<span>Oct 22</span>
+</div>
+</div>
+<!-- Fasting Glucose Chart Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-surface-variant p-md shadow-[0_4px_12px_rgba(15,23,42,0.05)] relative overflow-hidden">
+<div class="flex justify-between items-start mb-md relative z-10">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Fasting Glucose</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">mg/dL</p>
+</div>
+<div class="bg-surface-container-highest px-3 py-1 rounded-xl flex items-center gap-1">
+<span class="font-label-sm text-label-sm text-on-surface">Elevated</span>
+</div>
+</div>
+<div class="h-48 w-full relative z-10 pb-6 border-b border-surface-variant/50 flex flex-col justify-end">
+<!-- Line Chart placeholder approach via SVG path -->
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M0 60 L 33 55 L 66 70 L 100 40" fill="none" stroke="#006574" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+<circle cx="0" cy="60" fill="#ffffff" r="3" stroke="#006574" stroke-width="2"></circle>
+<circle cx="33" cy="55" fill="#ffffff" r="3" stroke="#006574" stroke-width="2"></circle>
+<circle cx="66" cy="70" fill="#ffffff" r="3" stroke="#006574" stroke-width="2"></circle>
+<circle cx="100" cy="40" fill="#006574" r="4" stroke="#ffffff" stroke-width="2"></circle>
+</svg>
+<!-- Target Range Background -->
+<div class="absolute inset-0 top-[20%] bottom-[40%] bg-secondary-container/20 -z-10 rounded"></div>
+</div>
+<div class="flex justify-between mt-2 font-label-sm text-label-sm text-on-surface-variant px-2">
+<span>Oct 1</span>
+<span>Oct 8</span>
+<span>Oct 15</span>
+<span>Oct 22</span>
+</div>
+</div>
+<!-- Cholesterol Summary Card (No chart, just insight) -->
+<div class="bg-surface-container-lowest rounded-xl border border-surface-variant p-md shadow-[0_4px_12px_rgba(15,23,42,0.05)] flex items-center justify-between">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Cholesterol</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Pending latest lab results.</p>
+</div>
+<div class="h-12 w-12 bg-surface-container-low rounded-full flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">pending_actions</span>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-t border-surface-variant dark:border-outline-variant shadow-lg md:hidden">
+<div class="flex justify-around items-center h-xxl px-md w-full">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">description</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-on-secondary-container text-on-secondary-container dark:text-secondary-container rounded-xl px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Stats</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Settings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Help</span>
+</a>
+</div>
+</nav>
+</body></html>

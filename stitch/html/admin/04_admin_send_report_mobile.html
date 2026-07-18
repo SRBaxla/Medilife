@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medilife Admin - Send Report</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#095300",
+                        "secondary": "#d7ffc5",
+                        "secondary-container": "#2ff801",
+                        "tertiary": "#e9ecff",
+                        "on-background": "#d4e4fa",
+                        "on-secondary-container": "#0f6d00",
+                        "primary": "#c3f5ff",
+                        "on-primary-fixed": "#001f24",
+                        "surface-container": "#122131",
+                        "surface-container-lowest": "#010f1f",
+                        "surface-dim": "#051424",
+                        "tertiary-fixed": "#dee2f5",
+                        "surface-container-low": "#0d1c2d",
+                        "background": "#051424",
+                        "error": "#ffb4ab",
+                        "surface-bright": "#2c3a4c",
+                        "secondary-fixed-dim": "#2ae500",
+                        "on-tertiary-fixed-variant": "#424656",
+                        "on-primary-container": "#00626e",
+                        "outline": "#849396",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#1c2b3c",
+                        "surface-container-highest": "#273647",
+                        "primary-fixed": "#9cf0ff",
+                        "on-tertiary-fixed": "#161b29",
+                        "on-primary": "#00363d",
+                        "surface": "#051424",
+                        "on-surface": "#d4e4fa",
+                        "inverse-surface": "#d4e4fa",
+                        "on-tertiary-container": "#545968",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c2c6d8",
+                        "on-surface-variant": "#bac9cc",
+                        "on-secondary": "#053900",
+                        "primary-fixed-dim": "#00daf3",
+                        "on-primary-fixed-variant": "#004f58",
+                        "on-tertiary": "#2b303e",
+                        "tertiary-container": "#ccd0e3",
+                        "outline-variant": "#3b494c",
+                        "secondary-fixed": "#79ff5b",
+                        "inverse-on-surface": "#233143",
+                        "surface-variant": "#273647",
+                        "on-error": "#690005",
+                        "on-secondary-fixed": "#022100",
+                        "primary-container": "#00e5ff",
+                        "inverse-primary": "#006875",
+                        "surface-tint": "#00daf3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "12px",
+                        "stack-lg": "48px",
+                        "base": "8px",
+                        "gutter": "16px",
+                        "stack-md": "24px",
+                        "container-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "data-numeric": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "data-numeric": ["14px", { "lineHeight": "1.0", "letterSpacing": "0em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .clinical-input:focus {
+            outline: none;
+            border-color: #00E5FF;
+            box-shadow: 0 0 4px rgba(0, 229, 255, 0.5);
+        }
+        .hud-glow {
+            box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col pb-24 md:hidden">
+<!-- Top Navigation (Transactional intent, suppressed nav shell, manual back header) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-3xl border-b border-white/10 shadow-[0px_20px_40px_rgba(0,0,0,0.4)] flex justify-between items-center px-container-padding h-16 w-full">
+<button aria-label="Go Back" class="text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md-mobile text-headline-md-mobile font-bold text-primary tracking-tight">Send Report</h1>
+<div class="w-6"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 mt-16 px-container-padding py-stack-md flex flex-col gap-stack-md">
+<!-- Patient Selector -->
+<section class="glass-panel rounded-xl p-4 hud-glow">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant mb-3 uppercase">Patient Record</h2>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container text-on-surface font-data-numeric pl-10 pr-4 py-3 rounded-lg border border-white/5 clinical-input placeholder-on-surface-variant/50 transition-all duration-300" placeholder="Search ID or Name" type="text" value="PR-9924-A"/>
+</div>
+<!-- Selected Patient Card (Mock state after selection) -->
+<div class="mt-3 bg-surface-container/50 border border-white/5 rounded-lg p-3 flex items-center justify-between">
+<div>
+<p class="font-body-md text-on-surface">Alex Mercer</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">DOB: 1984-10-12 | M</p>
+</div>
+<div class="flex items-center gap-1 bg-secondary-fixed-dim/10 px-2 py-1 rounded">
+<span class="w-2 h-2 rounded-full bg-[#39FF14] animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-secondary-fixed-dim">Verified</span>
+</div>
+</div>
+</section>
+<!-- Clinical Results Input -->
+<section class="flex flex-col gap-base">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase px-1">Comprehensive Metabolic Panel</h2>
+<!-- Input Card 1 -->
+<div class="glass-panel rounded-xl p-4 hud-glow flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<label class="font-body-md text-on-surface" for="glucose">Glucose, Fasting</label>
+<span class="font-label-sm text-label-sm text-on-surface-variant">mg/dL</span>
+</div>
+<div class="flex gap-3 items-end">
+<input class="flex-1 bg-surface-container text-on-surface font-data-numeric px-3 py-3 rounded-lg border border-white/5 clinical-input transition-all duration-300 text-right text-lg" id="glucose" placeholder="0.0" type="number" value="105"/>
+<div class="w-16 text-right pb-1">
+<span class="font-label-sm text-label-sm text-error block">↑ High</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant/70">70-99</span>
+</div>
+</div>
+</div>
+<!-- Input Card 2 -->
+<div class="glass-panel rounded-xl p-4 hud-glow flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<label class="font-body-md text-on-surface" for="sodium">Sodium</label>
+<span class="font-label-sm text-label-sm text-on-surface-variant">mmol/L</span>
+</div>
+<div class="flex gap-3 items-end">
+<input class="flex-1 bg-surface-container text-on-surface font-data-numeric px-3 py-3 rounded-lg border border-white/5 clinical-input transition-all duration-300 text-right text-lg" id="sodium" placeholder="0" type="number" value="140"/>
+<div class="w-16 text-right pb-1">
+<span class="font-label-sm text-label-sm text-secondary-fixed block">Normal</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant/70">135-145</span>
+</div>
+</div>
+</div>
+<!-- Input Card 3 -->
+<div class="glass-panel rounded-xl p-4 hud-glow flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<label class="font-body-md text-on-surface" for="potassium">Potassium</label>
+<span class="font-label-sm text-label-sm text-on-surface-variant">mmol/L</span>
+</div>
+<div class="flex gap-3 items-end">
+<input class="flex-1 bg-surface-container text-on-surface font-data-numeric px-3 py-3 rounded-lg border border-white/5 clinical-input transition-all duration-300 text-right text-lg" id="potassium" placeholder="0.0" type="number"/>
+<div class="w-16 text-right pb-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Pending</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant/70">3.5-5.2</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Notes Section -->
+<section class="glass-panel rounded-xl p-4 hud-glow">
+<h2 class="font-label-sm text-label-sm text-on-surface-variant mb-3 uppercase">Clinical Notes</h2>
+<textarea class="w-full bg-surface-container text-on-surface font-body-md p-3 rounded-lg border border-white/5 clinical-input placeholder-on-surface-variant/50 min-h-[100px] transition-all duration-300" placeholder="Enter any relevant observations..."></textarea>
+</section>
+</main>
+<!-- Fixed Footer Action -->
+<footer class="fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-3xl border-t border-white/10 px-container-padding py-4 shadow-[0px_-20px_40px_rgba(0,0,0,0.5)]">
+<button class="w-full bg-primary-container text-black font-body-md font-semibold py-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform duration-200 shadow-[0_0_15px_rgba(0,229,255,0.3)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+            Transmit Report
+        </button>
+</footer>
+</body></html>

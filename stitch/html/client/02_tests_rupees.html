@@ -1,0 +1,297 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e0e3e5",
+                        "inverse-primary": "#63d6ec",
+                        "tertiary-container": "#6c748b",
+                        "surface-container": "#eceef0",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-container": "#d4e6e5",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "background": "#f7f9fb",
+                        "on-primary-fixed": "#001f25",
+                        "inverse-surface": "#2d3133",
+                        "on-surface-variant": "#3d494b",
+                        "outline": "#6d797c",
+                        "primary-container": "#008092",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-dim": "#d8dadc",
+                        "secondary-fixed": "#d4e6e5",
+                        "tertiary": "#545c72",
+                        "surface-variant": "#e0e3e5",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f7f9fb",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "secondary": "#516161",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "on-surface": "#191c1e",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "outline-variant": "#bcc9cc",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#dae2fd",
+                        "primary": "#006574",
+                        "on-tertiary-fixed": "#131b2e",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#004e5a",
+                        "on-background": "#191c1e",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "on-tertiary-container": "#fefcff",
+                        "on-primary-container": "#f8fdff",
+                        "surface-tint": "#006877",
+                        "primary-fixed-dim": "#63d6ec",
+                        "primary-fixed": "#a3eeff",
+                        "on-secondary-container": "#576867"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            background-color: #f7f9fb;
+            color: #191c1e;
+        }
+    </style>
+</head>
+<body class="font-['Inter']">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-[#f8fbfc] group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+<!-- Shared Header -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e6f3f4] px-4 md:px-10 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-[#0c1b1d]">
+<div class="size-4">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-[#0c1b1d] text-lg font-bold leading-tight tracking-[-0.015em]">Health Diagnostics</h2>
+</div>
+<label class="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-[#4596a1] flex border-none bg-[#e6f3f4] items-center justify-center pl-4 rounded-l-lg border-r-0" data-icon="MagnifyingGlass" data-size="24px" data-weight="regular">
+<span class="material-symbols-outlined">magnify_docked</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0c1b1d] focus:outline-0 focus:ring-0 border-none bg-[#e6f3f4] focus:border-none h-full placeholder:text-[#4596a1] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" placeholder="Search" value="">
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="flex gap-2">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#e6f3f4] text-[#0c1b1d] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<div class="text-[#0c1b1d]" data-icon="Bell" data-size="20px" data-weight="regular">
+<span class="material-symbols-outlined">notifications</span>
+</div>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#e6f3f4] text-[#0c1b1d] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<div class="text-[#0c1b1d]" data-icon="ShoppingCart" data-size="20px" data-weight="regular">
+<span class="material-symbols-outlined">shopping_cart</span>
+</div>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="A clean, professional portrait of a medical technician in a bright, modern diagnostic lab, captured with high-key lighting to emphasize cleanliness and efficiency. The style is professional and minimalist, reflecting the advanced healthcare technology environment." style="background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuAueMOWi3rqZZdNbvb3bvfw_TiIaFH2s6fH9hXWrZ8P3LepfPv3rm6_auXyv4CAsWit-99UkdufdqsHjCluhyU917ZLM6QhHX8UhyKlBtns9O_xrWVlQhzy7lhGQeLqpPSFnxDU01ISQVLoZIsYBGParP1qm9xrnztfmfC_Bk1Lu8wG7lwbs_fIW6Ng08U8E_vyVGEWio-mDQiziIxJDvV-EI48OIktK-zlLnZ-oobLRfxCnJ646w_y&quot;);"></div>
+</div>
+</header>
+<div class="flex flex-wrap justify-between gap-3 p-4">
+<div class="flex min-w-72 flex-col gap-3">
+<h1 class="text-[#0c1b1d] text-4xl font-black leading-tight tracking-[-0.033em]">Diagnostic Services</h1>
+<p class="text-[#4596a1] text-base font-normal leading-normal">Manage and book your health screenings with ease</p>
+</div>
+</div>
+<div class="pb-3">
+<div class="flex border-b border-[#cde6ea] px-4 gap-8">
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-[#009bb0] text-[#0c1b1d] pb-[13px] pt-4" href="#">
+<p class="text-[#0c1b1d] text-sm font-bold leading-normal tracking-[0.015em]">All Tests</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#4596a1] pb-[13px] pt-4" href="#">
+<p class="text-[#4596a1] text-sm font-bold leading-normal tracking-[0.015em]">Popular</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#4596a1] pb-[13px] pt-4" href="#">
+<p class="text-[#4596a1] text-sm font-bold leading-normal tracking-[0.015em]">Recommended</p>
+</a>
+</div>
+</div>
+<!-- Test List Section -->
+<div class="flex flex-col gap-1 p-4">
+<!-- CBC -->
+<div class="flex items-center gap-4 bg-surface-container-lowest border border-outline-variant/10 rounded-xl px-4 min-h-[80px] py-2 justify-between hover:bg-surface-container-low transition-colors duration-200 shadow-sm mb-2">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-secondary-container shrink-0 size-12" data-icon="Drop" data-size="24px" data-weight="regular">
+<span class="material-symbols-outlined">water_drop</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-on-surface text-base font-semibold leading-normal line-clamp-1">Complete Blood Count (CBC)</p>
+<p class="text-on-surface-variant text-sm font-normal leading-normal line-clamp-2">Measures red and white blood cells for overall health monitoring</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-on-primary text-sm font-bold leading-normal w-fit">
+<span class="truncate">₹150</span>
+</button>
+</div>
+</div>
+<!-- Comprehensive Metabolic Panel -->
+<div class="flex items-center gap-4 bg-surface-container-lowest border border-outline-variant/10 rounded-xl px-4 min-h-[80px] py-2 justify-between hover:bg-surface-container-low transition-colors duration-200 shadow-sm mb-2">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-secondary-container shrink-0 size-12" data-icon="Flask" data-size="24px" data-weight="regular">
+<span class="material-symbols-outlined">science</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-on-surface text-base font-semibold leading-normal line-clamp-1">Comprehensive Metabolic Panel</p>
+<p class="text-on-surface-variant text-sm font-normal leading-normal line-clamp-2">Monitors kidney and liver function, electrolytes, and fluid balance</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-on-primary text-sm font-bold leading-normal w-fit">
+<span class="truncate">₹450</span>
+</button>
+</div>
+</div>
+<!-- Chest X-Ray -->
+<div class="flex items-center gap-4 bg-surface-container-lowest border border-outline-variant/10 rounded-xl px-4 min-h-[80px] py-2 justify-between hover:bg-surface-container-low transition-colors duration-200 shadow-sm mb-2">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-secondary-container shrink-0 size-12" data-icon="Radiology" data-size="24px" data-weight="regular">
+<span class="material-symbols-outlined">radiology</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-on-surface text-base font-semibold leading-normal line-clamp-1">Chest X-Ray</p>
+<p class="text-on-surface-variant text-sm font-normal leading-normal line-clamp-2">Evaluates lungs, heart, and chest wall</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-on-primary text-sm font-bold leading-normal w-fit">
+<span class="truncate">₹1200</span>
+</button>
+</div>
+</div>
+<!-- BRCA1 & BRCA2 Screening -->
+<div class="flex items-center gap-4 bg-surface-container-lowest border border-outline-variant/10 rounded-xl px-4 min-h-[80px] py-2 justify-between hover:bg-surface-container-low transition-colors duration-200 shadow-sm mb-2">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-secondary-container shrink-0 size-12" data-icon="Dna" data-size="24px" data-weight="regular">
+<span class="material-symbols-outlined">dns</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-on-surface text-base font-semibold leading-normal line-clamp-1">BRCA1 &amp; BRCA2 Screening</p>
+<p class="text-on-surface-variant text-sm font-normal leading-normal line-clamp-2">Genetic screening for hereditary breast and ovarian cancer risk</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-on-primary text-sm font-bold leading-normal w-fit">
+<span class="truncate">₹3500</span>
+</button>
+</div>
+</div>
+<!-- Thyroid Function Panel -->
+<div class="flex items-center gap-4 bg-surface-container-lowest border border-outline-variant/10 rounded-xl px-4 min-h-[80px] py-2 justify-between hover:bg-surface-container-low transition-colors duration-200 shadow-sm mb-2">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-secondary-container shrink-0 size-12" data-icon="Thermostat" data-size="24px" data-weight="regular">
+<span class="material-symbols-outlined">thermostat</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-on-surface text-base font-semibold leading-normal line-clamp-1">Thyroid Function Panel</p>
+<p class="text-on-surface-variant text-sm font-normal leading-normal line-clamp-2">Measures TSH, T3, and T4 levels to check thyroid activity</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-on-primary text-sm font-bold leading-normal w-fit">
+<span class="truncate">₹800</span>
+</button>
+</div>
+</div>
+<!-- Urinalysis, Complete -->
+<div class="flex items-center gap-4 bg-surface-container-lowest border border-outline-variant/10 rounded-xl px-4 min-h-[80px] py-2 justify-between hover:bg-surface-container-low transition-colors duration-200 shadow-sm mb-2">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-secondary-container shrink-0 size-12" data-icon="Beaker" data-size="24px" data-weight="regular">
+<span class="material-symbols-outlined">biotech</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-on-surface text-base font-semibold leading-normal line-clamp-1">Urinalysis, Complete</p>
+<p class="text-on-surface-variant text-sm font-normal leading-normal line-clamp-2">Routine screening of urine for infections or metabolic conditions</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-on-primary text-sm font-bold leading-normal w-fit">
+<span class="truncate">₹300</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Recommendation Section -->
+<div class="p-4 mt-4">
+<h3 class="text-on-surface text-xl font-bold mb-4">Recommended for You</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-surface-container-low rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl">favorite</span>
+</div>
+<h4 class="text-on-surface font-bold text-lg">Annual Health Checkup</h4>
+<p class="text-on-surface-variant text-sm">A comprehensive bundle including CBC, Metabolic Panel, and Lipid Profile.</p>
+<div class="flex justify-between items-center mt-2">
+<span class="text-primary font-black text-lg">₹2500</span>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg text-sm font-bold">Book Bundle</button>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl">shield</span>
+</div>
+<h4 class="text-on-surface font-bold text-lg">Preventative Screening</h4>
+<p class="text-on-surface-variant text-sm">Advanced screening focused on early detection of common vital markers.</p>
+<div class="flex justify-between items-center mt-2">
+<span class="text-primary font-black text-lg">₹4200</span>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg text-sm font-bold">Book Bundle</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Promotional Banner -->
+<div class="m-4 rounded-2xl bg-primary-container p-6 text-on-primary-container flex items-center justify-between shadow-lg overflow-hidden relative">
+<div class="relative z-10">
+<h2 class="text-2xl font-black mb-2">First Lab Test?</h2>
+<p class="opacity-90 max-w-xs">Get an instant discount of ₹200 on your first diagnostic booking over ₹1000.</p>
+<button class="mt-4 bg-surface-container-lowest text-primary font-bold px-6 py-2 rounded-full hover:scale-105 transition-transform">Claim Offer</button>
+</div>
+<div class="hidden md:block">
+<span class="material-symbols-outlined text-8xl opacity-30">local_activity</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

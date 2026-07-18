@@ -1,0 +1,281 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>HealthPlus - Health Packages</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#eceef0",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary": "#545c72",
+                        "tertiary-container": "#6c748b",
+                        "surface-container-high": "#e6e8ea",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "tertiary-fixed": "#dae2fd",
+                        "surface-container-low": "#f2f4f6",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#fefcff",
+                        "on-primary-container": "#f8fdff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#63d6ec",
+                        "on-primary-fixed-variant": "#004e5a",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "surface-dim": "#d8dadc",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "inverse-surface": "#2d3133",
+                        "background": "#f7f9fb",
+                        "primary-fixed": "#a3eeff",
+                        "on-background": "#191c1e",
+                        "surface-bright": "#f7f9fb",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#006877",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001f25",
+                        "primary": "#006574",
+                        "on-tertiary-fixed": "#131b2e",
+                        "primary-fixed-dim": "#63d6ec",
+                        "on-surface-variant": "#3d494b",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#576867",
+                        "outline-variant": "#bcc9cc",
+                        "outline": "#6d797c",
+                        "on-surface": "#191c1e",
+                        "primary-container": "#008092",
+                        "secondary-fixed": "#d4e6e5",
+                        "secondary": "#516161",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#d4e6e5",
+                        "surface-variant": "#e0e3e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "40px",
+                        "sm": "8px",
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "unit": "4px",
+                        "xxl": "64px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background antialiased font-body-md selection:bg-primary-container selection:text-on-primary-container min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-surface group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-xl flex flex-1 justify-center py-5 max-sm:px-4">
+<div class="layout-content-container flex flex-col max-w-container-max w-full flex-1">
+<!-- Shared TopNavBar (Included as this is a browsing destination) -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-surface-container-high px-10 py-3 max-sm:px-4 rounded-xl bg-surface-container-lowest shadow-sm mb-6">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-6 text-primary">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-primary text-headline-md tracking-tight font-bold">HealthPlus</h2>
+</div>
+<div class="flex items-center gap-9 hidden md:flex">
+<a class="text-on-surface font-label-md hover:text-primary transition-colors" href="#">Home</a>
+<a class="text-on-surface font-label-md hover:text-primary transition-colors" href="#">Packages</a>
+<a class="text-on-surface font-label-md hover:text-primary transition-colors" href="#">Consultations</a>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<label class="flex flex-col min-w-40 !h-10 max-w-64 hidden sm:flex">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full border border-outline-variant bg-surface-container-lowest focus-within:border-primary transition-colors overflow-hidden">
+<div class="text-on-surface-variant flex items-center justify-center pl-4 bg-transparent border-none">
+<span class="material-symbols-outlined text-[20px]" data-icon="search" data-weight="regular">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-on-surface focus:outline-0 focus:ring-0 border-none bg-transparent placeholder:text-on-surface-variant px-4 text-body-md" placeholder="Search packages..." value="">
+</div>
+</label>
+<div class="flex gap-2">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-on-primary font-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm hidden sm:flex">
+<span class="truncate">Book Appointment</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Hero Section Placeholder -->
+<div class="w-full h-64 md:h-96 rounded-2xl overflow-hidden relative mb-8 shadow-sm">
+<img class="object-cover w-full h-full" data-alt="A bright, modern hospital reception area with a focus on a high-tech health checkup banner. The lighting is soft and natural, emphasizing cleanliness and professionalism. A clear, light mode aesthetic with subtle teal and white brand colors. Professional medical environment conveying trust and wellness." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDB9k8BxqFy1kyuyRVRIFhQLyEvKMcu4Hv4STXQnMEN52fef5NisodzfjhTdKlkxH2pUrb73iwqCOfLfkrYPTlhmbbanfC21d0hPkzMrcHtjNjL9wu2D88kqLHjR3OS6_JE4-ACUh-N98LwvwwdCaSgcosHxbov7vGc9Hmzc11XNnIRUjgW-yDw6-z2MteApq30CtcVJSholO0NOpa8n4Cm2rr2UjwP4m3TJmaCJIFFCKrKQeilryLb">
+<div class="absolute inset-0 bg-gradient-to-r from-on-background/80 to-transparent flex items-center p-8 md:p-12">
+<div class="max-w-xl text-surface-container-lowest">
+<h1 class="font-display-lg-mobile md:font-display-lg text-surface-container-lowest mb-4">Modular Checkups for Proactive Health</h1>
+<p class="font-body-lg text-surface-container-low mb-6">Take control of your well-being with Medilife's modular health screenings. Tailored packages designed for early detection and long-term vitality.</p>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md shadow-md hover:bg-primary-container transition-colors">View All Packages</button>
+</div>
+</div>
+</div>
+<!-- Main Content: Health Packages -->
+<div class="flex flex-wrap justify-between gap-3 p-4 mb-4">
+<div class="flex min-w-72 flex-col gap-3">
+<h2 class="text-on-background tracking-light font-headline-lg">Comprehensive Health Packages</h2>
+<p class="text-on-surface-variant font-body-md">Explore our comprehensive health screening packages designed for your well-being.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 py-3 pb-20">
+<!-- Package 1: Comprehensive -->
+<div class="flex flex-1 flex-col gap-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-1 bg-primary transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+<div class="flex flex-col gap-2">
+<div class="flex items-start justify-between gap-2">
+<h3 class="text-on-background font-headline-md text-xl leading-tight">Executive Health</h3>
+<span class="text-on-primary font-label-sm rounded-full bg-primary px-3 py-1 text-center shrink-0 shadow-sm">Best Value</span>
+</div>
+<div class="flex items-baseline gap-1 mt-2">
+<span class="text-on-background font-display-lg-mobile md:text-[40px] font-black tracking-tight text-primary">₹149</span>
+<span class="text-on-surface-variant font-label-md">/package</span>
+</div>
+</div>
+<p class="text-on-surface-variant font-body-md text-sm my-2">A complete overview of your health status with detailed analytics.</p>
+<button class="w-full cursor-pointer items-center justify-center rounded-lg h-11 bg-surface-container-high text-on-surface font-label-md hover:bg-primary hover:text-on-primary transition-colors mt-auto">
+                            Book Now
+                        </button>
+<div class="flex flex-col gap-3 mt-4 pt-4 border-t border-surface-container-highest">
+<div class="font-body-md text-sm flex gap-3 text-on-surface items-center">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check_circle">check_circle</span>
+                                80+ Lab Tests
+                            </div>
+<div class="font-body-md text-sm flex gap-3 text-on-surface items-center">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check_circle">check_circle</span>
+                                Doctor Consultation
+                            </div>
+<div class="font-body-md text-sm flex gap-3 text-on-surface items-center">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check_circle">check_circle</span>
+                                Diet Plan
+                            </div>
+<div class="font-body-md text-sm flex gap-3 text-on-surface items-center">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check_circle">check_circle</span>
+                                ECG &amp; X-Ray
+                            </div>
+</div>
+</div>
+<!-- Package 2: Basic -->
+<div class="flex flex-1 flex-col gap-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-1 bg-secondary transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+<div class="flex flex-col gap-2">
+<div class="flex items-start justify-between gap-2">
+<h3 class="text-on-background font-headline-md text-xl leading-tight">Women's Wellness</h3>
+<span class="text-on-secondary font-label-sm rounded-full bg-secondary px-3 py-1 text-center shrink-0 shadow-sm">Popular</span>
+</div>
+<div class="flex items-baseline gap-1 mt-2">
+<span class="text-on-background font-display-lg-mobile md:text-[40px] font-black tracking-tight">₹79</span>
+<span class="text-on-surface-variant font-label-md">/package</span>
+</div>
+</div>
+<p class="text-on-surface-variant font-body-md text-sm my-2">Essential tests to monitor your baseline health metrics effectively.</p>
+<button class="w-full cursor-pointer items-center justify-center rounded-lg h-11 bg-surface-container-high text-on-surface font-label-md hover:bg-secondary hover:text-on-secondary transition-colors mt-auto">
+                            Book Now
+                        </button>
+<div class="flex flex-col gap-3 mt-4 pt-4 border-t border-surface-container-highest">
+<div class="font-body-md text-sm flex gap-3 text-on-surface items-center">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle">check_circle</span>
+                                40+ Lab Tests
+                            </div>
+<div class="font-body-md text-sm flex gap-3 text-on-surface items-center">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle">check_circle</span>
+                                General Physician Consult
+                            </div>
+<div class="font-body-md text-sm flex gap-3 text-on-surface items-center">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle">check_circle</span>
+                                Basic BMI Check
+                            </div>
+</div>
+</div>
+<!-- Package 3: Cardiac -->
+<div class="flex flex-1 flex-col gap-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-1 bg-tertiary transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+<div class="flex flex-col gap-2">
+<div class="flex items-start justify-between gap-2">
+<h3 class="text-on-background font-headline-md text-xl leading-tight">Heart Health</h3>
+<span class="text-on-tertiary font-label-sm rounded-full bg-tertiary px-3 py-1 text-center shrink-0 shadow-sm">Specialized</span>
+</div>
+<div class="flex items-baseline gap-1 mt-2">
+<span class="text-on-background font-display-lg-mobile md:text-[40px] font-black tracking-tight">₹129</span>
+<span class="text-on-surface-variant font-label-md">/package</span>
+</div>
+</div>
+<p class="text-on-surface-variant font-body-md text-sm my-2">Focused screening for heart health and cardiovascular risks.</p>
+<button class="w-full cursor-pointer items-center justify-center rounded-lg h-11 bg-surface-container-high text-on-surface font-label-md hover:bg-tertiary hover:text-on-tertiary transition-colors mt-auto">
+                            Book Now
+                        </button>
+<div class="flex flex-col gap-3 mt-4 pt-4 border-t border-surface-container-highest">
+<div class="font-body-md text-sm flex gap-3 text-on-surface items-center">
+<span class="material-symbols-outlined text-tertiary text-[20px]" data-icon="check_circle">check_circle</span>
+                                Lipid Profile
+                            </div>
+<div class="font-body-md text-sm flex gap-3 text-on-surface items-center">
+<span class="material-symbols-outlined text-tertiary text-[20px]" data-icon="check_circle">check_circle</span>
+                                ECG
+                            </div>
+<div class="font-body-md text-sm flex gap-3 text-on-surface items-center">
+<span class="material-symbols-outlined text-tertiary text-[20px]" data-icon="check_circle">check_circle</span>
+                                Treadmill Test (TMT)
+                            </div>
+<div class="font-body-md text-sm flex gap-3 text-on-surface items-center">
+<span class="material-symbols-outlined text-tertiary text-[20px]" data-icon="check_circle">check_circle</span>
+                                Cardiologist Consult
+                            </div>
+</div>
+</div>
+<!-- Package 4: Executive -->
+
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+</body></html>

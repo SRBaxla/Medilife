@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Pathology Care - Reports</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#eceef0",
+                        "surface": "#f7f9fb",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-dim": "#d8dadc",
+                        "on-background": "#191c1e",
+                        "secondary-container": "#d4e6e5",
+                        "background": "#f7f9fb",
+                        "primary-fixed": "#a3eeff",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "secondary": "#516161",
+                        "primary-container": "#008092",
+                        "inverse-primary": "#63d6ec",
+                        "outline": "#6d797c",
+                        "on-primary-container": "#f8fdff",
+                        "outline-variant": "#bcc9cc",
+                        "tertiary-fixed": "#dae2fd",
+                        "on-tertiary-fixed": "#131b2e",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#545c72",
+                        "secondary-fixed": "#d4e6e5",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#004e5a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "on-surface": "#191c1e",
+                        "on-secondary-container": "#576867",
+                        "surface-tint": "#006877",
+                        "on-tertiary-container": "#fefcff",
+                        "tertiary-container": "#6c748b",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "primary-fixed-dim": "#63d6ec",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#006574",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface-variant": "#3d494b",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary-fixed": "#001f25",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "64px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #f7f9fb; /* background */
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+        
+        /* Hide scrollbar for cleaner mobile look */
+        ::-webkit-scrollbar { display: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-background antialiased font-body-md min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-surface-variant dark:border-outline-variant shadow-sm">
+<div class="flex justify-between items-center px-lg py-sm w-full max-w-container-max mx-auto h-[64px]">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-lowest shadow-sm flex-shrink-0">
+<img alt="Patient Avatar" class="w-full h-full object-cover" data-alt="A close-up, professional headshot of a diverse patient in a clean, brightly lit modern clinic environment. Soft, diffused lighting highlights clear skin. The background is a soft, out-of-focus medical white. Minimalist, clinical-humanist style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpSAL99rs4cGemqusR0gMWCdZLKXHPQgi6ev1TkYN85S3FAYEpJlDNl5naYOvM1znDMtVz3pD75jX3WO_PL1eR3h5ztIbS_xXDI9zVCSKkbXp_HQ5wsYtjOVzkmwUpuHk86M0YnkxK9JWJCCb4SGyHreYpAPIgf1axA8WhAprwdPn26CJ-sI5Wi3HWb4QvI__eb3HG14xgfRMjfVVDNLSkgnxrahiDIQFMXxqC1xHiv6402hCiI46z"/>
+</div>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed truncate">
+                Pathology Care
+            </h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors active:scale-95 duration-150 ease-in-out">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow pt-[88px] pb-[100px] px-md md:px-lg max-w-container-max mx-auto w-full">
+<!-- Page Header / Context -->
+<div class="mb-md">
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-on-background mb-xs">Medical Reports</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Review your recent test results and clinical documents.</p>
+</div>
+<!-- Filter/Search Bar (Lightweight) -->
+<div class="mb-lg flex gap-sm overflow-x-auto pb-2 -mx-md px-md snap-x">
+<button class="snap-start flex-shrink-0 px-4 py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md shadow-sm transition-transform active:scale-95">All</button>
+<button class="snap-start flex-shrink-0 px-4 py-2 rounded-xl bg-surface-container-lowest border border-outline-variant text-on-surface-variant font-label-md text-label-md shadow-sm transition-transform active:scale-95">Recent</button>
+<button class="snap-start flex-shrink-0 px-4 py-2 rounded-xl bg-surface-container-lowest border border-outline-variant text-on-surface-variant font-label-md text-label-md shadow-sm transition-transform active:scale-95">Blood Work</button>
+<button class="snap-start flex-shrink-0 px-4 py-2 rounded-xl bg-surface-container-lowest border border-outline-variant text-on-surface-variant font-label-md text-label-md shadow-sm transition-transform active:scale-95">Imaging</button>
+</div>
+<!-- Reports List (Bento-ish vertical list for mobile) -->
+<div class="flex flex-col gap-md">
+<!-- Report Card 1: New/Unread -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant shadow-sm relative overflow-hidden transition-all duration-200 active:scale-[0.98]">
+<!-- Subtle indicator for new report -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">science</span>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Comprehensive Metabolic Panel</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Oct 24, 2023</span>
+</div>
+<h3 class="font-headline-md text-body-lg font-semibold text-on-surface mb-xs">Fasting Blood Glucose &amp; Lipid Profile</h3>
+<div class="flex items-center gap-xs mb-md">
+<div class="px-2 py-1 bg-secondary-container text-on-secondary-container rounded-lg font-label-sm text-label-sm">
+                        Available
+                    </div>
+<span class="font-body-md text-[13px] text-on-surface-variant">Dr. Sarah Jenkins</span>
+</div>
+<button class="w-full py-2 bg-surface-container-low hover:bg-surface-container transition-colors rounded-lg flex items-center justify-center gap-xs text-primary font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm">visibility</span>
+                    View Report
+                </button>
+</div>
+<!-- Report Card 2: Read -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant shadow-sm transition-all duration-200 active:scale-[0.98]">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 0;">radiology</span>
+<span class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider">Imaging</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Oct 12, 2023</span>
+</div>
+<h3 class="font-headline-md text-body-lg font-semibold text-on-surface mb-xs">Chest X-Ray (PA &amp; Lateral)</h3>
+<div class="flex items-center gap-xs mb-md">
+<div class="px-2 py-1 bg-surface-container text-on-surface-variant rounded-lg font-label-sm text-label-sm">
+                        Reviewed
+                    </div>
+<span class="font-body-md text-[13px] text-on-surface-variant">City Imaging Center</span>
+</div>
+<button class="w-full py-2 bg-surface-container-low hover:bg-surface-container transition-colors rounded-lg flex items-center justify-center gap-xs text-primary font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm">visibility</span>
+                    View Report
+                </button>
+</div>
+<!-- Report Card 3: Processing -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant shadow-sm transition-all duration-200">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">biotech</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Urinalysis</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Today</span>
+</div>
+<h3 class="font-headline-md text-body-lg font-semibold text-on-surface mb-xs">Routine Urinalysis</h3>
+<div class="flex items-center gap-xs mb-md">
+<div class="px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed rounded-lg font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] animate-spin">sync</span>
+                        Processing
+                    </div>
+<span class="font-body-md text-[13px] text-on-surface-variant">Dr. Sarah Jenkins</span>
+</div>
+<button class="w-full py-2 bg-surface-container-lowest border border-surface-variant text-outline opacity-50 rounded-lg flex items-center justify-center gap-xs font-label-md text-label-md cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-sm">hourglass_empty</span>
+                    Results Pending
+                </button>
+</div>
+<!-- Report Card 4: Historical -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant shadow-sm transition-all duration-200 active:scale-[0.98]">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 0;">science</span>
+<span class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider">Blood Work</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Mar 15, 2023</span>
+</div>
+<h3 class="font-headline-md text-body-lg font-semibold text-on-surface mb-xs">Complete Blood Count (CBC)</h3>
+<div class="flex items-center gap-xs mb-md">
+<div class="px-2 py-1 bg-surface-container text-on-surface-variant rounded-lg font-label-sm text-label-sm">
+                        Reviewed
+                    </div>
+</div>
+<button class="w-full py-2 bg-surface-container-low hover:bg-surface-container transition-colors rounded-lg flex items-center justify-center gap-xs text-primary font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm">visibility</span>
+                    View Report
+                </button>
+</div>
+</div>
+<!-- End of List Indicator -->
+<div class="text-center mt-xl mb-lg">
+<span class="material-symbols-outlined text-outline-variant text-4xl mb-2">check_circle</span>
+<p class="font-label-md text-label-md text-on-surface-variant">You've reached the end of your history.</p>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 pb-safe bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-t border-surface-variant dark:border-outline-variant shadow-lg flex justify-around items-center h-xxl px-md">
+<!-- Active: Reports -->
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-on-secondary-container text-on-secondary-container dark:text-secondary-container rounded-xl px-4 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Reports</span>
+</a>
+<!-- Inactive: Stats -->
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 rounded-xl active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">insights</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Stats</span>
+</a>
+<!-- Inactive: Profile -->
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 rounded-xl active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
+</a>
+<!-- Inactive: Settings -->
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 rounded-xl active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Settings</span>
+</a>
+<!-- Inactive: Help -->
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 rounded-xl active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Help</span>
+</a>
+</nav>
+</body></html>

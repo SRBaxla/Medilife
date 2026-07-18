@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Path - Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#eceef0",
+                        "surface": "#f7f9fb",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-dim": "#d8dadc",
+                        "on-background": "#191c1e",
+                        "secondary-container": "#d4e6e5",
+                        "background": "#f7f9fb",
+                        "primary-fixed": "#a3eeff",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "secondary": "#516161",
+                        "primary-container": "#008092",
+                        "inverse-primary": "#63d6ec",
+                        "outline": "#6d797c",
+                        "on-primary-container": "#f8fdff",
+                        "outline-variant": "#bcc9cc",
+                        "tertiary-fixed": "#dae2fd",
+                        "on-tertiary-fixed": "#131b2e",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#545c72",
+                        "secondary-fixed": "#d4e6e5",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#004e5a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "on-surface": "#191c1e",
+                        "on-secondary-container": "#576867",
+                        "surface-tint": "#006877",
+                        "on-tertiary-container": "#fefcff",
+                        "tertiary-container": "#6c748b",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "primary-fixed-dim": "#63d6ec",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#006574",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface-variant": "#3d494b",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary-fixed": "#001f25",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "64px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f7f9fb; }
+        
+        /* Custom Toggle Switch Styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #006574;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #006574;
+        }
+        .toggle-checkbox:focus { outline: none; box-shadow: none; }
+        
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            box-shadow: 0px 4px 12px rgba(15, 23, 42, 0.05);
+        }
+    </style>
+</head>
+<body class="text-on-surface antialiased flex flex-col md:flex-row min-h-screen">
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden lg:flex flex-col h-screen fixed left-0 top-0 p-md space-y-sm bg-surface w-64 border-r border-surface-container-low">
+<div class="mb-xl px-sm">
+<h1 class="font-headline-md text-headline-md font-extrabold text-primary">Lumina Path</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1 uppercase tracking-wider">Patient Portal</p>
+</div>
+<div class="flex-1 space-y-unit">
+<a class="flex items-center space-x-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">insights</span>
+<span class="font-label-md text-label-md">Statistics</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm rounded-lg bg-secondary-container text-on-secondary-container transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings_suggest</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+<span class="font-label-md text-label-md">Help</span>
+</a>
+</div>
+<div class="mt-auto pt-xl">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-md rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                Book New Test
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 w-full lg:ml-64 pb-xxl md:pb-0">
+<!-- TopNavBar (Web) -->
+<header class="hidden md:flex sticky top-0 z-50 justify-between items-center px-lg py-md max-w-container-max mx-auto w-full bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm">
+<div class="flex items-center">
+<h2 class="font-headline-md text-headline-md font-bold text-primary lg:hidden mr-md">Lumina Path</h2>
+</div>
+<div class="flex items-center space-x-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-sm rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Patient Profile Avatar" class="w-full h-full object-cover" data-alt="A macro photography shot of a pristine, modern medical glass vial with a subtle teal glowing reflection, representing a patient profile avatar in a minimalist, light-mode clinical setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdkMLRsfSdXADN5kdMwG4cvQr3BezmAAub_Jce8S-3BsJb0xdp7W7yWyI-H98__JW9XQzae3wfKIJ1lIP5I_Pq5mwYszlbNUo8tKllyspw0cEUDVaEWgHKlpnBMBFDQTPDdX0xkSrHWwi9P9jCmilBWfMcryGjKPCGDwUuzeP_T3y3QelYOBPkkX5MirDYt5j860dhWbm9BEynos_yOeD_u2EFhrw2tQeRZwkikMcReQmzVwS9A8qu"/>
+</div>
+</div>
+</header>
+<!-- Top AppBar Mobile -->
+<header class="md:hidden sticky top-0 z-50 flex justify-between items-center px-md py-md w-full bg-surface/90 backdrop-blur-lg shadow-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Settings</h1>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Patient Profile Avatar" class="w-full h-full object-cover" data-alt="A clean, abstract 3D render of a frosted glass sphere resting on a pristine white surface, bathed in soft, diffused light, serving as a minimalist patient profile avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb9exETh-5gTvG3L1O_jWvbtrrS9dv6V9HH4wXo1Sg4hkvbSi0NagsTTQYMsNxICtcCwFvO_8wIA-Qy-RScofPvkOWIs-k9rWWEir4kqFYH0jy27Sh3mpkQjh-MpwspJCdazJHoJpLlza3eUPxGFqhzQ-rbToJSAnKc_UnjLl1PdaLZo_qAt4sovc3sLMBgcp8G-BfsYJ5Zr3h10kcpzhC3DKKjTA2Xwin52drXaLMB7sOJGGlG-oe"/>
+</div>
+</header>
+<!-- Page Canvas -->
+<div class="max-w-4xl mx-auto px-md md:px-lg py-xl">
+<div class="mb-xl hidden md:block">
+<h1 class="font-display-lg text-display-lg text-on-surface">Settings</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-sm max-w-2xl">Manage your account security, notification preferences, and privacy controls.</p>
+</div>
+<!-- Bento Grid Layout for Settings -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Security Column -->
+<div class="md:col-span-7 space-y-gutter">
+<!-- Account Security Card -->
+<section class="glass-panel rounded-xl p-lg">
+<div class="flex items-center space-x-sm mb-lg border-b border-surface-container-low pb-sm">
+<span class="material-symbols-outlined text-primary">security</span>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Account Security</h2>
+</div>
+<div class="space-y-lg">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-md">
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Password</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Last changed 3 months ago</p>
+</div>
+<button class="px-md py-sm rounded-lg bg-surface-container-low text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors self-start sm:self-auto border border-surface-container">
+                                    Change Password
+                                </button>
+</div>
+<div class="h-px bg-surface-container-highest w-full"></div>
+<div class="flex items-center justify-between">
+<div class="pr-md">
+<h3 class="font-label-md text-label-md text-on-surface">Two-Factor Authentication (2FA)</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Add an extra layer of security to your account.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300" id="toggle_2fa" name="toggle_2fa" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300" for="toggle_2fa"></label>
+</div>
+</div>
+</div>
+</section>
+<!-- Privacy Settings Card -->
+<section class="glass-panel rounded-xl p-lg">
+<div class="flex items-center space-x-sm mb-lg border-b border-surface-container-low pb-sm">
+<span class="material-symbols-outlined text-primary">visibility_off</span>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Privacy</h2>
+</div>
+<div class="space-y-lg">
+<div class="flex items-center justify-between">
+<div class="pr-md">
+<h3 class="font-label-md text-label-md text-on-surface">Data Sharing with Practitioners</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Allow affiliated doctors to view your test history.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300" id="toggle_data_sharing" name="toggle_data_sharing" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300" for="toggle_data_sharing"></label>
+</div>
+</div>
+<div class="h-px bg-surface-container-highest w-full"></div>
+<div class="flex items-center justify-between">
+<div class="pr-md">
+<h3 class="font-label-md text-label-md text-on-surface">Anonymous Analytics</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Help us improve the portal by sharing usage data.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300" id="toggle_analytics" name="toggle_analytics" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300" for="toggle_analytics"></label>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Notifications Column -->
+<div class="md:col-span-5">
+<section class="glass-panel rounded-xl p-lg h-full">
+<div class="flex items-center space-x-sm mb-lg border-b border-surface-container-low pb-sm">
+<span class="material-symbols-outlined text-primary">notifications_active</span>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Notifications</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">Choose how you want to be alerted about new clinical results and appointments.</p>
+<div class="space-y-lg">
+<!-- Email Toggle -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-md rounded-lg border border-surface-container">
+<div class="flex items-center space-x-md">
+<div class="h-10 w-10 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">mail</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Email Alerts</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-xs mt-0.5">Results &amp; Summaries</p>
+</div>
+</div>
+<div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300" id="toggle_email" name="toggle_email" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300" for="toggle_email"></label>
+</div>
+</div>
+<!-- SMS Toggle -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-md rounded-lg border border-surface-container">
+<div class="flex items-center space-x-md">
+<div class="h-10 w-10 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">sms</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">SMS Texts</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-xs mt-0.5">Urgent Updates Only</p>
+</div>
+</div>
+<div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300" id="toggle_sms" name="toggle_sms" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300" for="toggle_sms"></label>
+</div>
+</div>
+<!-- Push Toggle -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-md rounded-lg border border-surface-container">
+<div class="flex items-center space-x-md">
+<div class="h-10 w-10 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">smartphone</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Push Notifications</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-xs mt-0.5">App updates &amp; reminders</p>
+</div>
+</div>
+<div class="relative inline-block w-12 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300" id="toggle_push" name="toggle_push" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300" for="toggle_push"></label>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- Danger Zone -->
+<div class="mt-xxl border border-error-container rounded-xl p-lg bg-surface-container-lowest">
+<h2 class="font-headline-md text-headline-md text-error mb-sm">Danger Zone</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Permanently delete your account and all associated medical records. This action cannot be undone.</p>
+<button class="px-lg py-sm rounded-lg bg-error-container text-on-error-container font-label-md text-label-md hover:opacity-90 transition-opacity">
+                     Delete Account
+                 </button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/90 backdrop-blur-lg rounded-t-xl border-t border-outline-variant/20 shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-90 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">description</span>
+<span class="font-label-sm text-label-sm">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-90 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">insights</span>
+<span class="font-label-sm text-label-sm">Stats</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-90 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1 transition-transform active:scale-90 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-sm text-label-sm">Settings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-transform active:scale-90 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">help</span>
+<span class="font-label-sm text-label-sm">Help</span>
+</a>
+</nav>
+<script>
+        // Simple script to handle toggle visuals if needed for older browsers, 
+        // though CSS handles the heavy lifting here.
+        document.querySelectorAll('.toggle-checkbox').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                // Future integration point for saving preferences
+            });
+        });
+    </script>
+</body></html>

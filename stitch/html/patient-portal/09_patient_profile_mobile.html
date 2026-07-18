@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Patient Profile - Pathology Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#eceef0",
+                        "surface": "#f7f9fb",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-dim": "#d8dadc",
+                        "on-background": "#191c1e",
+                        "secondary-container": "#d4e6e5",
+                        "background": "#f7f9fb",
+                        "primary-fixed": "#a3eeff",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "secondary": "#516161",
+                        "primary-container": "#008092",
+                        "inverse-primary": "#63d6ec",
+                        "outline": "#6d797c",
+                        "on-primary-container": "#f8fdff",
+                        "outline-variant": "#bcc9cc",
+                        "tertiary-fixed": "#dae2fd",
+                        "on-tertiary-fixed": "#131b2e",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#545c72",
+                        "secondary-fixed": "#d4e6e5",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#004e5a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "on-surface": "#191c1e",
+                        "on-secondary-container": "#576867",
+                        "surface-tint": "#006877",
+                        "on-tertiary-container": "#fefcff",
+                        "tertiary-container": "#6c748b",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "primary-fixed-dim": "#63d6ec",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#006574",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface-variant": "#3d494b",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary-fixed": "#001f25",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "64px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f7f9fb; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface antialiased flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-surface-variant dark:border-outline-variant shadow-sm pt-safe">
+<div class="flex justify-between items-center px-lg py-sm w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Profile Avatar" class="w-full h-full object-cover" data-alt="A close-up, softly lit portrait of a professional individual against a clean, clinical white background. The lighting is high-key and flattering, emphasizing a trustworthy and calm demeanor suitable for a medical profile avatar. Soft focus on the background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAsjAJePKkzwwvVGxfCEVgqZEWHrPm18Wy4fAnnTb5XK33ge-Teom6Bbm6kl2IHG95gTmzSsSnFSIIqhi1VnnAe2L4ikmwm2xmWXX8otfrtG7fS4ZNmWeKSD-XSsEbbM_OUv99WsemN1DfqwximgtFh_yIgNkUibw2JPf7IedAPrExrXioMiCuMmacmQ69WTeDQxcAAG2OnhMxNSNB2zVWVsbpAprICad-jg0lYDsWbq-ZZKjxcrJr"/>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Pathology Care</span>
+</div>
+<button class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-150 ease-in-out p-2 rounded-full">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-container-max mx-auto px-md pt-[90px] pb-[100px] flex flex-col gap-lg">
+<!-- Profile Header Card (Glassmorphism) -->
+<section class="glass-panel rounded-xl shadow-[0px_12px_32px_rgba(15,23,42,0.05)] border border-surface-container p-lg flex flex-col items-center text-center mt-md">
+<div class="relative mb-md">
+<div class="w-24 h-24 rounded-full overflow-hidden border-4 border-surface shadow-sm">
+<img alt="Patient Profile" class="w-full h-full object-cover" data-alt="A high-quality, professional headshot of a patient, well-lit with soft, natural light against a pristine white medical background. The subject appears relaxed and confident, fitting the sterile-humanist aesthetic of a modern digital health portal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3GvoPpFREPAVAvUqjRhfskdc_qYPODVIYFcoNmHlN_3VgfdcwM8EEufsSbDRTbSTXH_g8GJ6xLPvFvAiMoUQZ8yxElA4dPWtVMjh6N5MHqpJK5bE-07glRmhhedKf84Iq2g8FMsUZK0N3JdpyBkewkQ_0RKdn7HLvm9W7yPzx1GY9npyRWwTBHHc68dUIcHuGbXfCYikPIqTuJvSxA-3s0ZO2VeuzWv0VJZPUkvVX2Mkm0cJefyWZ"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-primary text-on-primary rounded-full p-1 shadow-md hover:bg-primary-container transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface mb-xs">Eleanor Vance</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Patient ID: #PC-84729</p>
+</section>
+<!-- Key Stats Bento -->
+<section class="grid grid-cols-2 gap-md">
+<div class="bg-surface-container-lowest rounded-xl p-md border border-surface-container shadow-[0px_4px_12px_rgba(15,23,42,0.02)] flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-primary mb-xs" style="font-variation-settings: 'FILL' 1;">bloodtype</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-xs">Blood Group</span>
+<span class="font-headline-md text-headline-md text-on-surface font-bold">O+</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-md border border-surface-container shadow-[0px_4px_12px_rgba(15,23,42,0.02)] flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-primary mb-xs" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-xs">Age</span>
+<span class="font-headline-md text-headline-md text-on-surface font-bold">34</span>
+</div>
+</section>
+<!-- Personal Details List -->
+<section class="bg-surface-container-lowest rounded-xl border border-surface-container shadow-[0px_4px_12px_rgba(15,23,42,0.02)] overflow-hidden">
+<h2 class="font-label-md text-label-md text-on-surface-variant px-md py-sm bg-surface-container-low border-b border-surface-container uppercase tracking-widest">Personal Details</h2>
+<div class="flex flex-col">
+<!-- Detail Item -->
+<div class="flex items-start gap-md p-md border-b border-surface-container hover:bg-surface transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant mt-xs">mail</span>
+<div class="flex-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Email</p>
+<p class="font-body-md text-body-md text-on-surface">eleanor.vance@example.com</p>
+</div>
+</div>
+<!-- Detail Item -->
+<div class="flex items-start gap-md p-md border-b border-surface-container hover:bg-surface transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant mt-xs">call</span>
+<div class="flex-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Phone</p>
+<p class="font-body-md text-body-md text-on-surface">+1 (555) 019-2834</p>
+</div>
+</div>
+<!-- Detail Item -->
+<div class="flex items-start gap-md p-md hover:bg-surface transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant mt-xs">home</span>
+<div class="flex-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Address</p>
+<p class="font-body-md text-body-md text-on-surface">1248 Medical Parkway, Suite 300<br/>San Francisco, CA 94143</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-t border-surface-variant dark:border-outline-variant shadow-lg md:hidden">
+<div class="flex justify-around items-center h-xxl px-md w-full">
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 active:scale-90 transition-transform duration-200 rounded-xl group">
+<span class="material-symbols-outlined mb-1 group-hover:text-primary transition-colors">description</span>
+<span class="font-label-sm text-label-sm-mobile group-hover:text-primary transition-colors">Reports</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 active:scale-90 transition-transform duration-200 rounded-xl group">
+<span class="material-symbols-outlined mb-1 group-hover:text-primary transition-colors">insights</span>
+<span class="font-label-sm text-label-sm-mobile group-hover:text-primary transition-colors">Stats</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container dark:bg-on-secondary-container text-on-secondary-container dark:text-secondary-container rounded-xl px-4 py-1 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-sm text-label-sm-mobile font-bold">Profile</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 active:scale-90 transition-transform duration-200 rounded-xl group">
+<span class="material-symbols-outlined mb-1 group-hover:text-primary transition-colors">settings</span>
+<span class="font-label-sm text-label-sm-mobile group-hover:text-primary transition-colors">Settings</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-high/50 dark:hover:bg-surface-variant/50 active:scale-90 transition-transform duration-200 rounded-xl group">
+<span class="material-symbols-outlined mb-1 group-hover:text-primary transition-colors">help</span>
+<span class="font-label-sm text-label-sm-mobile group-hover:text-primary transition-colors">Help</span>
+</button>
+</div>
+</nav>
+</body></html>

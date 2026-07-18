@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medilife Pathology - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#d8dadc",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "on-primary-fixed-variant": "#004e5a",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#63d6ec",
+                        "tertiary-fixed": "#dae2fd",
+                        "surface-container-low": "#f2f4f6",
+                        "on-tertiary-container": "#fefcff",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#f8fdff",
+                        "tertiary-container": "#6c748b",
+                        "surface-container-high": "#e6e8ea",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary": "#545c72",
+                        "surface-container": "#eceef0",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-container": "#d4e6e5",
+                        "on-surface": "#191c1e",
+                        "primary-container": "#008092",
+                        "secondary-fixed": "#d4e6e5",
+                        "secondary": "#516161",
+                        "outline-variant": "#bcc9cc",
+                        "outline": "#6d797c",
+                        "on-secondary-container": "#576867",
+                        "on-surface-variant": "#3d494b",
+                        "on-secondary": "#ffffff",
+                        "primary": "#006574",
+                        "on-primary-fixed": "#001f25",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#131b2e",
+                        "primary-fixed-dim": "#63d6ec",
+                        "surface-bright": "#f7f9fb",
+                        "surface-tint": "#006877",
+                        "error-container": "#ffdad6",
+                        "surface": "#f7f9fb",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#a3eeff",
+                        "on-background": "#191c1e",
+                        "inverse-surface": "#2d3133",
+                        "background": "#f7f9fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "4px",
+                        "xxl": "64px",
+                        "xl": "40px",
+                        "sm": "8px",
+                        "container-max": "1280px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #cbd5e1;
+        }
+        
+        /* Chart specific styles */
+        .chart-grid-line {
+            stroke: #F1F5F9;
+            stroke-width: 1;
+        }
+        .chart-path-primary {
+            stroke: #006574;
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .chart-point {
+            fill: #ffffff;
+            stroke: #006574;
+            stroke-width: 2;
+        }
+        .chart-point:hover {
+            fill: #006574;
+            r: 6;
+            transition: all 0.2s ease;
+        }
+        .chart-area {
+            fill: url(#tealGradient);
+            opacity: 0.2;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar (from JSON) -->
+<nav class="hidden md:flex bg-surface dark:bg-inverse-surface border-r border-outline-variant/20 flex-col gap-unit h-full p-md w-64 pt-xxl fixed left-0 top-0 z-40">
+<!-- Header -->
+<div class="flex flex-col items-center mb-xl">
+<div class="w-16 h-16 rounded-full bg-surface-container-low border border-outline-variant/30 flex items-center justify-center mb-md shadow-sm overflow-hidden">
+<img alt="Clinic logo" class="w-10 h-10 object-contain" data-alt="A stylized, clean vector logo of a medical cross merging with a microscope lens, rendered in clinical teal and soft medical blue against a pure white background. Minimalist, professional, sharp edges." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuJMVj-922CZuivLYHov254palajxwrtj88wMMGUPZA0-YZO2laKb7VIcqRq-jHUPnzmh7moK_MqZp42WdGKIGcTKFtcM88dgPVUW8PqPQM8QOgH0NKgra-Xqr6bwylQs36ua9SwZW_aBC4jqeL9CEc4Q1EhzlMqbjmT3KP3e2pF4rcMORklXvyAsKjblZtrzhmvqX5tACBJCmGLSXTo6Y8W9CO1m3GTz_rxKwk53ntJIQl5izB3O1"/>
+</div>
+<h1 class="font-headline-sm text-headline-sm text-primary text-center">Pathology Portal</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-sm">Clinical Excellence</p>
+</div>
+<!-- CTA -->
+<button class="w-full bg-primary text-on-primary font-label-md py-sm px-md rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 mb-lg flex items-center justify-center gap-sm group">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">add_circle</span>
+            Book New Test
+        </button>
+<!-- Main Navigation -->
+<div class="flex flex-col gap-xs flex-grow">
+<a class="bg-secondary-container text-on-secondary-container font-bold rounded-lg flex items-center gap-md px-md py-sm font-label-md select-none" href="#">
+<span class="material-symbols-outlined icon-fill">dashboard</span>
+                Dashboard
+            </a>
+<a class="text-on-surface-variant hover:bg-surface-container-low hover:translate-x-1 transition-all duration-200 rounded-lg flex items-center gap-md px-md py-sm font-label-md select-none" href="#">
+<span class="material-symbols-outlined">description</span>
+                Reports
+            </a>
+<a class="text-on-surface-variant hover:bg-surface-container-low hover:translate-x-1 transition-all duration-200 rounded-lg flex items-center gap-md px-md py-sm font-label-md select-none" href="#">
+<span class="material-symbols-outlined">insights</span>
+                Statistics
+            </a>
+<a class="text-on-surface-variant hover:bg-surface-container-low hover:translate-x-1 transition-all duration-200 rounded-lg flex items-center gap-md px-md py-sm font-label-md select-none" href="#">
+<span class="material-symbols-outlined">person</span>
+                Profile
+            </a>
+</div>
+<!-- Footer Navigation -->
+<div class="flex flex-col gap-xs mt-auto pt-lg border-t border-outline-variant/20">
+<a class="text-on-surface-variant hover:bg-surface-container-low hover:translate-x-1 transition-all duration-200 rounded-lg flex items-center gap-md px-md py-sm font-label-md select-none" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="text-on-surface-variant hover:bg-surface-container-low hover:translate-x-1 transition-all duration-200 rounded-lg flex items-center gap-md px-md py-sm font-label-md select-none" href="#">
+<span class="material-symbols-outlined">help</span>
+                Help
+            </a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-0 md:ml-64 flex flex-col min-h-screen">
+<!-- TopAppBar (Mobile Only - Simplified version of TopNavBar JSON to handle responsiveness) -->
+<header class="md:hidden bg-surface/80 backdrop-blur-xl fixed top-0 w-full z-50 border-b border-outline-variant/30 shadow-sm flex justify-between items-center px-lg py-sm h-16">
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Lumina PathLabs</h1>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:bg-surface-container-low p-sm rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30 cursor-pointer active:scale-95 transition-transform">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A small, professional headshot of an individual, well-lit, soft white background, clinical environment context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmuXPjm4fkt-oAGDDn-m4_T91xlTuLZqanL5QgRPNPJuPo9wTkT56fc468PmGZxwu0KrFFmp-RUja5iSG3AvZ9vLwyDsDqGmfk5MMjia8jcwoevBCphdd3RTzQxTXXN0gtLeXWhKUCHQ9EcFhzeoMshPEv930sAstSDMqkkVoBr4HoBy6ljb_VBG6psrRBQwJRwTaSs5OP_zhpfWaUCfjURiWSwLUSL69pMFm7N0QF4Tc37YZ-0qV6"/>
+</div>
+</div>
+</header>
+<!-- Scrollable Content Area -->
+<div class="flex-1 p-lg md:p-xl lg:p-xxl mt-16 md:mt-0 max-w-container-max mx-auto w-full space-y-xl">
+<!-- Welcome Header -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Welcome back, John.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Here is an overview of your recent pathological data.</p>
+</div>
+<div class="flex items-center gap-sm bg-surface-container-lowest border border-outline-variant/30 rounded-full px-md py-sm shadow-sm">
+<span class="material-symbols-outlined text-primary">calendar_today</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Today: Oct 24, 2024</span>
+</div>
+</header>
+<!-- Quick Summary Cards (Bento Grid Style) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant/30 shadow-[0_4px_12px_rgba(15,23,42,0.02)] hover:shadow-[0_8px_24px_rgba(15,23,42,0.06)] transition-shadow duration-300 flex flex-col relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<div class="w-10 h-10 rounded-full bg-secondary-container text-primary flex items-center justify-center mb-md z-10">
+<span class="material-symbols-outlined">biotech</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-xs z-10">Total Tests</h3>
+<div class="flex items-baseline gap-sm z-10">
+<span class="font-display-lg-mobile text-display-lg-mobile text-on-surface">14</span>
+<span class="font-label-sm text-label-sm text-outline">Lifetime</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant/30 shadow-[0_4px_12px_rgba(15,23,42,0.02)] hover:shadow-[0_8px_24px_rgba(15,23,42,0.06)] transition-shadow duration-300 flex flex-col relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<div class="w-10 h-10 rounded-full bg-secondary-container text-primary flex items-center justify-center mb-md z-10">
+<span class="material-symbols-outlined">assignment</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-xs z-10">Latest Report</h3>
+<div class="flex items-baseline gap-sm z-10">
+<span class="font-headline-md text-headline-md text-on-surface">Oct 12, 2024</span>
+</div>
+<div class="mt-sm flex items-center gap-xs z-10">
+<span class="w-2 h-2 rounded-full bg-[#10b981]"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">CBC Panel - Normal</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant/30 shadow-[0_4px_12px_rgba(15,23,42,0.02)] hover:shadow-[0_8px_24px_rgba(15,23,42,0.06)] transition-shadow duration-300 flex flex-col relative overflow-hidden group border-l-4 border-l-primary">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-md z-10">
+<span class="material-symbols-outlined">event</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-xs z-10">Next Health Check</h3>
+<div class="flex items-baseline gap-sm z-10">
+<span class="font-headline-md text-headline-md text-on-surface">Apr 2025</span>
+</div>
+<p class="font-label-sm text-label-sm text-outline mt-sm z-10">Annual Wellness Panel recommended.</p>
+</div>
+</section>
+<!-- Main Data Section (Asymmetric Grid) -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-lg">
+<!-- Health Trends Chart (Spans 2 columns) -->
+<section class="xl:col-span-2 bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_4px_12px_rgba(15,23,42,0.02)] p-lg flex flex-col h-[400px]">
+<header class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">monitoring</span>
+                            Health Trends
+                        </h3>
+<!-- Custom Select Dropdown -->
+<div class="relative">
+<select class="appearance-none bg-surface border border-outline-variant/50 text-on-surface font-label-md rounded-lg pl-md pr-xl py-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm cursor-pointer">
+<option value="hgb">Hemoglobin (g/dL)</option>
+<option value="chol">Total Cholesterol (mg/dL)</option>
+<option value="glu">Fasting Glucose (mg/dL)</option>
+</select>
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">arrow_drop_down</span>
+</div>
+</header>
+<!-- Chart Canvas Area (SVG Implementation for precise design control) -->
+<div class="flex-1 w-full relative pt-md">
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 800 250">
+<defs>
+<lineargradient id="tealGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#006574" stop-opacity="0.4"></stop>
+<stop offset="100%" stop-color="#006574" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid Lines -->
+<path class="chart-grid-line" d="M 50 50 L 780 50"></path>
+<path class="chart-grid-line" d="M 50 100 L 780 100"></path>
+<path class="chart-grid-line" d="M 50 150 L 780 150"></path>
+<path class="chart-grid-line" d="M 50 200 L 780 200"></path>
+<!-- Y-Axis Labels -->
+<text fill="#6d797c" font-family="Inter" font-size="12" text-anchor="end" x="40" y="55">16.0</text>
+<text fill="#6d797c" font-family="Inter" font-size="12" text-anchor="end" x="40" y="105">14.0</text>
+<text fill="#6d797c" font-family="Inter" font-size="12" text-anchor="end" x="40" y="155">12.0</text>
+<text fill="#6d797c" font-family="Inter" font-size="12" text-anchor="end" x="40" y="205">10.0</text>
+<!-- Data Area & Line -->
+<!-- Points: (100, 160), (270, 140), (440, 120), (610, 130), (780, 80) -->
+<path class="chart-area" d="M 100 200 L 100 160 C 185 160 185 140 270 140 C 355 140 355 120 440 120 C 525 120 525 130 610 130 C 695 130 695 80 780 80 L 780 200 Z"></path>
+<path class="chart-path-primary" d="M 100 160 C 185 160 185 140 270 140 C 355 140 355 120 440 120 C 525 120 525 130 610 130 C 695 130 695 80 780 80"></path>
+<!-- Normal Range Highlight Band (subtle) -->
+<rect fill="#10b981" height="75" opacity="0.05" width="730" x="50" y="75"></rect>
+<!-- Data Points & Tooltip Anchors -->
+<g class="cursor-pointer">
+<circle class="chart-point" cx="100" cy="160" r="4"></circle>
+<text fill="#6d797c" font-family="Inter" font-size="12" text-anchor="middle" x="100" y="230">Jan '23</text>
+</g>
+<g class="cursor-pointer">
+<circle class="chart-point" cx="270" cy="140" r="4"></circle>
+<text fill="#6d797c" font-family="Inter" font-size="12" text-anchor="middle" x="270" y="230">May '23</text>
+</g>
+<g class="cursor-pointer">
+<circle class="chart-point" cx="440" cy="120" r="4"></circle>
+<text fill="#6d797c" font-family="Inter" font-size="12" text-anchor="middle" x="440" y="230">Sep '23</text>
+</g>
+<g class="cursor-pointer">
+<circle class="chart-point" cx="610" cy="130" r="4"></circle>
+<text fill="#6d797c" font-family="Inter" font-size="12" text-anchor="middle" x="610" y="230">Feb '24</text>
+</g>
+<g class="cursor-pointer">
+<!-- Latest point highlighted -->
+<circle cx="780" cy="80" fill="#006574" r="6" stroke="#ffffff" stroke-width="2"></circle>
+<!-- Mock Tooltip for latest point -->
+<rect fill="#2d3133" height="30" rx="4" width="80" x="730" y="30"></rect>
+<text fill="#ffffff" font-family="Inter" font-size="12" font-weight="600" text-anchor="middle" x="770" y="50">15.2 g/dL</text>
+<path d="M 775 60 L 780 65 L 785 60 Z" fill="#2d3133"></path>
+<text fill="#191c1e" font-family="Inter" font-size="12" font-weight="600" text-anchor="middle" x="780" y="230">Oct '24</text>
+</g>
+</svg>
+</div>
+<div class="mt-sm flex justify-between items-center text-label-sm text-outline">
+<div class="flex items-center gap-xs">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span>Your Level</span>
+</div>
+<div class="flex items-center gap-xs">
+<div class="w-3 h-3 rounded-sm bg-[#10b981] opacity-20 border border-[#10b981]"></div>
+<span>Healthy Range (13.5 - 17.5 g/dL)</span>
+</div>
+</div>
+</section>
+<!-- Previous Reports Table (Glassmorphism inspired card) -->
+<section class="xl:col-span-1 bg-surface-container-lowest/80 backdrop-blur-xl rounded-xl border border-outline-variant/30 shadow-[0_4px_12px_rgba(15,23,42,0.02)] flex flex-col h-[400px]">
+<div class="p-lg border-b border-outline-variant/20 flex justify-between items-center bg-white/50 rounded-t-xl">
+<h3 class="font-headline-md text-headline-md text-on-surface">Previous Reports</h3>
+<button class="text-primary font-label-sm hover:underline">View All</button>
+</div>
+<div class="overflow-y-auto flex-1 p-sm">
+<!-- List Item 1 -->
+<div class="flex items-center justify-between p-sm rounded-lg hover:bg-surface-container-low transition-colors duration-200 group">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">science</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">CBC Profile</h4>
+<div class="flex items-center gap-sm mt-xs">
+<span class="font-label-sm text-label-sm text-outline">Oct 12, 2024</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#10b981]/10 text-[#059669]">Completed</span>
+</div>
+</div>
+</div>
+<button aria-label="Download PDF" class="text-primary p-2 rounded-full hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all duration-200 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+</div>
+<!-- Divider -->
+<div class="h-px bg-outline-variant/20 mx-sm"></div>
+<!-- List Item 2 -->
+<div class="flex items-center justify-between p-sm rounded-lg hover:bg-surface-container-low transition-colors duration-200 group">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">bloodtype</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Thyroid Panel</h4>
+<div class="flex items-center gap-sm mt-xs">
+<span class="font-label-sm text-label-sm text-outline">Feb 28, 2024</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#10b981]/10 text-[#059669]">Completed</span>
+</div>
+</div>
+</div>
+<button aria-label="Download PDF" class="text-primary p-2 rounded-full hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all duration-200 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+</div>
+<!-- Divider -->
+<div class="h-px bg-outline-variant/20 mx-sm"></div>
+<!-- List Item 3 -->
+<div class="flex items-center justify-between p-sm rounded-lg hover:bg-surface-container-low transition-colors duration-200 group">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">monitor_heart</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Lipid Profile</h4>
+<div class="flex items-center gap-sm mt-xs">
+<span class="font-label-sm text-label-sm text-outline">Sep 15, 2023</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#10b981]/10 text-[#059669]">Completed</span>
+</div>
+</div>
+</div>
+<button aria-label="Download PDF" class="text-primary p-2 rounded-full hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all duration-200 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+</div>
+<!-- Divider -->
+<div class="h-px bg-outline-variant/20 mx-sm"></div>
+<!-- List Item 4 -->
+<div class="flex items-center justify-between p-sm rounded-lg hover:bg-surface-container-low transition-colors duration-200 group">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">science</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">CBC Profile</h4>
+<div class="flex items-center gap-sm mt-xs">
+<span class="font-label-sm text-label-sm text-outline">May 10, 2023</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#10b981]/10 text-[#059669]">Completed</span>
+</div>
+</div>
+</div>
+<button aria-label="Download PDF" class="text-primary p-2 rounded-full hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all duration-200 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- Footer (from JSON) -->
+<footer class="bg-surface-container-lowest dark:bg-inverse-surface w-full py-xl mt-auto border-t border-outline-variant/20">
+<div class="flex flex-col md:flex-row justify-between items-center px-lg max-w-container-max mx-auto gap-md">
+<div class="flex flex-col items-center md:items-start">
+<span class="font-label-md text-label-md font-bold text-on-surface mb-xs">Lumina PathLabs</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">© 2024 Lumina PathLabs. All medical data is encrypted.</span>
+</div>
+<div class="flex flex-wrap justify-center gap-md">
+<a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors opacity-90 hover:opacity-100" href="#">Support</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors opacity-90 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors opacity-90 hover:opacity-100" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary transition-colors opacity-90 hover:opacity-100" href="#">Contact Lab</a>
+</div>
+</div>
+</footer>
+</main>
+</body></html>

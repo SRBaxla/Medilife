@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medilife Pathology</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#6d797c",
+                        "background": "#f7f9fb",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f2f4f6",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#eceef0",
+                        "on-secondary-container": "#576867",
+                        "surface-tint": "#006877",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001f25",
+                        "secondary": "#516161",
+                        "primary-container": "#008092",
+                        "surface-container-high": "#e6e8ea",
+                        "on-surface": "#191c1e",
+                        "outline-variant": "#bcc9cc",
+                        "on-primary-fixed-variant": "#004e5a",
+                        "tertiary-container": "#6c748b",
+                        "inverse-primary": "#63d6ec",
+                        "on-primary-container": "#f8fdff",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#dae2fd",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary": "#545c72",
+                        "surface-bright": "#f7f9fb",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "on-background": "#191c1e",
+                        "inverse-surface": "#2d3133",
+                        "surface": "#f7f9fb",
+                        "primary-fixed": "#a3eeff",
+                        "surface-dim": "#d8dadc",
+                        "secondary-fixed": "#d4e6e5",
+                        "on-surface-variant": "#3d494b",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "on-tertiary-container": "#fefcff",
+                        "secondary-container": "#d4e6e5",
+                        "primary": "#006574",
+                        "surface-container-highest": "#e0e3e5",
+                        "primary-fixed-dim": "#63d6ec",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "on-tertiary-fixed": "#131b2e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "xxl": "64px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "container-max": "1280px",
+                        "xl": "40px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl shadow-sm fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg py-sm max-w-container-max mx-auto transition-all duration-300 ease-in-out">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">biotech</span>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim tracking-tight">Medilife Pathology</span>
+</div>
+<nav class="hidden md:flex items-center gap-md">
+<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-1" href="#">Home</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors hover:bg-secondary-container/50 dark:hover:bg-secondary-fixed-dim/20 rounded-lg px-sm py-xs" href="#">Tests</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors hover:bg-secondary-container/50 dark:hover:bg-secondary-fixed-dim/20 rounded-lg px-sm py-xs" href="#">Packages</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors hover:bg-secondary-container/50 dark:hover:bg-secondary-fixed-dim/20 rounded-lg px-sm py-xs" href="#">About Us</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors hover:bg-secondary-container/50 dark:hover:bg-secondary-fixed-dim/20 rounded-lg px-sm py-xs" href="#">Contact</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors hover:bg-secondary-container/50 dark:hover:bg-secondary-fixed-dim/20 rounded-lg px-sm py-xs" href="#">Book Now</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="hidden md:block bg-surface text-primary border border-outline-variant hover:bg-surface-container transition-colors rounded-lg px-md py-sm font-label-md text-label-md">Patient Portal</button>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<main class="flex-grow pt-[80px]">
+<!-- Hero Section -->
+<section class="relative px-md md:px-lg py-xxl md:py-[120px] max-w-container-max mx-auto overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary-container/10 -z-10 rounded-3xl"></div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl items-center">
+<div class="flex flex-col gap-lg">
+<div class="inline-flex items-center gap-sm bg-secondary-container/30 px-sm py-xs rounded-full w-fit">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-label-sm text-primary">NABL Accredited Laboratory</span>
+</div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-on-surface">
+                        Professional Care, <br/><span class="text-primary">Local Heart.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
+                        Accurate diagnostics delivered with compassion. We combine advanced clinical precision with the warmth of a community-focused practice to ensure your health is in safe hands.
+                    </p>
+<div class="flex flex-wrap gap-sm">
+<button class="bg-primary text-on-primary hover:bg-primary/90 transition-colors shadow-md hover:shadow-lg rounded-lg px-lg py-sm font-label-md text-label-md flex items-center gap-xs">
+                            Book a Test <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+<button class="bg-surface text-primary border border-outline-variant hover:bg-surface-container transition-colors rounded-lg px-lg py-sm font-label-md text-label-md">
+                            View Health Packages
+                        </button>
+</div>
+</div>
+<div class="relative h-[300px] md:h-[450px] rounded-2xl overflow-hidden shadow-sm border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A brightly lit, modern clinical laboratory setting. The space features clean white surfaces, soft natural lighting from a large window, and subtle teal accents reflecting a 'sterile-humanist' aesthetic. A skilled technician in a crisp white lab coat is carefully examining a sample, embodying professionalism and care." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAP0MPSt2dsXuswRxe7iVpJmHQ8Vd0xDolIoJV0NETPOv1hu022CwoUNI4sHG9LJXF376LyEpB_XrKWYBQvpnLxyFNYDal4QcNT3shfw9ls9V-Qwh9eOHMUcdBNVKWnNzwsS04tQStth6uYQDKf4v4kNORcsS1QNjalEoh6G2HdCjHaIks1EHQ4Zn9u1XlXIomd__EihNhUwoyehCSnq2Yx_THwnIQHJPHTeTgQ3-FDxcW0EMN3V5t9"/>
+<div class="absolute bottom-md left-md bg-surface/90 backdrop-blur-md p-sm rounded-lg shadow-lg border border-outline-variant/50 flex items-center gap-sm">
+<div class="bg-primary-container text-on-primary-container rounded-full p-xs flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_health</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Home Collection</p>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Available Today</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Services Bento -->
+<section class="px-md md:px-lg py-xl max-w-container-max mx-auto">
+<div class="text-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Comprehensive Diagnostics</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">Fast, accurate, and reliable testing services tailored for your individual healthcare needs.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Card 1 -->
+<div class="bg-surface rounded-2xl p-lg border border-surface-variant shadow-sm hover:shadow-md transition-shadow flex flex-col gap-md relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-lg opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary" style="font-variation-settings: 'FILL' 1;">bloodtype</span>
+</div>
+<div class="bg-primary-container/20 w-12 h-12 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">bloodtype</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Blood Tests</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">Routine to specialized blood analyses with same-day reports for critical parameters.</p>
+<a class="font-label-md text-label-md text-primary flex items-center gap-xs mt-auto group-hover:underline" href="#">Explore Tests <span class="material-symbols-outlined text-sm">arrow_right_alt</span></a>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface rounded-2xl p-lg border border-surface-variant shadow-sm hover:shadow-md transition-shadow flex flex-col gap-md relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-lg opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-secondary" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<div class="bg-secondary-container/20 w-12 h-12 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Health Packages</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">Curated preventive health checkups covering full body profiles for all age groups.</p>
+<a class="font-label-md text-label-md text-primary flex items-center gap-xs mt-auto group-hover:underline" href="#">View Packages <span class="material-symbols-outlined text-sm">arrow_right_alt</span></a>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface rounded-2xl p-lg border border-surface-variant shadow-sm hover:shadow-md transition-shadow flex flex-col gap-md relative overflow-hidden group md:col-span-1 md:row-span-1">
+<div class="absolute top-0 right-0 p-lg opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-tertiary" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+</div>
+<div class="bg-tertiary-container/20 w-12 h-12 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Home Collection</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">Comfortable and safe sample collection at your doorstep by certified phlebotomists.</p>
+<a class="font-label-md text-label-md text-primary flex items-center gap-xs mt-auto group-hover:underline" href="#">Schedule Visit <span class="material-symbols-outlined text-sm">arrow_right_alt</span></a>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container dark:bg-surface-container-highest w-full py-xxl px-lg grid grid-cols-1 md:grid-cols-4 gap-gutter max-w-container-max mx-auto border-t border-outline-variant">
+<div class="flex flex-col gap-sm md:col-span-1">
+<span class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed-dim">Medilife Pathology</span>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-xs">Clinical Excellence &amp; Professional Care.</p>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-on-surface font-semibold mb-xs">Quick Links</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline transition-opacity opacity-90 hover:opacity-100" href="#">Lab Locations</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline transition-opacity opacity-90 hover:opacity-100" href="#">Accreditation</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline transition-opacity opacity-90 hover:opacity-100" href="#">Careers</a>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-on-surface font-semibold mb-xs">Legal</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline transition-opacity opacity-90 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline transition-opacity opacity-90 hover:opacity-100" href="#">Terms of Service</a>
+</div>
+<div class="flex flex-col gap-sm">
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-auto pt-md">
+                © 2024 Medilife Pathology. Clinical Excellence &amp; Professional Care.
+            </p>
+</div>
+</footer>
+</body></html>

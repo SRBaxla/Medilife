@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Pathology Care - Settings</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#eceef0",
+                        "surface": "#f7f9fb",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-dim": "#d8dadc",
+                        "on-background": "#191c1e",
+                        "secondary-container": "#d4e6e5",
+                        "background": "#f7f9fb",
+                        "primary-fixed": "#a3eeff",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "secondary": "#516161",
+                        "primary-container": "#008092",
+                        "inverse-primary": "#63d6ec",
+                        "outline": "#6d797c",
+                        "on-primary-container": "#f8fdff",
+                        "outline-variant": "#bcc9cc",
+                        "tertiary-fixed": "#dae2fd",
+                        "on-tertiary-fixed": "#131b2e",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#545c72",
+                        "secondary-fixed": "#d4e6e5",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#004e5a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "on-surface": "#191c1e",
+                        "on-secondary-container": "#576867",
+                        "surface-tint": "#006877",
+                        "on-tertiary-container": "#fefcff",
+                        "tertiary-container": "#6c748b",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "primary-fixed-dim": "#63d6ec",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#006574",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface-variant": "#3d494b",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary-fixed": "#001f25",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "64px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Custom Toggle Switch Styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #006574; /* primary */
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #006574; /* primary */
+        }
+        
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e0e3e5; /* surface-variant */
+            transition: all 0.3s;
+        }
+        
+        .toggle-label {
+            width: 48px;
+            height: 24px;
+            background-color: #e0e3e5; /* surface-variant */
+            border-radius: 9999px;
+            transition: all 0.3s;
+        }
+        
+        .toggle-checkbox:checked {
+            transform: translateX(100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex flex-col pb-xxl">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-surface-variant shadow-sm transition-colors duration-200">
+<div class="flex justify-between items-center px-lg py-sm w-full max-w-container-max mx-auto h-16">
+<div class="flex items-center gap-md">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm border border-surface-variant" data-alt="A small, circular profile picture of a patient, showing a smiling face in a well-lit, sterile, modern clinical setting with soft natural light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNgWmXtrwT1NYLQXNlZYFnGeiMBee164bUPaDcwFYQLNMZZXXIRGExka2xprtf_L_vBeNjGB-HIwO6zj1f67ImuwOtuaa54LDW6Hx6gW4PQVGh9ak65m-EysG2OqjIgwB9xMm39cVt11TiHEZnxqI7gPf4mECKupA4fJLXUb_sI6gc50iYjrmoQuahhuL75qyv1VKz2_0zwUVnNgUA0qLf7lMBI81r088dyJYlEaUGwJl2aq8pLcJt"/>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Pathology Care</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-low active:scale-95 duration-150 ease-in-out transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-container-max mx-auto mt-20 px-md md:px-lg pb-xxl space-y-lg">
+<!-- Header Section -->
+<div class="pt-md pb-sm">
+<h2 class="font-headline-lg-mobile text-headline-lg text-on-surface">Settings</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Manage your preferences and security.</p>
+</div>
+<!-- Settings Groups Bento Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Notifications Card -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-variant/50 p-lg hover:shadow-md transition-shadow duration-300">
+<div class="flex items-center gap-sm mb-md pb-sm border-b border-surface-container">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+<h3 class="font-headline-md text-label-md text-on-surface">Notifications</h3>
+</div>
+<div class="space-y-md">
+<!-- Toggle Item -->
+<div class="flex justify-between items-center">
+<div class="pr-md">
+<h4 class="font-label-md text-label-md text-on-surface">Test Results</h4>
+<p class="font-body-md text-[13px] text-on-surface-variant mt-1">Get notified when new pathology reports are ready.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer translate-x-full border-primary" id="toggle_results" name="toggle_results" style="top: -2px; left: -2px;" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-primary cursor-pointer" for="toggle_results"></label>
+</div>
+</div>
+<hr class="border-surface-container"/>
+<!-- Toggle Item -->
+<div class="flex justify-between items-center">
+<div class="pr-md">
+<h4 class="font-label-md text-label-md text-on-surface">Appointment Reminders</h4>
+<p class="font-body-md text-[13px] text-on-surface-variant mt-1">SMS and email reminders for upcoming visits.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer translate-x-full border-primary" id="toggle_appointments" name="toggle_appointments" style="top: -2px; left: -2px;" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-primary cursor-pointer" for="toggle_appointments"></label>
+</div>
+</div>
+<hr class="border-surface-container"/>
+<!-- Toggle Item -->
+<div class="flex justify-between items-center">
+<div class="pr-md">
+<h4 class="font-label-md text-label-md text-on-surface">Marketing &amp; Surveys</h4>
+<p class="font-body-md text-[13px] text-on-surface-variant mt-1">Updates on new services and patient feedback surveys.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-surface-variant" id="toggle_marketing" name="toggle_marketing" style="top: -2px; left: -2px;" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer" for="toggle_marketing"></label>
+</div>
+</div>
+</div>
+</section>
+<!-- Security & Privacy Card -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-variant/50 p-lg hover:shadow-md transition-shadow duration-300">
+<div class="flex items-center gap-sm mb-md pb-sm border-b border-surface-container">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">security</span>
+<h3 class="font-headline-md text-label-md text-on-surface">Security &amp; Privacy</h3>
+</div>
+<div class="space-y-md">
+<!-- Toggle Item -->
+<div class="flex justify-between items-center">
+<div class="pr-md">
+<h4 class="font-label-md text-label-md text-on-surface">Biometric Login</h4>
+<p class="font-body-md text-[13px] text-on-surface-variant mt-1">Use Face ID or Touch ID to access your reports.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer translate-x-full border-primary" id="toggle_biometric" name="toggle_biometric" style="top: -2px; left: -2px;" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-primary cursor-pointer" for="toggle_biometric"></label>
+</div>
+</div>
+<hr class="border-surface-container"/>
+<!-- Action Item -->
+<div class="flex justify-between items-center py-sm group cursor-pointer active:scale-[0.98] transition-transform">
+<div class="pr-md">
+<h4 class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Change Password</h4>
+<p class="font-body-md text-[13px] text-on-surface-variant mt-1">Update your account access password.</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<hr class="border-surface-container"/>
+<!-- Action Item -->
+<div class="flex justify-between items-center py-sm group cursor-pointer active:scale-[0.98] transition-transform">
+<div class="pr-md">
+<h4 class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Two-Factor Authentication</h4>
+<p class="font-body-md text-[13px] text-on-surface-variant mt-1">Currently enabled via SMS.</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Preferences Card -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-variant/50 p-lg hover:shadow-md transition-shadow duration-300 md:col-span-2">
+<div class="flex items-center gap-sm mb-md pb-sm border-b border-surface-container">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">tune</span>
+<h3 class="font-headline-md text-label-md text-on-surface">App Preferences</h3>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+<!-- Action Item -->
+<div class="flex justify-between items-center p-md rounded-lg border border-surface-variant bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer active:scale-[0.98]">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-tertiary">dark_mode</span>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Theme</h4>
+<p class="font-body-md text-[13px] text-on-surface-variant">System Default</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</div>
+<!-- Action Item -->
+<div class="flex justify-between items-center p-md rounded-lg border border-surface-variant bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer active:scale-[0.98]">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-tertiary">language</span>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Language</h4>
+<p class="font-body-md text-[13px] text-on-surface-variant">English (US)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Sign Out Button -->
+<div class="mt-lg pt-md border-t border-surface-container flex justify-center">
+<button class="w-full sm:w-auto px-xl py-sm rounded-full bg-error-container text-on-error-container font-label-md text-label-md flex items-center justify-center gap-sm hover:bg-error hover:text-on-error transition-colors duration-200 active:scale-95 shadow-sm">
+<span class="material-symbols-outlined" style="font-size: 20px;">logout</span>
+                         Sign Out
+                     </button>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 pb-safe bg-surface/80 backdrop-blur-xl border-t border-surface-variant shadow-lg">
+<div class="flex justify-around items-center h-xxl px-md w-full">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant px-4 py-1 hover:bg-surface-container-high/50 transition-colors active:scale-90 duration-200 rounded-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">description</span>
+<span class="font-label-sm text-label-sm mt-1">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant px-4 py-1 hover:bg-surface-container-high/50 transition-colors active:scale-90 duration-200 rounded-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">insights</span>
+<span class="font-label-sm text-label-sm mt-1">Stats</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant px-4 py-1 hover:bg-surface-container-high/50 transition-colors active:scale-90 duration-200 rounded-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-sm text-label-sm mt-1">Settings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant px-4 py-1 hover:bg-surface-container-high/50 transition-colors active:scale-90 duration-200 rounded-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+<span class="font-label-sm text-label-sm mt-1">Help</span>
+</a>
+</div>
+</nav>
+<script>
+        // Simple script to handle visual state of custom toggles (CSS handles the actual animation, this just ensures standard checkbox behavior)
+        document.querySelectorAll('.toggle-checkbox').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                // The CSS :checked state handles the visual update
+                if(this.checked) {
+                    this.classList.add('translate-x-full', 'border-primary');
+                    this.classList.remove('border-surface-variant');
+                    this.nextElementSibling.classList.add('bg-primary');
+                    this.nextElementSibling.classList.remove('bg-surface-variant');
+                } else {
+                    this.classList.remove('translate-x-full', 'border-primary');
+                    this.classList.add('border-surface-variant');
+                    this.nextElementSibling.classList.remove('bg-primary');
+                    this.nextElementSibling.classList.add('bg-surface-variant');
+                }
+            });
+        });
+    </script>
+</body></html>

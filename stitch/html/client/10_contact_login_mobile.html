@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Contact &amp; Patient Login - Medilife Pathology</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#6d797c",
+                        "background": "#f7f9fb",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f2f4f6",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#eceef0",
+                        "on-secondary-container": "#576867",
+                        "surface-tint": "#006877",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001f25",
+                        "secondary": "#516161",
+                        "primary-container": "#008092",
+                        "surface-container-high": "#e6e8ea",
+                        "on-surface": "#191c1e",
+                        "outline-variant": "#bcc9cc",
+                        "on-primary-fixed-variant": "#004e5a",
+                        "tertiary-container": "#6c748b",
+                        "inverse-primary": "#63d6ec",
+                        "on-primary-container": "#f8fdff",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#dae2fd",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary": "#545c72",
+                        "surface-bright": "#f7f9fb",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "on-background": "#191c1e",
+                        "inverse-surface": "#2d3133",
+                        "surface": "#f7f9fb",
+                        "primary-fixed": "#a3eeff",
+                        "surface-dim": "#d8dadc",
+                        "secondary-fixed": "#d4e6e5",
+                        "on-surface-variant": "#3d494b",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "on-tertiary-container": "#fefcff",
+                        "secondary-container": "#d4e6e5",
+                        "primary": "#006574",
+                        "surface-container-highest": "#e0e3e5",
+                        "primary-fixed-dim": "#63d6ec",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "on-tertiary-fixed": "#131b2e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "xxl": "64px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "container-max": "1280px",
+                        "xl": "40px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f7f9fb; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+            border: 1px solid #f2f4f6;
+        }
+        .input-clinical {
+            background-color: #ffffff;
+            border: 1px solid #e0e3e5;
+            transition: all 0.2s ease;
+        }
+        .input-clinical:focus {
+            border-color: #006574;
+            box-shadow: 0 0 0 3px rgba(0, 101, 116, 0.1);
+            outline: none;
+        }
+        .otp-input {
+            width: 3rem;
+            height: 3.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-background min-h-screen pb-xxl">
+<!-- Top Navigation (Mobile Version) -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-md py-sm bg-surface/90 backdrop-blur-xl shadow-sm border-b border-surface-variant">
+<div class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+            Medilife Pathology
+        </div>
+<button aria-label="Menu" class="p-sm rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</nav>
+<main class="pt-xxl px-md flex flex-col gap-lg max-w-lg mx-auto w-full mt-xl">
+<!-- Patient Login Section -->
+<section class="glass-panel rounded-xl p-lg flex flex-col gap-md">
+<div class="flex items-center gap-sm text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">login</span>
+<h2 class="font-headline-md text-headline-md text-primary">Patient Portal</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Access your test results and medical history securely.
+            </p>
+<!-- Login Form (Phone -> OTP) -->
+<div class="flex flex-col gap-md mt-sm" id="login-step-1">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="phone">Mobile Number</label>
+<div class="relative">
+<span class="absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant material-symbols-outlined">phone_iphone</span>
+<input class="input-clinical rounded-lg w-full py-md pl-xl pr-md font-body-md text-body-md" id="phone" placeholder="Enter 10-digit number" required="" type="tel"/>
+</div>
+</div>
+<button class="bg-primary text-on-primary rounded-lg py-md font-label-md text-label-md w-full shadow-sm hover:shadow-md transition-shadow flex items-center justify-center gap-sm" onclick="showOTP()" type="button">
+                    Send OTP <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="hidden flex-col gap-md mt-sm" id="login-step-2">
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface">Enter OTP</label>
+<button class="font-label-sm text-label-sm text-primary hover:underline" onclick="resetLogin()" type="button">Edit Number</button>
+</div>
+<div class="flex justify-between gap-sm">
+<input autofocus="" class="input-clinical rounded-lg otp-input focus:border-primary" maxlength="1" type="text"/>
+<input class="input-clinical rounded-lg otp-input focus:border-primary" maxlength="1" type="text"/>
+<input class="input-clinical rounded-lg otp-input focus:border-primary" maxlength="1" type="text"/>
+<input class="input-clinical rounded-lg otp-input focus:border-primary" maxlength="1" type="text"/>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center mt-sm">Didn't receive code? <button class="text-primary hover:underline">Resend in 30s</button></p>
+</div>
+<button class="bg-primary text-on-primary rounded-lg py-md font-label-md text-label-md w-full shadow-sm hover:shadow-md transition-shadow" type="button">
+                    Verify &amp; Login
+                </button>
+</div>
+</section>
+<!-- Contact Information Section -->
+<section class="flex flex-col gap-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Get in Touch</h2>
+<div class="grid grid-cols-1 gap-md">
+<!-- Phone Card -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-md flex items-start gap-md">
+<div class="bg-secondary-container text-on-secondary-container p-sm rounded-full shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">call</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface mb-xs">Helpline</h3>
+<p class="font-body-md text-body-md text-primary font-medium">1800-123-4567</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Mon-Sat, 8am to 8pm</p>
+</div>
+</div>
+<!-- Location Card -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-md flex items-start gap-md">
+<div class="bg-secondary-container text-on-secondary-container p-sm rounded-full shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface mb-xs">Central Lab</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-snug">
+                            124 Medical District Blvd,<br/>Suite 300, Healthcare City
+                        </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Inquiry Form -->
+<section class="glass-panel rounded-xl p-lg flex flex-col gap-md mb-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface">Quick Inquiry</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Have a question about tests or home collection? Drop us a message.</p>
+<form class="flex flex-col gap-md mt-xs">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="name">Full Name</label>
+<input class="input-clinical rounded-lg w-full py-md px-md font-body-md text-body-md" id="name" required="" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="inquiry-phone">Phone Number</label>
+<input class="input-clinical rounded-lg w-full py-md px-md font-body-md text-body-md" id="inquiry-phone" required="" type="tel"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="message">Message (Optional)</label>
+<textarea class="input-clinical rounded-lg w-full py-md px-md font-body-md text-body-md resize-none" id="message" rows="3"></textarea>
+</div>
+<button class="bg-surface-tint text-on-primary rounded-lg py-md font-label-md text-label-md w-full shadow-sm hover:shadow-md transition-shadow" type="submit">
+                    Submit Inquiry
+                </button>
+</form>
+</section>
+</main>
+<!-- Footer (Simplified for Mobile) -->
+<footer class="w-full py-lg px-md bg-surface-container border-t border-outline-variant mt-auto">
+<div class="flex flex-col items-center justify-center gap-md text-center">
+<div class="font-headline-sm text-headline-sm font-bold text-primary">Medilife Pathology</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">© 2024 Medilife Pathology. Clinical Excellence.</p>
+<div class="flex gap-md flex-wrap justify-center">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+<script>
+        function showOTP() {
+            const phoneInput = document.getElementById('phone').value;
+            if(phoneInput.length >= 10) {
+                document.getElementById('login-step-1').classList.add('hidden');
+                document.getElementById('login-step-1').classList.remove('flex');
+                document.getElementById('login-step-2').classList.remove('hidden');
+                document.getElementById('login-step-2').classList.add('flex');
+            } else {
+                alert("Please enter a valid mobile number.");
+            }
+        }
+
+        function resetLogin() {
+            document.getElementById('login-step-2').classList.add('hidden');
+            document.getElementById('login-step-2').classList.remove('flex');
+            document.getElementById('login-step-1').classList.remove('hidden');
+            document.getElementById('login-step-1').classList.add('flex');
+        }
+
+        // OTP input auto-advance
+        const otpInputs = document.querySelectorAll('.otp-input');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1) {
+                    if (index < otpInputs.length - 1) otpInputs[index + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value === '') {
+                    if (index > 0) otpInputs[index - 1].focus();
+                }
+            });
+        });
+    </script>
+</body></html>

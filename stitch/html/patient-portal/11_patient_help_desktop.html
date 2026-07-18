@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Path - Help &amp; Support</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#eceef0",
+                        "surface": "#f7f9fb",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-dim": "#d8dadc",
+                        "on-background": "#191c1e",
+                        "secondary-container": "#d4e6e5",
+                        "background": "#f7f9fb",
+                        "primary-fixed": "#a3eeff",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "secondary": "#516161",
+                        "primary-container": "#008092",
+                        "inverse-primary": "#63d6ec",
+                        "outline": "#6d797c",
+                        "on-primary-container": "#f8fdff",
+                        "outline-variant": "#bcc9cc",
+                        "tertiary-fixed": "#dae2fd",
+                        "on-tertiary-fixed": "#131b2e",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#545c72",
+                        "secondary-fixed": "#d4e6e5",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#004e5a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "on-surface": "#191c1e",
+                        "on-secondary-container": "#576867",
+                        "surface-tint": "#006877",
+                        "on-tertiary-container": "#fefcff",
+                        "tertiary-container": "#6c748b",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "primary-fixed-dim": "#63d6ec",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#006574",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface-variant": "#3d494b",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary-fixed": "#001f25",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "64px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: #f7f9fb; }
+        .glass-panel {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .soft-shadow {
+            box-shadow: 0px 4px 12px rgba(15, 23, 42, 0.05);
+        }
+        .glass-shadow {
+            box-shadow: 0px 12px 32px rgba(15, 23, 42, 0.1);
+        }
+        .input-glow:focus {
+            box-shadow: 0 0 0 3px rgba(0, 101, 116, 0.1);
+        }
+    </style>
+</head>
+<body class="text-on-background font-body-md antialiased min-h-screen flex flex-col md:flex-row">
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden lg:flex flex-col h-screen fixed left-0 top-0 p-md space-y-sm bg-surface dark:bg-inverse-surface text-primary dark:text-inverse-primary font-label-md text-label-md docked left-0 h-full w-64 bg-surface-container-low dark:bg-surface-dim flat no shadows z-40">
+<div class="px-4 py-6 mb-4 flex flex-col items-center">
+<img alt="Lumina Pathology Lab Logo" class="w-16 h-16 rounded-full mb-3 shadow-sm object-cover" data-alt="A clean, minimalist logo mark for a clinical pathology lab, featuring a subtle geometric or abstract representation of a microscope or slide, rendered in soft teal and dark navy on a pure white background. The aesthetic is sterile, professional, and humanist, suitable for a modern medical brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7HdYhDWl2OMJUhpNQJHs_5w9mKiYLCIOuvMtZwtYnTzqEZYfBSEI2nNJ44MsUjGH8hOpCBoKBmnG998tSGxCy2HtZRfbTtdY7Qw8-9U4hS4VXPSKkBJMJ_hV6zqOvCiaZo9qGTRkOy3H17BFimaVWk_xGZFMGNkbBtaCQNUOjSOrkp-kNCqsJry1HHIxGDyysofMIgquAyDP6LOoD9xv8Cwo3Ev9q2ht3h1Ja9GrEfBK8xaCEPJh2"/>
+<h1 class="font-headline-md text-headline-md font-extrabold text-primary dark:text-inverse-primary text-center">Patient Portal</h1>
+<p class="text-on-surface-variant dark:text-surface-variant font-label-sm text-label-sm mt-1">Clinical Results</p>
+</div>
+<div class="flex-1 space-y-2 px-2">
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span>Reports</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span>Statistics</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span>Profile</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-container-high transition-all active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="settings_suggest">settings_suggest</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-secondary-container dark:bg-on-secondary-container/20 text-on-secondary-container dark:text-secondary-fixed active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="help" data-weight="fill" style="font-variation-settings: 'FILL' 1;">help</span>
+<span>Help</span>
+</a>
+</div>
+<div class="p-4 mt-auto">
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md hover:shadow-md transition-shadow active:scale-95 duration-150">Book New Test</button>
+</div>
+</nav>
+<!-- TopNavBar (Tablet/Mobile structure placeholder, full desktop handled above, but here's the top bar for responsive) -->
+<header class="lg:hidden sticky top-0 z-50 flex justify-between items-center px-lg py-md max-w-container-max mx-auto w-full bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-xl text-primary dark:text-inverse-primary font-body-md text-body-md docked full-width top-0 border-b border-outline-variant/30 dark:border-outline/20 shadow-sm cursor-pointer active:scale-95 duration-150">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">Lumina Path</div>
+<div class="flex items-center space-x-4">
+<span class="material-symbols-outlined hover:text-primary dark:hover:text-inverse-primary transition-colors text-on-surface-variant dark:text-surface-variant" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined hover:text-primary dark:hover:text-inverse-primary transition-colors text-on-surface-variant dark:text-surface-variant" data-icon="settings">settings</span>
+<img alt="Patient Profile Avatar" class="w-8 h-8 rounded-full object-cover" data-alt="A small circular avatar placeholder image for a generic patient profile, featuring a clean, soft teal geometric pattern or a blurred, bright clinical setting in the background. The aesthetic is minimal, professional, and light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbI6KCOPytSWkGLIZW8RMBYjK89odkrlKDAsrEvWAMvmDSMazzyqNPSGaN1AIOvQe6sdUJLgOy1TIADfysbcW6BCAt2opxP0jAR2QnLMpdHF4beila2TVtwrFKHe4L7OlN003Gxf7tGtglHy5l900y2iT2puFL1hgpobGb4E6F9tlCR3JuYyPa1dQO-hWsF43eMVH3MsjOAU5_StWoHXkyXSNM5y0rkWngwI-EXvwUhlO_CzMKFPUc"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full lg:ml-64 max-w-container-max mx-auto px-4 md:px-gutter lg:px-xl py-8 md:py-xxl pb-24 md:pb-xxl">
+<div class="mb-12">
+<h2 class="font-display-lg-mobile md:font-display-lg text-primary mb-4">How can we help you today?</h2>
+<p class="font-body-lg text-on-surface-variant max-w-2xl">Find answers to common questions about your lab results, portal navigation, or get in touch with our clinical support team.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: FAQs -->
+<div class="lg:col-span-7 space-y-6">
+<h3 class="font-headline-lg text-on-background mb-6">Frequently Asked Questions</h3>
+<!-- FAQ Item 1 -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-xl p-6 soft-shadow hover:shadow-md transition-shadow cursor-pointer group">
+<div class="flex justify-between items-center">
+<h4 class="font-headline-md text-on-background group-hover:text-primary transition-colors">When will my lab results be ready?</h4>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">expand_more</span>
+</div>
+<p class="font-body-md text-on-surface-variant mt-4 hidden group-hover:block">Most routine blood test results are available within 24 to 48 hours. Specialized or complex tests may take 3 to 5 business days. You will receive an email or SMS notification (based on your preferences) as soon as new results are uploaded to your portal.</p>
+</div>
+<!-- FAQ Item 2 -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-xl p-6 soft-shadow hover:shadow-md transition-shadow cursor-pointer group">
+<div class="flex justify-between items-center">
+<h4 class="font-headline-md text-on-background group-hover:text-primary transition-colors">How do I interpret my test results?</h4>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">expand_more</span>
+</div>
+<p class="font-body-md text-on-surface-variant mt-4 hidden group-hover:block">Your results are displayed alongside standard reference ranges. If a value is outside the normal range, it will be highlighted. We strongly recommend discussing all results with your referring healthcare provider, as they can interpret them in the context of your personal medical history.</p>
+</div>
+<!-- FAQ Item 3 -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-xl p-6 soft-shadow hover:shadow-md transition-shadow cursor-pointer group">
+<div class="flex justify-between items-center">
+<h4 class="font-headline-md text-on-background group-hover:text-primary transition-colors">Can I download or print my reports?</h4>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">expand_more</span>
+</div>
+<p class="font-body-md text-on-surface-variant mt-4 hidden group-hover:block">Yes. Navigate to the 'Reports' section from the side menu. Click on the specific report you wish to view, and select the 'Download PDF' or 'Print' icon located at the top right of the document viewer.</p>
+</div>
+<!-- FAQ Item 4 -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-xl p-6 soft-shadow hover:shadow-md transition-shadow cursor-pointer group">
+<div class="flex justify-between items-center">
+<h4 class="font-headline-md text-on-background group-hover:text-primary transition-colors">Who can see my records?</h4>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">expand_more</span>
+</div>
+<p class="font-body-md text-on-surface-variant mt-4 hidden group-hover:block">Your privacy is our priority. Your records are only accessible to you, the referring physician, and authorized clinical staff at Lumina Path. You can manage access permissions for specific providers in the 'Settings' menu under 'Privacy &amp; Sharing'.</p>
+</div>
+</div>
+<!-- Right Column: Contact & Support Ticket -->
+<div class="lg:col-span-5 space-y-8">
+<!-- Contact Info Card -->
+<div class="glass-panel rounded-2xl p-6 border border-surface-container-highest glass-shadow relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-container rounded-full mix-blend-multiply filter blur-3xl opacity-30 -mr-10 -mt-10"></div>
+<h3 class="font-headline-md text-on-background mb-6 relative z-10">Contact the Lab</h3>
+<div class="space-y-4 relative z-10">
+<div class="flex items-start space-x-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
+<span class="material-symbols-outlined">call</span>
+</div>
+<div>
+<p class="font-label-sm text-outline-variant uppercase tracking-wider">Patient Support Line</p>
+<p class="font-body-lg font-medium text-on-background mt-1">1-800-555-PATH</p>
+<p class="font-body-md text-on-surface-variant text-sm">Mon-Fri, 8am - 6pm EST</p>
+</div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
+<span class="material-symbols-outlined">mail</span>
+</div>
+<div>
+<p class="font-label-sm text-outline-variant uppercase tracking-wider">General Inquiries</p>
+<p class="font-body-lg font-medium text-on-background mt-1">support@luminapath.com</p>
+<p class="font-body-md text-on-surface-variant text-sm">Typical response within 24 hours</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Support Ticket Form -->
+<div class="bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-6 soft-shadow">
+<h3 class="font-headline-md text-on-background mb-2">Submit a Request</h3>
+<p class="font-body-md text-on-surface-variant mb-6">Need further assistance? Send us a message and our support team will get back to you.</p>
+<form class="space-y-4">
+<div>
+<label class="block font-label-md text-on-background mb-1" for="topic">Topic</label>
+<select class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-background focus:outline-none focus:border-primary input-glow transition-all appearance-none" id="topic">
+<option>Question about a recent report</option>
+<option>Technical issue with the portal</option>
+<option>Billing or insurance inquiry</option>
+<option>Update personal information</option>
+<option>Other</option>
+</select>
+</div>
+<div>
+<label class="block font-label-md text-on-background mb-1" for="message">Message</label>
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 font-body-md text-on-background focus:outline-none focus:border-primary input-glow transition-all resize-none" id="message" placeholder="Please describe how we can help..." rows="4"></textarea>
+</div>
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md hover:bg-surface-tint hover:shadow-md transition-all active:scale-95 duration-150 flex items-center justify-center space-x-2" type="button">
+<span>Send Message</span>
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</form>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/90 dark:bg-inverse-surface/90 backdrop-blur-lg text-primary dark:text-inverse-primary font-label-sm text-label-sm-mobile docked full-width bottom-0 rounded-t-xl border-t border-outline-variant/20 shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant active:bg-surface-variant transition-transform active:scale-90 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="description">description</span>
+<span>Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant active:bg-surface-variant transition-transform active:scale-90 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="insights">insights</span>
+<span>Stats</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant active:bg-surface-variant transition-transform active:scale-90 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span>Profile</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant active:bg-surface-variant transition-transform active:scale-90 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-3 py-1 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="help" data-weight="fill" style="font-variation-settings: 'FILL' 1;">help</span>
+<span>Help</span>
+</a>
+</nav>
+<script>
+        // Simple FAQ toggle logic for the interactive feel
+        document.querySelectorAll('.group').forEach(item => {
+            item.addEventListener('click', () => {
+                const content = item.querySelector('p');
+                const icon = item.querySelector('.material-symbols-outlined');
+                
+                if (content.classList.contains('hidden')) {
+                    content.classList.remove('hidden');
+                    icon.textContent = 'expand_less';
+                } else {
+                    content.classList.add('hidden');
+                    icon.textContent = 'expand_more';
+                }
+            });
+        });
+    </script>
+</body></html>

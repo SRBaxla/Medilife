@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Business Analytics - Medilife Pathology</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#122131",
+                        "error": "#ffb4ab",
+                        "surface-container-low": "#0d1c2d",
+                        "primary-fixed": "#9cf0ff",
+                        "on-primary-container": "#00626e",
+                        "on-secondary-fixed": "#022100",
+                        "on-tertiary-container": "#545968",
+                        "on-secondary": "#053900",
+                        "inverse-on-surface": "#233143",
+                        "surface-container-highest": "#273647",
+                        "secondary-fixed-dim": "#2ae500",
+                        "secondary-fixed": "#79ff5b",
+                        "on-primary": "#00363d",
+                        "on-background": "#d4e4fa",
+                        "tertiary-fixed": "#dee2f5",
+                        "secondary": "#d7ffc5",
+                        "tertiary-container": "#ccd0e3",
+                        "on-tertiary": "#2b303e",
+                        "secondary-container": "#2ff801",
+                        "on-tertiary-fixed": "#161b29",
+                        "surface-container-high": "#1c2b3c",
+                        "on-primary-fixed": "#001f24",
+                        "on-surface": "#d4e4fa",
+                        "on-secondary-container": "#0f6d00",
+                        "on-error": "#690005",
+                        "inverse-surface": "#d4e4fa",
+                        "outline-variant": "#3b494c",
+                        "surface-bright": "#2c3a4c",
+                        "inverse-primary": "#006875",
+                        "on-tertiary-fixed-variant": "#424656",
+                        "surface": "#051424",
+                        "tertiary-fixed-dim": "#c2c6d8",
+                        "on-surface-variant": "#bac9cc",
+                        "tertiary": "#e9ecff",
+                        "on-secondary-fixed-variant": "#095300",
+                        "background": "#051424",
+                        "surface-variant": "#273647",
+                        "surface-tint": "#00daf3",
+                        "surface-container-lowest": "#010f1f",
+                        "outline": "#849396",
+                        "on-error-container": "#ffdad6",
+                        "surface-dim": "#051424",
+                        "primary-container": "#00e5ff",
+                        "primary": "#c3f5ff",
+                        "on-primary-fixed-variant": "#004f58",
+                        "primary-fixed-dim": "#00daf3",
+                        "error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding": "24px",
+                        "stack-sm": "12px",
+                        "base": "8px",
+                        "stack-lg": "48px",
+                        "stack-md": "24px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "data-numeric": ["JetBrains Mono"],
+                        "label-sm": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "data-numeric": ["14px", { "lineHeight": "1.0", "letterSpacing": "0em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background-color: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            transition: all 0.3s ease;
+        }
+        .text-glow {
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(57, 255, 20, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); }
+        }
+        
+        /* Chart.js tooltips styling overrides */
+        #chartjs-tooltip {
+            background: rgba(13, 28, 45, 0.9) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px) !important;
+            border-radius: 4px !important;
+            color: #d4e4fa !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 12px !important;
+            padding: 8px 12px !important;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full flex flex-col bg-surface-container-low/80 backdrop-blur-3xl h-screen w-64 border-r border-white/10 shadow-[0px_20px_40px_rgba(0,0,0,0.4)] z-50 transition-all duration-300" id="sidebar">
+<div class="p-container-padding flex items-center justify-between border-b border-white/10 bg-surface-container-low">
+<div class="flex items-center gap-3 overflow-hidden">
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center border border-primary/30 shrink-0">
+<span class="material-symbols-outlined text-primary">local_hospital</span>
+</div>
+<div class="sidebar-text whitespace-nowrap">
+<h1 class="font-headline-md text-headline-md font-bold text-primary truncate">Medilife Pathology</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Clinical Command Center</p>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface p-1 md:hidden" id="toggleSidebar">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto py-stack-md flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="sidebar-text font-label-sm text-label-sm tracking-wide">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">send_and_archive</span>
+<span class="sidebar-text font-label-sm text-label-sm tracking-wide">Send Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container/10 text-primary border-r-2 border-primary hover:bg-white/5 transition-all duration-300 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="sidebar-text font-label-sm text-label-sm tracking-wide">Business Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="sidebar-text font-label-sm text-label-sm tracking-wide">Day Schedule</span>
+</a>
+</div>
+<div class="p-container-padding border-t border-white/10 bg-surface-container-low">
+<button class="w-full bg-primary-container text-on-primary-container hover:bg-primary-fixed-dim transition-colors py-2 rounded flex items-center justify-center gap-2 font-label-sm text-label-sm font-bold uppercase tracking-wider mb-stack-md sidebar-text">
+<span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                New Analysis
+            </button>
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-2 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300 rounded" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="sidebar-text font-label-sm text-label-sm">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-2 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300 rounded" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="sidebar-text font-label-sm text-label-sm">Support</span>
+</a>
+</div>
+<div class="mt-stack-md flex items-center gap-3 sidebar-text">
+<img alt="Medical Administrator Profile" class="w-8 h-8 rounded-full border border-white/20 object-cover" data-alt="Close up portrait of a female medical administrator in a clinical setting, wearing glasses and a dark blue scrub top. Professional, focused lighting, high quality clinical futurism aesthetic, deep space navy background hints." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNwzG9ZdXhUVMixiUaAcX8LvFIkTsQvfCVdXbfrpvtKBMnC3sVKB18DfULt3051eAeUdbyTOw7M8A7xZprBUZqYU4ALGbAzUD9uPDqHgz8YXnjo53vxPVI1rU6uMtNJVpbZiO-P7VJ2hdP36fMMmCdH6DEL_S9mB3lZ5v7ftzYRYSjVUcjjBnW1KFl7Jy3R9Mm6c65LFGCD93qtssTQ1r91y95ek36l49f4EsinPcQi2PbsQjkJC9c"/>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Admin User</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" style="font-size: 10px;">ID: ML-8492</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<main class="flex-1 flex flex-col min-h-screen w-full transition-all duration-300 ml-64 relative" id="mainContent">
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-64 z-40 flex justify-between items-center px-container-padding bg-surface-container/60 backdrop-blur-2xl w-full h-16 border-b border-white/10 transition-all duration-300" id="topHeader">
+<div class="flex items-center gap-4 w-1/3">
+<button class="text-on-surface-variant hover:text-on-surface p-1 hidden md:block" id="toggleSidebarDesktop">
+<span class="material-symbols-outlined">menu_open</span>
+</button>
+<div class="relative w-full max-w-md hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size: 20px;">search</span>
+<input class="w-full bg-surface-container-highest border border-white/10 rounded pl-10 pr-4 py-1.5 font-label-sm text-label-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all" placeholder="Search analytics..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-stack-md">
+<div class="flex bg-surface-container-highest rounded border border-white/10 p-0.5">
+<button class="px-3 py-1 font-label-sm text-label-sm rounded bg-white/10 text-on-surface shadow-sm">Today</button>
+<button class="px-3 py-1 font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface">7D</button>
+<button class="px-3 py-1 font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface flex items-center gap-1">
+                        Custom <span class="material-symbols-outlined" style="font-size: 14px;">expand_more</span>
+</button>
+</div>
+<div class="flex items-center gap-3">
+<button class="text-on-surface-variant hover:text-on-surface relative p-1 hover:bg-white/5 transition-colors rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full pulse-dot"></span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface p-1 hover:bg-white/5 transition-colors rounded-full">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="flex-1 mt-16 p-container-padding md:p-stack-lg overflow-y-auto">
+<div class="mb-stack-md flex justify-between items-end">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface tracking-tight mb-2">Business Analytics</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Live overview of laboratory performance and revenue metrics.</p>
+</div>
+<div class="flex items-center gap-2 bg-secondary-fixed-dim/10 px-3 py-1.5 rounded border border-secondary-fixed-dim/20">
+<span class="w-2 h-2 bg-secondary-fixed-dim rounded-full pulse-dot"></span>
+<span class="font-data-numeric text-data-numeric text-secondary-fixed-dim">SYSTEM LIVE</span>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-stack-md">
+<!-- KPI 1 -->
+<div class="glass-panel p-stack-md rounded-lg md:col-span-3 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Revenue</span>
+<span class="material-symbols-outlined text-primary/70">payments</span>
+</div>
+<div>
+<div class="font-display-lg text-headline-lg md:text-display-lg text-on-surface font-bold text-glow">$124,500</div>
+<div class="flex items-center gap-1 mt-2 text-secondary-fixed-dim font-label-sm text-label-sm">
+<span class="material-symbols-outlined" style="font-size: 16px;">trending_up</span>
+<span>+12.5% vs last week</span>
+</div>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="glass-panel p-stack-md rounded-lg md:col-span-3 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Avg Turnaround</span>
+<span class="material-symbols-outlined text-primary/70">timer</span>
+</div>
+<div>
+<div class="font-display-lg text-headline-lg md:text-display-lg text-on-surface font-bold">4.2 <span class="text-headline-md text-on-surface-variant font-normal">hrs</span></div>
+<div class="flex items-center gap-1 mt-2 text-secondary-fixed-dim font-label-sm text-label-sm">
+<span class="material-symbols-outlined" style="font-size: 16px;">trending_down</span>
+<span>-0.5 hrs vs avg</span>
+</div>
+</div>
+</div>
+<!-- Test Volume Status -->
+<div class="glass-panel p-stack-md rounded-lg md:col-span-6 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Test Volume Pipeline</span>
+<span class="material-symbols-outlined text-primary/70">biotech</span>
+</div>
+<div class="flex items-end gap-stack-md">
+<div class="flex-1">
+<div class="flex justify-between font-label-sm text-label-sm mb-2">
+<span class="text-on-surface">Processed (842)</span>
+<span class="text-on-surface-variant">Pending (158)</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="h-full bg-primary" style="width: 84%"></div>
+<div class="h-full bg-outline-variant" style="width: 16%"></div>
+</div>
+</div>
+<div class="text-right">
+<div class="font-display-lg text-headline-lg text-on-surface font-bold">1,000</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-1">Total Tests Today</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-stack-md">
+<!-- Revenue Chart -->
+<div class="glass-panel p-stack-md rounded-lg md:col-span-8 flex flex-col">
+<div class="flex justify-between items-center mb-stack-md">
+<h3 class="font-headline-md text-headline-md text-on-surface font-medium">Revenue Overview</h3>
+<button class="text-primary font-label-sm text-label-sm flex items-center gap-1 hover:underline">
+                            Detailed Report <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+</button>
+</div>
+<div class="flex-1 relative min-h-[300px]">
+<canvas id="revenueChart"></canvas>
+</div>
+</div>
+<!-- Popular Tests Donut -->
+<div class="glass-panel p-stack-md rounded-lg md:col-span-4 flex flex-col">
+<div class="flex justify-between items-center mb-stack-md">
+<h3 class="font-headline-md text-headline-md text-on-surface font-medium">Test Distribution</h3>
+<span class="material-symbols-outlined text-on-surface-variant">pie_chart</span>
+</div>
+<div class="flex-1 relative min-h-[250px] flex items-center justify-center">
+<canvas id="distributionChart"></canvas>
+<!-- Center Text -->
+<div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+<span class="font-display-lg text-headline-lg text-on-surface font-bold">CBC</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Top Request</span>
+</div>
+</div>
+<div class="mt-4 flex flex-col gap-2">
+<div class="flex justify-between items-center font-label-sm text-label-sm">
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-[#00E5FF]"></span> <span class="text-on-surface">CBC</span></div>
+<span class="font-data-numeric text-data-numeric text-on-surface-variant">45%</span>
+</div>
+<div class="flex justify-between items-center font-label-sm text-label-sm">
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-[#006875]"></span> <span class="text-on-surface">Glucose</span></div>
+<span class="font-data-numeric text-data-numeric text-on-surface-variant">30%</span>
+</div>
+<div class="flex justify-between items-center font-label-sm text-label-sm">
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-[#3b494c]"></span> <span class="text-on-surface">Lipid Profile</span></div>
+<span class="font-data-numeric text-data-numeric text-on-surface-variant">25%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Staff Efficiency Table -->
+<div class="glass-panel rounded-lg overflow-hidden">
+<div class="p-stack-md border-b border-white/5 flex justify-between items-center bg-surface-container-low/50">
+<h3 class="font-headline-md text-headline-md text-on-surface font-medium">Staff Efficiency Metrics</h3>
+<div class="flex gap-2">
+<button class="p-1.5 rounded border border-white/10 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors"><span class="material-symbols-outlined" style="font-size: 18px;">filter_list</span></button>
+<button class="p-1.5 rounded border border-white/10 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors"><span class="material-symbols-outlined" style="font-size: 18px;">download</span></button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-highest/30">
+<th class="py-3 px-stack-md font-label-sm text-label-sm text-on-surface-variant uppercase font-medium border-b border-white/5">Operator ID</th>
+<th class="py-3 px-stack-md font-label-sm text-label-sm text-on-surface-variant uppercase font-medium border-b border-white/5">Name</th>
+<th class="py-3 px-stack-md font-label-sm text-label-sm text-on-surface-variant uppercase font-medium border-b border-white/5">Tests Completed</th>
+<th class="py-3 px-stack-md font-label-sm text-label-sm text-on-surface-variant uppercase font-medium border-b border-white/5">Avg Process Time</th>
+<th class="py-3 px-stack-md font-label-sm text-label-sm text-on-surface-variant uppercase font-medium border-b border-white/5 text-right">Status</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md">
+<tr class="hover:bg-white/5 transition-colors border-b border-white/5 group">
+<td class="py-4 px-stack-md font-data-numeric text-data-numeric text-primary">OP-1042</td>
+<td class="py-4 px-stack-md text-on-surface flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center font-label-sm text-label-sm">SJ</div>
+                                    Sarah Jenkins
+                                </td>
+<td class="py-4 px-stack-md font-data-numeric text-data-numeric text-on-surface">142</td>
+<td class="py-4 px-stack-md font-data-numeric text-data-numeric text-on-surface">12 min</td>
+<td class="py-4 px-stack-md text-right">
+<span class="inline-block px-2 py-1 bg-secondary-fixed-dim/10 text-secondary-fixed-dim font-label-sm text-label-sm rounded border border-secondary-fixed-dim/20">Optimal</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors border-b border-white/5 group">
+<td class="py-4 px-stack-md font-data-numeric text-data-numeric text-primary">OP-1055</td>
+<td class="py-4 px-stack-md text-on-surface flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center font-label-sm text-label-sm">MC</div>
+                                    Marcus Chen
+                                </td>
+<td class="py-4 px-stack-md font-data-numeric text-data-numeric text-on-surface">98</td>
+<td class="py-4 px-stack-md font-data-numeric text-data-numeric text-on-surface">15 min</td>
+<td class="py-4 px-stack-md text-right">
+<span class="inline-block px-2 py-1 bg-secondary-fixed-dim/10 text-secondary-fixed-dim font-label-sm text-label-sm rounded border border-secondary-fixed-dim/20">Optimal</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors border-b border-white/5 group">
+<td class="py-4 px-stack-md font-data-numeric text-data-numeric text-primary">OP-1021</td>
+<td class="py-4 px-stack-md text-on-surface flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center font-label-sm text-label-sm">ER</div>
+                                    Elena Rodriguez
+                                </td>
+<td class="py-4 px-stack-md font-data-numeric text-data-numeric text-on-surface">64</td>
+<td class="py-4 px-stack-md font-data-numeric text-data-numeric text-error">22 min</td>
+<td class="py-4 px-stack-md text-right">
+<span class="inline-block px-2 py-1 bg-error/10 text-error font-label-sm text-label-sm rounded border border-error/20">Review</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Sidebar Toggle Logic
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const topHeader = document.getElementById('topHeader');
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const toggleBtnDesktop = document.getElementById('toggleSidebarDesktop');
+        
+        let isCollapsed = false;
+
+        function toggleSidebar() {
+            isCollapsed = !isCollapsed;
+            if (isCollapsed) {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-20');
+                mainContent.classList.remove('ml-64');
+                mainContent.classList.add('ml-20');
+                topHeader.classList.remove('left-64');
+                topHeader.classList.add('left-20');
+                
+                // Hide text elements in sidebar
+                document.querySelectorAll('.sidebar-text').forEach(el => el.style.display = 'none');
+                
+                // Change icon
+                if(toggleBtnDesktop) toggleBtnDesktop.querySelector('span').textContent = 'menu';
+            } else {
+                sidebar.classList.add('w-64');
+                sidebar.classList.remove('w-20');
+                mainContent.classList.add('ml-64');
+                mainContent.classList.remove('ml-20');
+                topHeader.classList.add('left-64');
+                topHeader.classList.remove('left-20');
+                
+                // Show text elements in sidebar
+                setTimeout(() => {
+                    document.querySelectorAll('.sidebar-text').forEach(el => el.style.display = 'block');
+                }, 150); // slight delay to wait for width transition
+
+                // Change icon
+                 if(toggleBtnDesktop) toggleBtnDesktop.querySelector('span').textContent = 'menu_open';
+            }
+        }
+
+        if(toggleBtn) toggleBtn.addEventListener('click', toggleSidebar);
+        if(toggleBtnDesktop) toggleBtnDesktop.addEventListener('click', toggleSidebar);
+
+        // Chart.js Default Configs for Dark Theme
+        Chart.defaults.color = '#bac9cc';
+        Chart.defaults.font.family = "'JetBrains Mono', monospace";
+        Chart.defaults.font.size = 10;
+        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+
+        // Revenue Line Chart
+        const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+        
+        // Create gradient for line chart
+        const gradientRevenue = ctxRevenue.createLinearGradient(0, 0, 0, 300);
+        gradientRevenue.addColorStop(0, 'rgba(0, 229, 255, 0.4)'); // Primary color with opacity
+        gradientRevenue.addColorStop(1, 'rgba(0, 229, 255, 0.0)');
+
+        new Chart(ctxRevenue, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Daily Revenue',
+                    data: [15000, 18200, 16500, 21000, 19500, 14000, 20300],
+                    borderColor: '#00E5FF',
+                    backgroundColor: gradientRevenue,
+                    borderWidth: 2,
+                    pointBackgroundColor: '#051424', // background color
+                    pointBorderColor: '#00E5FF',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.4 // smooth curves
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        border: { display: false },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value / 1000 + 'k';
+                            }
+                        }
+                    },
+                    x: {
+                        border: { display: false },
+                        grid: { display: false }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+
+        // Test Distribution Donut Chart
+        const ctxDist = document.getElementById('distributionChart').getContext('2d');
+        new Chart(ctxDist, {
+            type: 'doughnut',
+            data: {
+                labels: ['CBC', 'Glucose', 'Lipid Profile'],
+                datasets: [{
+                    data: [45, 30, 25],
+                    backgroundColor: [
+                        '#00E5FF', // Primary
+                        '#006875', // Inverse Primary
+                        '#3b494c'  // Outline Variant
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '80%', // Thin donut
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body></html>

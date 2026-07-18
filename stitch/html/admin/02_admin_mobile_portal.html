@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medilife Admin - High Efficiency Portal (Mobile)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#053900",
+                        "tertiary-fixed": "#dee2f5",
+                        "on-tertiary-fixed": "#161b29",
+                        "on-error": "#690005",
+                        "inverse-surface": "#d4e4fa",
+                        "on-primary-fixed": "#001f24",
+                        "surface-tint": "#00daf3",
+                        "secondary-fixed": "#79ff5b",
+                        "secondary": "#d7ffc5",
+                        "error-container": "#93000a",
+                        "surface": "#051424",
+                        "on-tertiary": "#2b303e",
+                        "surface-dim": "#051424",
+                        "surface-container-low": "#0d1c2d",
+                        "primary": "#c3f5ff",
+                        "outline": "#849396",
+                        "surface-container": "#122131",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c2c6d8",
+                        "secondary-container": "#2ff801",
+                        "on-primary-container": "#00626e",
+                        "background": "#051424",
+                        "surface-variant": "#273647",
+                        "on-surface-variant": "#bac9cc",
+                        "secondary-fixed-dim": "#2ae500",
+                        "surface-bright": "#2c3a4c",
+                        "on-tertiary-container": "#545968",
+                        "tertiary": "#e9ecff",
+                        "surface-container-lowest": "#010f1f",
+                        "primary-fixed-dim": "#00daf3",
+                        "outline-variant": "#3b494c",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed-variant": "#424656",
+                        "surface-container-high": "#1c2b3c",
+                        "surface-container-highest": "#273647",
+                        "on-secondary-fixed": "#022100",
+                        "on-secondary-container": "#0f6d00",
+                        "on-primary": "#00363d",
+                        "inverse-primary": "#006875",
+                        "on-primary-fixed-variant": "#004f58",
+                        "on-background": "#d4e4fa",
+                        "on-secondary-fixed-variant": "#095300",
+                        "primary-fixed": "#9cf0ff",
+                        "on-surface": "#d4e4fa",
+                        "tertiary-container": "#ccd0e3",
+                        "primary-container": "#00e5ff",
+                        "inverse-on-surface": "#233143"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "48px",
+                        "container-padding": "24px",
+                        "stack-sm": "12px",
+                        "stack-md": "24px",
+                        "gutter": "16px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "data-numeric": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+                        "data-numeric": ["14px", { "lineHeight": "1.0", "letterSpacing": "0em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .live-pulse {
+            animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
+<!-- TopNavBar (Mobile) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-3xl shadow-[0px_20px_40px_rgba(0,0,0,0.4)] flex justify-between items-center px-container-padding h-16 w-full">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl">science</span>
+<h1 class="font-headline-md-mobile text-headline-md-mobile font-bold text-primary tracking-tight">Medilife</h1>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="relative hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-secondary-container rounded-full live-pulse"></span>
+</button>
+<button class="hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a medical operator in a sterile, high-tech clinical environment. The lighting is cool and professional, with subtle teal highlights reflecting off a glass visor. The operator appears focused and efficient against a dark, out-of-focus background of blinking control panels." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcRd1fJOFuwAOSddJJt2hwZX_grWn4Wb9ntOberyAsSRpnx9zMudjVFPmNWcIi7kG3o6CFOWc-G2THAItGqsPo-hVkig6OEBjaYzEFhBWWaDNMtXpexUHTIeoE80hmrW3jvgSGshhakGeNtXKoeTUpc9FWrY4hO74CKP9l9_fXVRxV4hk1b6gGiSOeUAYc9kvMUO_moYvcEz0EqPAuB_WuEN7i4LsA_yaPJANogt2T-9Yc10OfrXYW"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto mt-16 mb-20 px-container-padding py-stack-md flex flex-col gap-stack-md">
+<!-- Check-in Search -->
+<section class="glass-card rounded-xl p-4 flex flex-col gap-3">
+<h2 class="font-headline-md-mobile text-headline-md-mobile text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">person_search</span> Patient Check-in
+            </h2>
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-variant/50 border border-outline-variant rounded-lg py-3 pl-10 pr-4 text-body-md text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_8px_rgba(0,229,255,0.4)] transition-all" placeholder="Scan ID or enter PRN..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 bg-primary/10 text-primary p-1.5 rounded-md hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-sm">qr_code_scanner</span>
+</button>
+</div>
+</section>
+<!-- Current Processing (FIFO) -->
+<section class="flex flex-col gap-stack-sm">
+<div class="flex justify-between items-center">
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">FIFO Queue</h3>
+<span class="bg-secondary-container/10 text-secondary-container font-data-numeric text-data-numeric px-2 py-0.5 rounded flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-secondary-container rounded-full live-pulse"></span> 4 Live
+                </span>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Patient Card 1 -->
+<div class="glass-card rounded-lg p-3 hover:border-white/20 hover:backdrop-blur-[32px] transition-all flex flex-col gap-3 border-l-2 border-l-secondary-container">
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-bright flex items-center justify-center font-data-numeric text-on-surface border border-white/5">
+                                A12
+                            </div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface font-medium">Chen, Marcus</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">PRN: 994-22X</span>
+</div>
+</div>
+<span class="bg-secondary-container/20 text-secondary-container font-label-sm text-label-sm px-2 py-1 rounded">In Queue</span>
+</div>
+<div class="flex justify-between items-center pt-2 border-t border-white/5">
+<span class="font-label-sm text-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-[14px] align-middle mr-1">biotech</span>Comprehensive Blood</span>
+<button class="bg-primary text-black font-label-sm text-label-sm px-4 py-1.5 rounded hover:bg-primary/90 transition-colors">Process</button>
+</div>
+</div>
+<!-- Patient Card 2 -->
+<div class="glass-card rounded-lg p-3 flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center font-data-numeric text-on-surface-variant border border-white/5">
+                                B04
+                            </div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface font-medium opacity-80">Patel, Aisha</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">PRN: 412-88Y</span>
+</div>
+</div>
+<span class="bg-surface-variant text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded">Waiting (12m)</span>
+</div>
+</div>
+<!-- Patient Card 3 -->
+<div class="glass-card rounded-lg p-3 flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center font-data-numeric text-on-surface-variant border border-white/5">
+                                C19
+                            </div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface font-medium opacity-80">Rossi, Elena</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">PRN: 771-09Z</span>
+</div>
+</div>
+<span class="bg-surface-variant text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded">Waiting (24m)</span>
+</div>
+</div>
+</div>
+<button class="w-full py-2 text-primary font-label-sm text-label-sm uppercase tracking-widest hover:bg-white/5 rounded transition-colors flex items-center justify-center gap-2">
+                View Full Queue <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</section>
+<!-- Quick Actions & Status -->
+<section class="grid grid-cols-2 gap-3">
+<button class="glass-card rounded-lg p-4 flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-primary text-2xl">send</span>
+<span class="font-label-sm text-label-sm text-on-surface">Send Reports</span>
+</button>
+<button class="glass-card rounded-lg p-4 flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-primary text-2xl">analytics</span>
+<span class="font-label-sm text-label-sm text-on-surface">Analytics</span>
+</button>
+</section>
+<!-- Staff Break Management -->
+<section class="mt-auto pt-4 border-t border-white/10 flex justify-between items-center gap-4">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Staff Efficiency</span>
+<span class="font-data-numeric text-data-numeric text-on-surface">Op. 772 Active</span>
+</div>
+<div class="flex gap-2">
+<button class="bg-transparent border border-outline text-on-surface-variant font-label-sm text-label-sm px-3 py-1.5 rounded hover:border-primary hover:text-primary transition-colors">
+                    15m Pause
+                </button>
+<button class="bg-transparent border border-outline text-on-surface-variant font-label-sm text-label-sm px-3 py-1.5 rounded hover:border-primary hover:text-primary transition-colors">
+                    30m Break
+                </button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="fixed bottom-0 w-full z-50 md:hidden rounded-t-xl bg-surface/80 backdrop-blur-3xl shadow-[0px_-10px_30px_rgba(0,0,0,0.5)] border-t border-white/10 fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2">
+<button class="flex flex-col items-center justify-center bg-primary-container/20 text-primary rounded-xl px-4 py-1 active:scale-90 duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 duration-150 px-4 py-1">
+<span class="material-symbols-outlined">science</span>
+<span class="font-label-sm text-label-sm mt-1">Labs</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 duration-150 px-4 py-1">
+<span class="material-symbols-outlined">pending_actions</span>
+<span class="font-label-sm text-label-sm mt-1">Queue</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 duration-150 px-4 py-1">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm mt-1">Me</span>
+</button>
+</nav>
+</body></html>

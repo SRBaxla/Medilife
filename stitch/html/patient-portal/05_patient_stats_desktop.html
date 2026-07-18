@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Path - Statistics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container": "#eceef0",
+                      "surface": "#f7f9fb",
+                      "surface-variant": "#e0e3e5",
+                      "tertiary-fixed-dim": "#bec6e0",
+                      "surface-dim": "#d8dadc",
+                      "on-background": "#191c1e",
+                      "secondary-container": "#d4e6e5",
+                      "background": "#f7f9fb",
+                      "primary-fixed": "#a3eeff",
+                      "surface-container-lowest": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "on-secondary-fixed-variant": "#3a4a49",
+                      "secondary": "#516161",
+                      "primary-container": "#008092",
+                      "inverse-primary": "#63d6ec",
+                      "outline": "#6d797c",
+                      "on-primary-container": "#f8fdff",
+                      "outline-variant": "#bcc9cc",
+                      "tertiary-fixed": "#dae2fd",
+                      "on-tertiary-fixed": "#131b2e",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-container-highest": "#e0e3e5",
+                      "on-secondary": "#ffffff",
+                      "tertiary": "#545c72",
+                      "secondary-fixed": "#d4e6e5",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed-variant": "#004e5a",
+                      "on-tertiary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed-dim": "#b8cac9",
+                      "on-surface": "#191c1e",
+                      "on-secondary-container": "#576867",
+                      "surface-tint": "#006877",
+                      "on-tertiary-container": "#fefcff",
+                      "tertiary-container": "#6c748b",
+                      "on-tertiary-fixed-variant": "#3f465c",
+                      "primary-fixed-dim": "#63d6ec",
+                      "inverse-on-surface": "#eff1f3",
+                      "primary": "#006574",
+                      "inverse-surface": "#2d3133",
+                      "on-secondary-fixed": "#0e1e1e",
+                      "surface-bright": "#f7f9fb",
+                      "on-surface-variant": "#3d494b",
+                      "on-error": "#ffffff",
+                      "surface-container-high": "#e6e8ea",
+                      "on-primary-fixed": "#001f25",
+                      "error": "#ba1a1a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xxl": "64px",
+                      "unit": "4px",
+                      "md": "16px",
+                      "xl": "40px",
+                      "container-max": "1280px",
+                      "gutter": "24px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "sm": "8px"
+              },
+              "fontFamily": {
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "30px",
+                              {
+                                      "lineHeight": "38px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+        body {
+            background-color: theme('colors.surface');
+            color: theme('colors.on-surface');
+        }
+        /* Frosted Glass Utilities */
+        .glass-panel {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+        }
+        .clinical-shadow {
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased flex h-screen overflow-hidden">
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden lg:flex flex-col h-screen fixed left-0 top-0 p-md space-y-sm bg-surface dark:bg-inverse-surface w-64 z-40 bg-surface-container-low dark:bg-surface-dim">
+<div class="flex flex-col items-center mb-xl mt-lg">
+<div class="w-20 h-20 rounded-full overflow-hidden mb-sm border-2 border-primary-container p-1">
+<img alt="Lumina Pathology Lab Logo" class="w-full h-full object-cover rounded-full" data-alt="A clean, minimalist logo for a clinical pathology lab named 'Lumina'. The logo features abstract geometric shapes resembling a soft glowing sun or a stylized medical cross, rendered in crisp teal and soft medical blue against a pure white background. The overall mood is sterile, modern, and highly legible, fitting a high-end medical portal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdHBFx9AhJsjAIsbMTo4TR-u0IUQS479cctbOjznsZBtJ_qF5ELDODhUsC6fiowkOfEeMpoF-gMc-1lGP3nisY3udwwnwTr46KDTFCVzjsnnt_bCDzZ-w2b8DioU8wGA-pcSa60HrEcc2oDMpfWj-vM_PpvMZV6DpXIc4WPsGJseLNb9mEGXHisQxOF6y3nn1Y_o63XsQznvQo6g29Np8Pj9soIjOHq0_SZRAdAUvel-zHZM9qFaid"/>
+</div>
+<h1 class="font-headline-md text-headline-md font-extrabold text-primary dark:text-inverse-primary text-center">Patient Portal</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center mt-1">Clinical Results</p>
+</div>
+<div class="flex-1 flex flex-col space-y-2 px-2 w-full">
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all font-label-md text-label-md w-full" href="#">
+<span class="material-symbols-outlined" data-weight="regular">description</span>
+<span>Reports</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-secondary-container dark:bg-on-secondary-container/20 text-on-secondary-container dark:text-secondary-fixed transition-all font-label-md text-label-md w-full" href="#">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span>Statistics</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all font-label-md text-label-md w-full" href="#">
+<span class="material-symbols-outlined" data-weight="regular">person</span>
+<span>Profile</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all font-label-md text-label-md w-full" href="#">
+<span class="material-symbols-outlined" data-weight="regular">settings_suggest</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all font-label-md text-label-md w-full" href="#">
+<span class="material-symbols-outlined" data-weight="regular">help</span>
+<span>Help</span>
+</a>
+</div>
+<div class="mt-auto pt-4 px-2">
+<button class="w-full bg-primary hover:bg-surface-tint text-on-primary font-label-md text-label-md py-3 rounded-lg shadow-sm transition-all flex justify-center items-center active:opacity-80">
+                Book New Test
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col h-screen overflow-hidden lg:ml-64 w-full">
+<!-- TopNavBar (Web) -->
+<header class="hidden md:flex sticky top-0 z-50 flex justify-between items-center px-lg py-md max-w-container-max mx-auto w-full bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-xl shadow-sm">
+<div class="flex items-center">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary mr-xl">Lumina Path</span>
+</div>
+<nav class="flex-1 flex justify-center space-x-8">
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors cursor-pointer active:scale-95 duration-150 py-2" href="#">Reports</a>
+<a class="font-body-md text-body-md text-primary dark:text-inverse-primary border-b-2 border-primary pb-1 cursor-pointer active:scale-95 duration-150 py-2" href="#">Statistics</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors cursor-pointer active:scale-95 duration-150 py-2" href="#">Help</a>
+</nav>
+<div class="flex items-center space-x-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95 duration-150">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95 duration-150">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-outline-variant/30 cursor-pointer active:scale-95 duration-150">
+<img alt="Patient Profile Avatar" class="w-full h-full object-cover" data-alt="A highly detailed close up of a diverse female patient profile avatar. The avatar is rendered in a clean, soft realistic style, softly lit by sterile, white clinical lighting. She is wearing a soft blue top, set against a pristine, soft out-of-focus white background that matches a medical portal's clean, minimalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdaPOGTJmFaFOuktvfKbJyCJEVlaslbNql91eJ7c-ugOtjUXuw3Cq9B3Osm8FhWXk2Lhw00tga7uMurV5nnZCt0HbTiWnjhlcg9z6CUPV_zAlY9LKRejtIFx8rECLy60OQEYauCVexFXZ1c8qO5LdoEIlvSNZFYYhqKoZ1v1egajahB14s1mWaCKIW4V7VkdBZnrZQEHuZr12uPsR25NFsM1hhhivwnn_Fivshamynh800vn1cG43M"/>
+</div>
+</div>
+</header>
+<!-- Main Scrollable Canvas -->
+<main class="flex-1 overflow-y-auto p-4 md:p-lg lg:p-xl space-y-xl pb-32 lg:pb-xl">
+<!-- Page Header -->
+<div class="max-w-container-max mx-auto flex flex-col md:flex-row md:items-end justify-between space-y-4 md:space-y-0">
+<div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Health Statistics</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+                        Monitor your key health markers over time. Consistent tracking helps identify trends early for proactive wellness.
+                    </p>
+</div>
+<!-- Date Range Selector -->
+<div class="flex items-center bg-surface-container-lowest border border-outline-variant/50 rounded-lg p-1 shadow-sm">
+<button class="px-4 py-2 text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-low rounded-md transition-colors">1M</button>
+<button class="px-4 py-2 text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-low rounded-md transition-colors">3M</button>
+<button class="px-4 py-2 text-label-md font-label-md bg-secondary-container text-on-secondary-container rounded-md transition-colors shadow-sm">6M</button>
+<button class="px-4 py-2 text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-low rounded-md transition-colors">1Y</button>
+</div>
+</div>
+<div class="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Insight Card -->
+<div class="lg:col-span-1 glass-panel rounded-xl p-6 flex flex-col justify-between">
+<div>
+<div class="flex items-center space-x-3 mb-4 text-primary">
+<span class="material-symbols-outlined">vital_signs</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Clinical Insight</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+                            Your Vitamin D levels have shown a steady increase over the last 6 months, correlating with your recent supplement regimen. Fasting blood sugar remains stable within the optimal range.
+                        </p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg border border-surface-variant">
+<p class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider mb-2">Next Recommended Action</p>
+<p class="font-body-md text-body-md text-on-surface">Schedule follow-up lipid panel in 3 months.</p>
+</div>
+</div>
+<!-- Main Chart - Hemoglobin -->
+<div class="lg:col-span-2 glass-panel rounded-xl p-6 clinical-shadow">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Hemoglobin (Hb)</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">g/dL - Target: 13.8 - 17.2</p>
+</div>
+<div class="flex items-center space-x-2 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>Optimal</span>
+</div>
+</div>
+<div class="w-full h-64 relative">
+<canvas id="hbChart"></canvas>
+</div>
+</div>
+</div>
+<!-- Bento Grid - Secondary Charts -->
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Blood Sugar Chart -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-xl p-6 shadow-sm">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-body-lg text-body-lg font-semibold text-on-surface">Fasting Blood Sugar</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">mg/dL - Target: 70 - 99</p>
+</div>
+<div class="flex items-center space-x-1 text-primary">
+<span class="material-symbols-outlined text-[20px]">water_drop</span>
+</div>
+</div>
+<div class="w-full h-48 relative">
+<canvas id="glucoseChart"></canvas>
+</div>
+</div>
+<!-- Vitamin D Chart -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-xl p-6 shadow-sm">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-body-lg text-body-lg font-semibold text-on-surface">Vitamin D (25-OH)</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">ng/mL - Target: 30 - 50</p>
+</div>
+<div class="flex items-center space-x-1 text-primary">
+<span class="material-symbols-outlined text-[20px]">light_mode</span>
+</div>
+</div>
+<div class="w-full h-48 relative">
+<canvas id="vitdChart"></canvas>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/90 dark:bg-inverse-surface/90 backdrop-blur-lg rounded-t-xl border-t border-outline-variant/20 shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant active:bg-surface-variant transition-transform active:scale-90 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-weight="regular">description</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-1 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Stats</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant active:bg-surface-variant transition-transform active:scale-90 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-weight="regular">person</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant active:bg-surface-variant transition-transform active:scale-90 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-weight="regular">settings</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Settings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant active:bg-surface-variant transition-transform active:scale-90 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-weight="regular">help</span>
+<span class="font-label-sm text-label-sm-mobile mt-1">Help</span>
+</a>
+</nav>
+<script>
+        // Chart.js Configuration
+        const chartColors = {
+            primary: '#006574', // Tailwind primary
+            secondary: '#a3eeff', // primary-fixed
+            tertiary: '#bec6e0', // tertiary-fixed-dim
+            grid: '#e0e3e5', // surface-variant
+            text: '#3d494b' // on-surface-variant
+        };
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    titleColor: '#191c1e',
+                    bodyColor: '#3d494b',
+                    borderColor: '#e0e3e5',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += context.parsed.y;
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: chartColors.text, font: { family: 'Inter', size: 12 } }
+                },
+                y: {
+                    border: { display: false },
+                    grid: { color: chartColors.grid, drawTicks: false },
+                    ticks: { color: chartColors.text, font: { family: 'Inter', size: 12 }, padding: 10 }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+        };
+
+        // Hemoglobin Line Chart (Smooth)
+        const hbCtx = document.getElementById('hbChart').getContext('2d');
+        const hbGradient = hbCtx.createLinearGradient(0, 0, 0, 300);
+        hbGradient.addColorStop(0, 'rgba(0, 101, 116, 0.2)'); // primary with opacity
+        hbGradient.addColorStop(1, 'rgba(0, 101, 116, 0)');
+
+        new Chart(hbCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Hemoglobin',
+                    data: [14.2, 14.5, 14.1, 14.8, 15.1, 15.0],
+                    borderColor: chartColors.primary,
+                    backgroundColor: hbGradient,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: chartColors.primary,
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.4 // Smooth curves
+                }]
+            },
+            options: commonOptions
+        });
+
+        // Fasting Blood Sugar Bar Chart
+        const glucoseCtx = document.getElementById('glucoseChart').getContext('2d');
+        new Chart(glucoseCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Fasting Blood Sugar',
+                    data: [95, 92, 88, 90, 85, 87],
+                    backgroundColor: chartColors.secondary,
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    ...commonOptions.scales,
+                    y: {
+                        ...commonOptions.scales.y,
+                        suggestedMin: 70,
+                        suggestedMax: 110
+                    }
+                }
+            }
+        });
+
+        // Vitamin D Line Chart (Stepped/Linear)
+        const vitdCtx = document.getElementById('vitdChart').getContext('2d');
+        new Chart(vitdCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Vitamin D',
+                    data: [25, 28, 32, 38, 42, 45],
+                    borderColor: chartColors.tertiary,
+                    borderWidth: 2,
+                    pointBackgroundColor: chartColors.tertiary,
+                    pointRadius: 3,
+                    fill: false,
+                    tension: 0 // Straight lines
+                }]
+            },
+            options: {
+                 ...commonOptions,
+                 scales: {
+                    ...commonOptions.scales,
+                    y: {
+                        ...commonOptions.scales.y,
+                        suggestedMin: 10,
+                        suggestedMax: 60
+                    }
+                }
+            }
+        });
+    </script>
+</body></html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Medilife Booking Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "on-secondary-container": "#576867",
+                        "on-surface-variant": "#3d494b",
+                        "inverse-primary": "#63d6ec",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#bcc9cc",
+                        "on-primary-container": "#f8fdff",
+                        "background": "#f7f9fb",
+                        "surface-container": "#eceef0",
+                        "primary-fixed-dim": "#63d6ec",
+                        "primary": "#006574",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#006877",
+                        "on-primary-fixed": "#001f25",
+                        "secondary": "#516161",
+                        "secondary-container": "#d4e6e5",
+                        "on-secondary-fixed": "#0e1e1e",
+                        "surface-dim": "#d8dadc",
+                        "outline": "#6d797c",
+                        "tertiary-container": "#6c748b",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f2f4f6",
+                        "surface": "#f7f9fb",
+                        "on-secondary-fixed-variant": "#3a4a49",
+                        "tertiary-fixed": "#dae2fd",
+                        "inverse-surface": "#2d3133",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-fixed": "#d4e6e5",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "surface-container-high": "#e6e8ea",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary": "#545c72",
+                        "on-surface": "#191c1e",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-container": "#fefcff",
+                        "secondary-fixed-dim": "#b8cac9",
+                        "on-background": "#191c1e",
+                        "on-tertiary-fixed": "#131b2e",
+                        "primary-fixed": "#a3eeff",
+                        "primary-container": "#008092",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#004e5a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "xxl": "64px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "container-max": "1280px",
+                        "xl": "40px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen pb-[100px]">
+<!-- Top Navigation (Mobile focused) -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl flex justify-between items-center px-lg py-sm shadow-sm transition-all duration-300 ease-in-out">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="science" style="font-variation-settings: 'FILL' 1;">science</span>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Medilife Pathology</span>
+</div>
+<button class="p-xs rounded-full hover:bg-secondary-container/50 transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="close">close</span>
+</button>
+</header>
+<main class="pt-[80px] px-md max-w-[600px] mx-auto space-y-lg">
+<!-- Header Section -->
+<section class="text-center pt-md pb-sm">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-xs">Book Appointment</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Select your required tests and preferred time slot.</p>
+</section>
+<!-- Step 1: Patient Details (Minimized) -->
+<div class="glass-card rounded-xl p-md flex justify-between items-center opacity-70">
+<div>
+<span class="font-label-sm text-label-sm text-primary mb-xs block">STEP 1</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Patient Details</span>
+</div>
+<span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<!-- Step 2: Select Tests -->
+<section class="glass-card rounded-xl p-md space-y-md">
+<div>
+<span class="font-label-sm text-label-sm text-primary mb-xs block">STEP 2</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Select Tests</h2>
+</div>
+<!-- Horizontal Pill Scroll -->
+<div class="flex overflow-x-auto no-scrollbar gap-sm pb-xs -mx-md px-md">
+<button class="flex-shrink-0 px-md py-sm rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm transition-transform active:scale-95">Complete Blood Count</button>
+<button class="flex-shrink-0 px-md py-sm rounded-full bg-surface-container-low border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">Lipid Profile</button>
+<button class="flex-shrink-0 px-md py-sm rounded-full bg-surface-container-low border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">Thyroid Panel</button>
+<button class="flex-shrink-0 px-md py-sm rounded-full bg-surface-container-low border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">Diabetes Screening</button>
+</div>
+<!-- Selected Tests List -->
+<div class="space-y-sm pt-sm border-t border-outline-variant/30">
+<div class="flex justify-between items-center p-sm bg-surface-container-lowest rounded-lg border border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-medium text-on-surface">Complete Blood Count (CBC)</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">$45.00</span>
+</div>
+<button class="text-error p-xs rounded-full hover:bg-error-container/50 transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Step 3: Date & Time Picker -->
+<section class="glass-card rounded-xl p-md space-y-md">
+<div>
+<span class="font-label-sm text-label-sm text-primary mb-xs block">STEP 3</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Schedule Date &amp; Time</h2>
+</div>
+<!-- Date Selection (Horizontal) -->
+<div class="space-y-sm">
+<h3 class="font-label-md text-label-md text-on-surface-variant">Select Date</h3>
+<div class="flex overflow-x-auto no-scrollbar gap-sm pb-xs -mx-md px-md">
+<!-- Dates -->
+<button class="flex-shrink-0 flex flex-col items-center justify-center w-[64px] h-[72px] rounded-xl bg-surface-container-low border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="font-label-sm text-label-sm uppercase">Mon</span>
+<span class="font-headline-md text-headline-md">12</span>
+</button>
+<button class="flex-shrink-0 flex flex-col items-center justify-center w-[64px] h-[72px] rounded-xl bg-primary text-on-primary shadow-sm transition-transform active:scale-95">
+<span class="font-label-sm text-label-sm uppercase">Tue</span>
+<span class="font-headline-md text-headline-md">13</span>
+</button>
+<button class="flex-shrink-0 flex flex-col items-center justify-center w-[64px] h-[72px] rounded-xl bg-surface-container-low border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="font-label-sm text-label-sm uppercase">Wed</span>
+<span class="font-headline-md text-headline-md">14</span>
+</button>
+<button class="flex-shrink-0 flex flex-col items-center justify-center w-[64px] h-[72px] rounded-xl bg-surface-container-low border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="font-label-sm text-label-sm uppercase">Thu</span>
+<span class="font-headline-md text-headline-md">15</span>
+</button>
+<button class="flex-shrink-0 flex flex-col items-center justify-center w-[64px] h-[72px] rounded-xl bg-surface-container-low border border-outline-variant text-on-surface-variant opacity-50 cursor-not-allowed">
+<span class="font-label-sm text-label-sm uppercase">Fri</span>
+<span class="font-headline-md text-headline-md">16</span>
+</button>
+</div>
+</div>
+<!-- Time Selection Grid -->
+<div class="space-y-sm pt-sm border-t border-outline-variant/30">
+<h3 class="font-label-md text-label-md text-on-surface-variant">Select Time</h3>
+<div class="grid grid-cols-3 gap-sm">
+<button class="py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">08:00 AM</button>
+<button class="py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">08:30 AM</button>
+<button class="py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-md text-label-md opacity-50 cursor-not-allowed line-through">09:00 AM</button>
+<button class="py-sm rounded-lg bg-primary/10 border-2 border-primary text-primary font-label-md text-label-md font-bold">09:30 AM</button>
+<button class="py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">10:00 AM</button>
+<button class="py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors">10:30 AM</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Fixed Bottom CTA Bar -->
+<div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-md border-t border-outline-variant/50 p-md z-40 pb-[env(safe-area-inset-bottom)]">
+<div class="max-w-[600px] mx-auto flex justify-between items-center gap-md">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Total Cost</span>
+<span class="font-headline-md text-headline-md font-bold text-primary">$45.00</span>
+</div>
+<button class="flex-1 bg-primary text-on-primary py-[14px] rounded-xl font-label-md text-label-md font-bold shadow-lg shadow-primary/20 hover:shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-sm">
+                Proceed to Checkout
+                <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Send Medical Reports - Medilife Pathology</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed-variant": "#095300",
+                      "secondary": "#d7ffc5",
+                      "secondary-container": "#2ff801",
+                      "tertiary": "#e9ecff",
+                      "on-background": "#d4e4fa",
+                      "on-secondary-container": "#0f6d00",
+                      "primary": "#c3f5ff",
+                      "on-primary-fixed": "#001f24",
+                      "surface-container": "#122131",
+                      "surface-container-lowest": "#010f1f",
+                      "surface-dim": "#051424",
+                      "tertiary-fixed": "#dee2f5",
+                      "surface-container-low": "#0d1c2d",
+                      "background": "#051424",
+                      "error": "#ffb4ab",
+                      "surface-bright": "#2c3a4c",
+                      "secondary-fixed-dim": "#2ae500",
+                      "on-tertiary-fixed-variant": "#424656",
+                      "on-primary-container": "#00626e",
+                      "outline": "#849396",
+                      "error-container": "#93000a",
+                      "surface-container-high": "#1c2b3c",
+                      "surface-container-highest": "#273647",
+                      "primary-fixed": "#9cf0ff",
+                      "on-tertiary-fixed": "#161b29",
+                      "on-primary": "#00363d",
+                      "surface": "#051424",
+                      "on-surface": "#d4e4fa",
+                      "inverse-surface": "#d4e4fa",
+                      "on-tertiary-container": "#545968",
+                      "on-error-container": "#ffdad6",
+                      "tertiary-fixed-dim": "#c2c6d8",
+                      "on-surface-variant": "#bac9cc",
+                      "on-secondary": "#053900",
+                      "primary-fixed-dim": "#00daf3",
+                      "on-primary-fixed-variant": "#004f58",
+                      "on-tertiary": "#2b303e",
+                      "tertiary-container": "#ccd0e3",
+                      "outline-variant": "#3b494c",
+                      "secondary-fixed": "#79ff5b",
+                      "inverse-on-surface": "#233143",
+                      "surface-variant": "#273647",
+                      "on-error": "#690005",
+                      "on-secondary-fixed": "#022100",
+                      "primary-container": "#00e5ff",
+                      "inverse-primary": "#006875",
+                      "surface-tint": "#00daf3"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-sm": "12px",
+                      "stack-lg": "48px",
+                      "base": "8px",
+                      "gutter": "16px",
+                      "stack-md": "24px",
+                      "container-padding": "24px"
+              },
+              "fontFamily": {
+                      "label-sm": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "data-numeric": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "data-numeric": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "letterSpacing": "0em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0em",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #0A0F1C; /* Base Layer */
+            color: #d4e4fa; /* on-surface */
+        }
+        
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background-color: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+        
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            transition: all 0.3s ease;
+        }
+
+        .ambient-shadow {
+            box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .glow-focus:focus-within {
+            border-color: #00E5FF;
+            box-shadow: 0 0 4px #00E5FF;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(5, 20, 36, 0.5); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2); 
+        }
+        
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #39FF14;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(57, 255, 20, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); }
+        }
+      </style>
+</head>
+<body class="bg-[#0A0F1C] text-on-surface antialiased overflow-hidden min-h-screen font-body-md text-body-md">
+<!-- TopNavBar Web (Suppressed BottomNav) -->
+<nav class="hidden md:flex justify-between items-center px-container-padding h-16 w-full fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-3xl shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
+<div class="flex items-center gap-gutter">
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Medilife Pathology</span>
+</div>
+<div class="flex items-center gap-base">
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary hover:bg-white/5 transition-colors duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary hover:bg-white/5 transition-colors duration-200">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/10 ml-2">
+<img alt="Medical Operator Avatar" class="w-full h-full object-cover" data-alt="A macro photograph of a highly detailed, futuristic glowing blue medical cross emblem on a dark textured metallic surface. The light from the cross softly illuminates the surrounding metal, creating a professional and sterile mood. Cinematic lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWUyI7qQ0zva2mj7acOTDnMap6EtCL1VVd7Sxy3CwnBVqmK7aqRtLi-9Pfq_8eZ6luB9ox5TR4iD9WsTaFSMSkkXERCNX44C-yJ2PBKFmisv0urfpjP3X07lT2soVliTuscuiqHQxkNaBaO_WFKtXNZJxttjzwMkgKet0So76rhkN3CRXYdWafVWv_brzTHStsSvw3eMRZGFyUEwvMdkq7AS0svIzNr6JbiORhxAXUk10zkLXlVGxZ"/>
+</div>
+</div>
+</nav>
+<div class="flex h-screen pt-16">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col py-stack-md gap-base bg-surface/60 backdrop-blur-2xl fixed left-0 top-16 h-[calc(100vh-64px)] w-64 border-r border-white/10 shadow-none z-40">
+<div class="px-container-padding mb-stack-sm flex items-center gap-3">
+<div class="pulse-dot"></div>
+<div>
+<h2 class="font-label-sm text-label-sm text-on-surface">System Live</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant opacity-70">Operator ID: 772</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1 px-3">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-white/5 hover:text-on-surface transition-colors duration-200 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-white/5 hover:text-on-surface transition-colors duration-200 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">event_note</span>
+                    Bookings
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-white/5 hover:text-on-surface transition-colors duration-200 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+                    Patients
+                </a>
+<!-- Active State Example -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary border-r-2 border-primary font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">description</span>
+                    Reports
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-white/5 hover:text-on-surface transition-colors duration-200 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">biotech</span>
+                    Inventory
+                </a>
+</nav>
+<div class="mt-auto flex flex-col gap-1 px-3">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-white/5 hover:text-on-surface transition-colors duration-200 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+                    Help
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-white/5 hover:text-on-surface transition-colors duration-200 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                    Logout
+                </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-0 md:ml-64 p-4 md:p-12 overflow-y-auto">
+<div class="max-w-7xl mx-auto space-y-stack-md">
+<!-- Header -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div>
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-sm mb-2 group" href="#">
+<span class="material-symbols-outlined text-[16px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                            Back to Dashboard
+                        </a>
+<h1 class="font-headline-lg text-headline-lg text-white">Send Medical Report</h1>
+<p class="text-on-surface-variant mt-1">Select patient and input clinical data securely.</p>
+</div>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Section 1: Patient Selection (Col span 4) -->
+<div class="lg:col-span-4 space-y-stack-md">
+<section class="glass-panel rounded-xl p-6 ambient-shadow">
+<h2 class="font-headline-md text-headline-md text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined">person_search</span>
+                                Patient Context
+                            </h2>
+<div class="space-y-4">
+<div class="glow-focus transition-all duration-200 rounded-lg p-1 bg-surface-container border border-white/10">
+<label class="block font-label-sm text-label-sm text-on-surface-variant px-3 pt-2 mb-1">Select Patient</label>
+<select class="w-full bg-transparent border-none text-white focus:ring-0 text-sm py-2 px-3 appearance-none cursor-pointer">
+<option class="bg-surface-dim text-on-surface-variant" value="">-- Select Patient by PRN --</option>
+<option class="bg-surface-dim" selected="" value="994-22X">Marcus Chen (PRN: 994-22X)</option>
+<option class="bg-surface-dim" value="812-44Y">Sarah Jenkins (PRN: 812-44Y)</option>
+<option class="bg-surface-dim" value="771-90A">David Okafor (PRN: 771-90A)</option>
+</select>
+</div>
+<div class="p-4 rounded-lg bg-surface-container/50 border border-white/5">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Selected Test</span>
+<span class="bg-[#39FF14]/10 text-[#39FF14] px-2 py-1 rounded font-label-sm text-label-sm border border-[#39FF14]/20 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#39FF14]"></span>
+                                            Pending
+                                        </span>
+</div>
+<p class="text-white font-medium">Comprehensive Metabolic Panel (CMP)</p>
+<p class="text-sm text-on-surface-variant mt-1">Req ID: REQ-2023-8842</p>
+</div>
+<div class="pt-4 border-t border-white/5">
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Collection Date:</span>
+<span class="text-white font-data-numeric">Oct 24, 2023 08:30 AM</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Section 2: Report Entry Form (Col span 8) -->
+<div class="lg:col-span-8">
+<section class="glass-panel rounded-xl p-6 ambient-shadow h-full flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">science</span>
+                                    Clinical Data Entry
+                                </h2>
+<button class="text-primary border border-primary/30 hover:bg-primary/10 px-4 py-2 rounded-lg font-label-sm text-label-sm transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">document_scanner</span>
+                                    Import from Analyzer
+                                </button>
+</div>
+<!-- Data Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-8 flex-1">
+<!-- Input Field Group -->
+<div class="relative group">
+<div class="flex justify-between items-end mb-1">
+<label class="font-label-sm text-label-sm text-on-surface">Glucose</label>
+<span class="font-label-sm text-[10px] text-on-surface-variant">Ref: 70 - 99 mg/dL</span>
+</div>
+<div class="flex items-center bg-surface-container border border-white/10 rounded-lg glow-focus overflow-hidden">
+<input class="w-full bg-transparent border-none text-white font-data-numeric text-data-numeric focus:ring-0 px-3 py-2" placeholder="e.g. 92" type="text" value="95"/>
+<span class="px-3 text-on-surface-variant text-sm border-l border-white/10 bg-black/20">mg/dL</span>
+</div>
+</div>
+<div class="relative group">
+<div class="flex justify-between items-end mb-1">
+<label class="font-label-sm text-label-sm text-on-surface">BUN (Blood Urea Nitrogen)</label>
+<span class="font-label-sm text-[10px] text-on-surface-variant">Ref: 6 - 20 mg/dL</span>
+</div>
+<div class="flex items-center bg-surface-container border border-white/10 rounded-lg glow-focus overflow-hidden">
+<input class="w-full bg-transparent border-none text-white font-data-numeric text-data-numeric focus:ring-0 px-3 py-2" placeholder="e.g. 14" type="text"/>
+<span class="px-3 text-on-surface-variant text-sm border-l border-white/10 bg-black/20">mg/dL</span>
+</div>
+</div>
+<div class="relative group">
+<div class="flex justify-between items-end mb-1">
+<label class="font-label-sm text-label-sm text-on-surface">Creatinine</label>
+<span class="font-label-sm text-[10px] text-on-surface-variant">Ref: 0.74 - 1.35 mg/dL</span>
+</div>
+<!-- Highlighting abnormal state conceptually -->
+<div class="flex items-center bg-error-container/20 border border-error/50 rounded-lg focus-within:border-error focus-within:box-shadow-[0_0_4px_#ffb4ab] overflow-hidden">
+<input class="w-full bg-transparent border-none text-error font-data-numeric text-data-numeric focus:ring-0 px-3 py-2" type="text" value="1.42"/>
+<span class="px-3 text-error/70 text-sm border-l border-error/20 bg-error-container/30">mg/dL</span>
+</div>
+<div class="absolute -top-1 -right-1">
+<span class="material-symbols-outlined text-error text-[14px] bg-[#0A0F1C] rounded-full">warning</span>
+</div>
+</div>
+<div class="relative group">
+<div class="flex justify-between items-end mb-1">
+<label class="font-label-sm text-label-sm text-on-surface">Sodium</label>
+<span class="font-label-sm text-[10px] text-on-surface-variant">Ref: 134 - 144 mmol/L</span>
+</div>
+<div class="flex items-center bg-surface-container border border-white/10 rounded-lg glow-focus overflow-hidden">
+<input class="w-full bg-transparent border-none text-white font-data-numeric text-data-numeric focus:ring-0 px-3 py-2" placeholder="e.g. 140" type="text"/>
+<span class="px-3 text-on-surface-variant text-sm border-l border-white/10 bg-black/20">mmol/L</span>
+</div>
+</div>
+<div class="relative group">
+<div class="flex justify-between items-end mb-1">
+<label class="font-label-sm text-label-sm text-on-surface">Potassium</label>
+<span class="font-label-sm text-[10px] text-on-surface-variant">Ref: 3.5 - 5.2 mmol/L</span>
+</div>
+<div class="flex items-center bg-surface-container border border-white/10 rounded-lg glow-focus overflow-hidden">
+<input class="w-full bg-transparent border-none text-white font-data-numeric text-data-numeric focus:ring-0 px-3 py-2" placeholder="e.g. 4.2" type="text"/>
+<span class="px-3 text-on-surface-variant text-sm border-l border-white/10 bg-black/20">mmol/L</span>
+</div>
+</div>
+<div class="relative group">
+<div class="flex justify-between items-end mb-1">
+<label class="font-label-sm text-label-sm text-on-surface">Chloride</label>
+<span class="font-label-sm text-[10px] text-on-surface-variant">Ref: 96 - 106 mmol/L</span>
+</div>
+<div class="flex items-center bg-surface-container border border-white/10 rounded-lg glow-focus overflow-hidden">
+<input class="w-full bg-transparent border-none text-white font-data-numeric text-data-numeric focus:ring-0 px-3 py-2" placeholder="e.g. 102" type="text"/>
+<span class="px-3 text-on-surface-variant text-sm border-l border-white/10 bg-black/20">mmol/L</span>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="mt-auto pt-6 border-t border-white/10 flex justify-end items-center gap-4">
+<button class="text-on-surface-variant hover:text-white px-4 py-2 font-label-sm text-label-sm transition-colors">
+                                    Clear Form
+                                </button>
+<button class="bg-[#00E5FF] hover:bg-[#00daf3] text-black px-6 py-3 rounded-lg font-bold flex items-center gap-2 transition-all transform active:scale-95 shadow-[0_0_15px_rgba(0,229,255,0.3)]">
+<span class="material-symbols-outlined text-[20px]">send</span>
+                                    Generate &amp; Send Report
+                                </button>
+</div>
+</section>
+</div>
+</div>
+</div>
+<div class="h-24"></div> <!-- Spacer for scrolling -->
+</main>
+</div>
+</body></html>

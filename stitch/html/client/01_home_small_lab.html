@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medilife Pathology | Professional Care, Local Heart</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed-variant": "#3f465c",
+                    "surface-container-high": "#e6e8ea",
+                    "tertiary": "#545c72",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#63d6ec",
+                    "outline-variant": "#bcc9cc",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f7f9fb",
+                    "on-tertiary-container": "#fefcff",
+                    "secondary-fixed-dim": "#b8cac9",
+                    "on-surface-variant": "#3d494b",
+                    "tertiary-container": "#6c748b",
+                    "primary-container": "#008092",
+                    "inverse-on-surface": "#eff1f3",
+                    "primary-fixed": "#a3eeff",
+                    "on-surface": "#191c1e",
+                    "on-secondary-fixed-variant": "#3a4a49",
+                    "on-primary-fixed-variant": "#004e5a",
+                    "on-background": "#191c1e",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-secondary-fixed": "#0e1e1e",
+                    "on-secondary-container": "#576867",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#63d6ec",
+                    "secondary": "#516161",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#d4e6e5",
+                    "surface-tint": "#006877",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#2d3133",
+                    "on-primary-fixed": "#001f25",
+                    "tertiary-fixed": "#dae2fd",
+                    "on-tertiary-fixed": "#131b2e",
+                    "on-secondary": "#ffffff",
+                    "surface-variant": "#e0e3e5",
+                    "on-primary-container": "#f8fdff",
+                    "background": "#f7f9fb",
+                    "surface-container": "#eceef0",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "secondary-container": "#d4e6e5",
+                    "primary": "#006574",
+                    "outline": "#6d797c",
+                    "surface-dim": "#d8dadc",
+                    "surface-container-low": "#f2f4f6",
+                    "surface": "#f7f9fb",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "xxl": "64px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "unit": "4px",
+                    "xl": "40px",
+                    "sm": "8px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f7f9fb;
+        color: #191c1e;
+      }
+      .frosted-glass {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .clinical-shadow {
+        box-shadow: 0px 4px 12px rgba(15, 23, 42, 0.05);
+      }
+      .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0px 12px 32px rgba(15, 23, 42, 0.1);
+      }
+    </style>
+</head>
+<body class="antialiased">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl shadow-sm">
+<nav class="max-w-container-max mx-auto px-lg py-sm flex justify-between items-center h-16">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+                Medilife Pathology
+            </div>
+<div class="hidden md:flex items-center gap-lg">
+<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-1" href="#">Home</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">Tests</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">Packages</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">About Us</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">Contact</a>
+<a class="px-md py-sm bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:opacity-90 transition-all clinical-shadow" href="#">Book Now</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="md:hidden p-sm text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<button class="hidden lg:flex items-center gap-xs px-md py-sm border border-outline-variant rounded-lg text-primary hover:bg-secondary-container/50 transition-all font-label-md text-label-md">
+<span class="material-symbols-outlined">person</span>
+                    Patient Portal
+                </button>
+</div>
+</nav>
+</header>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative min-h-[870px] flex items-center overflow-hidden bg-surface">
+<!-- Background Decoration -->
+<div class="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
+
+</div>
+<div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-2 gap-xl items-center relative z-10">
+<div class="space-y-lg">
+<div class="inline-flex items-center gap-sm px-md py-xs bg-secondary-container text-on-secondary-container rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Trusted Local Clinic</span>
+</div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">
+                        Professional Care, <br/>
+<span class="text-primary">Local Heart.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
+                        Medilife Pathology brings world-class clinical diagnostics to your doorstep. We prioritize accuracy and your comfort above all else.
+                    </p>
+<div class="flex flex-wrap gap-md">
+<button class="px-xl py-md bg-primary text-on-primary rounded-xl font-label-md text-label-md hover:shadow-lg transition-all flex items-center gap-sm">
+                            Book a Test
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="px-xl py-md bg-secondary-container text-primary rounded-xl font-label-md text-label-md hover:bg-outline-variant/20 transition-all border border-primary/10">
+                            View All Packages
+                        </button>
+</div>
+<div class="flex items-center gap-lg pt-md">
+<div class="flex -space-x-4">
+<div class="w-12 h-12 rounded-full border-4 border-surface bg-slate-200 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A close-up, high-quality portrait of a friendly female medical technician in a clean white lab coat, smiling warmly. The background is a soft-focus clinical environment with bright, natural Lumina lighting and teal accents, conveying trust and professionalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfyhslT6GeoImSF76khy2hspcU3tyvjPKP4ra5Q-UqwksFqLV2v0Z4-JIvGVZVXbJAYV7A9MrM7TYkdSk7WIjBpxZla18VDf9hTmI4t6qPrtcIr1WNg7a5faVhCR29bU4KIRg7LBk9RgbPI9s4_Ez3b6QlJyb1ygAPwLGoas5eZfnVC08Au9DM7T9BpZUgVl97je6T7R83HAuRP7ll3kkQW__w7LLSZRffZosTtWBgvPKKVsSkFLHC"/>
+</div>
+<div class="w-12 h-12 rounded-full border-4 border-surface bg-slate-300 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a male lab specialist in professional medical attire, looking approachable and confident. The lighting is crisp and bright, following a modern medical aesthetic with soft blue and teal tones in a minimalist clinic setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-Nr96ChLxT8MKwbNPr_Pj0svnqIaZ7CMOGbpPBPhzh5obJqkCyzczHVFX1_EAkKuvFcp0QZWSfDAFIOR1BSAJQuwMmf4jjQ6_N0IgpwyCjvbTBRPLswu2ciLaEL_VbQJWxGpbefkYobNctLnulQGPObsTgLpRHxNQyLA6869mHY_4DpG_ZJUJrobDKyM0ErlaMoNOZnan26xwegUzdCQ09tQg83CUNH2Fc4d2gtNZEXdW_4tP3tCX"/>
+</div>
+</div>
+<div>
+<p class="font-label-md text-label-md font-bold">15,000+</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Happy Local Patients</p>
+</div>
+</div>
+</div>
+<div class="relative hidden lg:block">
+<div class="relative z-10 rounded-[2rem] overflow-hidden clinical-shadow border-8 border-white">
+<img class="w-full aspect-[4/5] object-cover" data-alt="A wide-angle, bright and airy photograph of a modern, clean pathology lab exterior with large glass windows. The signage is professional and welcoming, reflecting a minimalist medical aesthetic with Clinical Teal accents and warm sunlight hitting the facade." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKv044Eff9tjp0FSRHc1mG4_XrRryU4CtttWQbWAXeB-yelUn1Mq4dwSq8IBawsz0fUumE4QUVeUdf5QnnbWlPMgGjccJN9hgaFufQO-keJqhCVG3KN9z67Kp3kLhlZhpnoSMlOSGnYsgJgd253meYe5h1Q4LiM2dASEfLj4DaIP3fkGkVo7URPmnZKmzX1CyZBisNR_PQQzZMVQGMA7Cf1wNOZUHEk6h5lCDwqE2FPYiqQz3oPlOC"/>
+</div>
+<!-- Decorative Elements -->
+<div class="absolute -bottom-6 -left-6 w-48 h-48 bg-primary-fixed-dim/30 rounded-3xl -z-0 blur-2xl"></div>
+<div class="absolute -top-6 -right-6 w-32 h-32 bg-secondary-fixed/50 rounded-full -z-0 blur-xl"></div>
+<!-- Floating Quick Info -->
+<div class="absolute top-1/4 -right-8 frosted-glass p-md rounded-xl clinical-shadow border border-white/40 animate-bounce-slow">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+</div>
+<div>
+<p class="text-[10px] font-bold uppercase tracking-tight text-on-surface-variant">Fast Results</p>
+<p class="text-xs font-medium">Reports in 4 Hours</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Services Section -->
+<section class="py-xxl px-lg bg-surface-bright">
+<div class="max-w-container-max mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-xl gap-md">
+<div class="max-w-xl">
+<p class="text-primary font-label-md text-label-md mb-xs uppercase tracking-widest">Our Expertise</p>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Comprehensive Diagnostic Services</h2>
+</div>
+<a class="text-primary font-label-md text-label-md flex items-center gap-xs hover:underline" href="#">
+                        Browse all tests <span class="material-symbols-outlined">open_in_new</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-lg">
+<!-- Service 1 -->
+<div class="bg-white p-lg rounded-2xl clinical-shadow hover-lift border border-outline-variant/30 flex flex-col h-full">
+<div class="w-12 h-12 bg-secondary-container rounded-xl flex items-center justify-center text-primary mb-md">
+<span class="material-symbols-outlined">bloodtype</span>
+</div>
+<h3 class="font-headline-sm text-[18px] font-bold mb-sm">Routine Blood Tests</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg flex-grow">Complete Blood Count (CBC), Lipid Profile, and more with clinical precision.</p>
+<div class="pt-md border-t border-outline-variant flex justify-between items-center">
+<span class="font-label-md text-label-md font-bold text-primary">Starting ₹499</span>
+<button class="p-sm rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Service 2 -->
+<div class="bg-white p-lg rounded-2xl clinical-shadow hover-lift border border-outline-variant/30 flex flex-col h-full">
+<div class="w-12 h-12 bg-secondary-container rounded-xl flex items-center justify-center text-primary mb-md">
+<span class="material-symbols-outlined">home_health</span>
+</div>
+<h3 class="font-headline-sm text-[18px] font-bold mb-sm">Home Collection</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg flex-grow">Trained phlebotomists collect samples from the comfort of your home or office.</p>
+<div class="pt-md border-t border-outline-variant flex justify-between items-center">
+<span class="font-label-md text-label-md font-bold text-primary">Free for Seniors</span>
+<button class="p-sm rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Service 3 -->
+<div class="bg-white p-lg rounded-2xl clinical-shadow hover-lift border border-outline-variant/30 flex flex-col h-full">
+<div class="w-12 h-12 bg-secondary-container rounded-xl flex items-center justify-center text-primary mb-md">
+<span class="material-symbols-outlined">package_2</span>
+</div>
+<h3 class="font-headline-sm text-[18px] font-bold mb-sm">Health Packages</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg flex-grow">Specially curated wellness panels for every age group and clinical need.</p>
+<div class="pt-md border-t border-outline-variant flex justify-between items-center">
+<span class="font-label-md text-label-md font-bold text-primary">Starting ₹1,299</span>
+<button class="p-sm rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Service 4 -->
+<div class="bg-white p-lg rounded-2xl clinical-shadow hover-lift border border-outline-variant/30 flex flex-col h-full">
+<div class="w-12 h-12 bg-secondary-container rounded-xl flex items-center justify-center text-primary mb-md">
+<span class="material-symbols-outlined">ecg</span>
+</div>
+<h3 class="font-headline-sm text-[18px] font-bold mb-sm">Specialized Tests</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg flex-grow">Genetic screening, hormone testing, and advanced cardiology biomarkers.</p>
+<div class="pt-md border-t border-outline-variant flex justify-between items-center">
+<span class="font-label-md text-label-md font-bold text-primary">Contact for Pricing</span>
+<button class="p-sm rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Why Choose Us - Bento Grid Style -->
+<section class="py-xxl px-lg bg-surface">
+<div class="max-w-container-max mx-auto">
+<div class="text-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-md">The Medilife Advantage</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">We combine advanced technology with a personal touch that only a local partner can provide.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-lg h-auto md:h-[600px]">
+<!-- Large Feature -->
+<div class="md:col-span-2 md:row-span-2 bg-white rounded-3xl overflow-hidden clinical-shadow relative group">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A clean, sterile laboratory environment where a professional technician in a blue scrub is looking at a high-end microscope. The scene is bright and airy with the Lumina clinical style, featuring soft light and subtle teal accents. The mood is precise and focused." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_LwSpN2fI51Fdcx_Zywb3xgyPKVVlrZ6ad42GIBveRv6OAZxbe_Ps3c-B_mOXqqnq6km8AyxRmt8xC2PDwfICTwz-E15C0KIVWv7WeP1QjqGqT-ayJy31ZJLD5Xs_UblGVrAN94F9Xfq9JWhac0peTtWryQbH3seGO4w6toYHjC9ncyHFT1vVuY2ZJwSOW3daaV_h1LHaaHc12D7xL10HY45kVlOPsFCxOxdMKwykEhBYif1k8q2K"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-xl">
+<h3 class="font-headline-lg text-headline-lg text-white mb-md">Clinical Excellence</h3>
+<p class="text-white/80 font-body-lg text-body-lg max-w-md">Our lab is equipped with NABL-compliant machinery ensuring 99.9% accuracy for every report generated.</p>
+</div>
+</div>
+<!-- Small Feature 1 -->
+<div class="bg-primary p-lg rounded-3xl clinical-shadow flex flex-col justify-center items-center text-center text-on-primary">
+<span class="material-symbols-outlined text-[48px] mb-md" style="font-variation-settings: 'FILL' 1;">speed</span>
+<h4 class="font-headline-md text-headline-md mb-xs">Fast TAT</h4>
+<p class="font-label-md text-label-md opacity-90">Turnaround time under 24 hours for most routine tests.</p>
+</div>
+<!-- Small Feature 2 -->
+<div class="bg-white p-lg rounded-3xl clinical-shadow border border-outline-variant/30 flex flex-col justify-center">
+<div class="flex items-center gap-md mb-md">
+<div class="w-12 h-12 bg-secondary-container text-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">volunteer_activism</span>
+</div>
+<h4 class="font-headline-md text-headline-md">Personalized</h4>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">We treat every sample as a person, not a number. Dedicated patient support for report explanation.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Team Section -->
+<section class="py-xxl px-lg bg-surface-bright">
+<div class="max-w-container-max mx-auto text-center">
+<p class="text-primary font-label-md text-label-md mb-xs uppercase tracking-widest">Our Medical Experts</p>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-xl">Meet Your Care Team</h2>
+<div class="flex flex-wrap justify-center gap-xl">
+<!-- Doctor 1 -->
+<div class="w-full max-w-sm group">
+<div class="relative rounded-[2rem] overflow-hidden mb-lg aspect-square clinical-shadow">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="A portrait of Dr. Anjali Sharma, a professional female pathologist in her 40s wearing a stethoscope and a white doctor's coat. She has a friendly, reassuring expression. The setting is a clean, modern medical office with Lumina light aesthetic, featuring soft pastels and clinical teal branding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnrrg3hK53LmnYrQhPvW5UeoKO0w49dvuCdTkjK5OtfBrDx0VthD7o5xI2-bimNDGu7vdksvxQ8wawHD7gFK9xRov64Gkj-baOmFMwXRLSNt_G_EXhAHsQnI0seEvEv2_c-P9T8yx73dAXmisHS4e-MvLv9xa_ASTWS0U4eMTr6eREfvJWyqH2bfWLN3Z8qmD2D9V2eUa4_P4E4CIxkghzz8fMzQ9l7yFHQmqHmptmHmURCx2NlaMC"/>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-lg">
+<div class="frosted-glass px-lg py-sm rounded-full text-primary font-bold">15+ Years Experience</div>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Dr. Anjali Sharma</h3>
+<p class="text-primary font-label-md text-label-md mb-md">Head Pathologist, MBBS, MD</p>
+<p class="font-body-md text-body-md text-on-surface-variant italic">"Your health journey starts with the right diagnosis. We are here to guide you with care and accuracy."</p>
+</div>
+<!-- Doctor 2 -->
+<div class="w-full max-w-sm group">
+<div class="relative rounded-[2rem] overflow-hidden mb-lg aspect-square clinical-shadow">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="A portrait of Dr. Rajesh Iyer, a male senior lab consultant with a kind smile, wearing professional clinical attire. The background is a minimalist medical corridor with bright, diffused Lumina lighting and high-quality finishes, reflecting trust and community focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXkhk9N2qqwAZknig4ASaGGgDO1Lgt_9h0Gbj_0YRXsLFA-HD4obPf8zVITkwdRSvTRXr5S7IxGXzoaX_J2lUHJo6vg9JeQtVVQbJFeTFZQ43Qzplg7G1dL6_BiL9qYwNUOFLb05j0ohM8QLOBLvnnt-tVr4TmPKsYURXUasl5IUNeZjWYJzhdY6OqYwYtyv9y0MyeYcfUQqmWBubVkORl19YrcwmHE0s9jN3kgak5LMhuA12UfZba"/>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-lg">
+<div class="frosted-glass px-lg py-sm rounded-full text-primary font-bold">Clinical Consultant</div>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Dr. Rajesh Iyer</h3>
+<p class="text-primary font-label-md text-label-md mb-md">Senior Lab Consultant</p>
+<p class="font-body-md text-body-md text-on-surface-variant italic">"We focus on the small details of your health so you can focus on living your life to the fullest."</p>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-xxl px-lg relative">
+<div class="max-w-container-max mx-auto bg-primary-container rounded-[3rem] p-xl md:p-xxl flex flex-col items-center text-center text-on-primary-container overflow-hidden relative">
+<!-- Background Glow -->
+<div class="absolute -top-1/2 -left-1/4 w-full h-full bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-md relative z-10">Start Your Health Check Today</h2>
+<p class="font-body-lg text-body-lg mb-xl max-w-2xl opacity-90 relative z-10">Don't wait for symptoms. Regular health screenings are the foundation of a long, healthy life. Book your appointment now.</p>
+<div class="flex flex-wrap justify-center gap-md relative z-10">
+<button class="px-xl py-md bg-white text-primary rounded-xl font-headline-sm text-[18px] hover:shadow-xl transition-all">Schedule Home Visit</button>
+<button class="px-xl py-md bg-primary-fixed-dim text-on-primary-fixed-variant rounded-xl font-headline-sm text-[18px] hover:bg-white/90 transition-all">Call Us: +91 98765 43210</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container dark:bg-surface-container-highest border-t border-outline-variant">
+<div class="max-w-container-max mx-auto py-xxl px-lg grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="space-y-md">
+<div class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed-dim">
+                    Medilife Pathology
+                </div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Your neighborhood partner for health and wellness. Clinical excellence with a local heart.
+                </p>
+<div class="flex gap-md">
+<a class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">public</span>
+</a>
+<a class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+</a>
+</div>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-md uppercase tracking-widest text-on-surface">Quick Links</h4>
+<ul class="space-y-sm">
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">About Us</a></li>
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">Lab Locations</a></li>
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">Accreditation</a></li>
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">Careers</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-md uppercase tracking-widest text-on-surface">Tests &amp; Packages</h4>
+<ul class="space-y-sm">
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">Full Body Checkup</a></li>
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">Diabetic Profile</a></li>
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">Thyroid Tests</a></li>
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">Lipid Profile</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-md uppercase tracking-widest text-on-surface">Support</h4>
+<ul class="space-y-sm">
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">Privacy Policy</a></li>
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">Terms of Service</a></li>
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">Report Tracking</a></li>
+<li><a class="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline" href="#">FAQ</a></li>
+</ul>
+</div>
+</div>
+<div class="border-t border-outline-variant max-w-container-max mx-auto py-lg px-lg flex flex-col md:flex-row justify-between items-center gap-md text-on-surface-variant">
+<p class="font-body-md text-body-md">© 2024 Medilife Pathology. Clinical Excellence &amp; Professional Care.</p>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">verified</span>
+<span class="font-label-sm text-label-sm">NABL Accredited &amp; ISO Certified</span>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions and interactions
+        document.querySelectorAll('button, a').forEach(elem => {
+            elem.addEventListener('mouseenter', () => {
+                // Subtle scale effect handled by Tailwind classes mostly, 
+                // but can add custom JS logic here if needed
+            });
+        });
+
+        // Sticky Header Reveal on scroll
+        let lastScroll = 0;
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll <= 0) {
+                header.classList.remove('shadow-lg');
+                header.classList.add('shadow-sm');
+                return;
+            }
+            if (currentScroll > lastScroll) {
+                // Scrolling down
+                header.style.transform = 'translateY(-100%)';
+            } else {
+                // Scrolling up
+                header.style.transform = 'translateY(0)';
+                header.classList.add('shadow-lg');
+            }
+            lastScroll = currentScroll;
+        });
+    </script>
+</body></html>
