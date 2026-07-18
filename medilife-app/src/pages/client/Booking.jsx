@@ -16,12 +16,12 @@ const sampleTests = [
   { name: 'Kidney Function Test', price: 549 },
 ]
 
-const DEFAULT_TENANT_ID = import.meta.env.VITE_DEFAULT_TENANT_ID || import.meta.env.NEXT_PUBLIC_CURRENT_TENANT_ID || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e';
+const DEFAULT_TENANT_ID = import.meta.env.VITE_DEFAULT_TENANT_ID || import.meta.env.VITE_PUBLIC_CURRENT_TENANT_ID || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e';
 
 export default function Booking() {
   const navigate = useNavigate()
   const { tenantSlug } = useParams()
-  
+
   const [step, setStep] = useState(0)
   const [selected, setSelected] = useState([])
   const [collection, setCollection] = useState('')
@@ -37,7 +37,7 @@ export default function Booking() {
   const [patientPhone, setPatientPhone] = useState('')
   const [patientEmail, setPatientEmail] = useState('')
   const [patientPassword, setPatientPassword] = useState('')
-  
+
   // Submission / Overlay States
   const [bookingLoading, setBookingLoading] = useState(false)
   const [bookingError, setBookingError] = useState(null)
@@ -111,7 +111,7 @@ export default function Booking() {
 
       // 3. User does not exist: provision new user via signUp
       const tempPassword = 'TempBooking' + Math.random().toString(36).slice(-8) + '1!';
-      
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: patientEmail,
         password: tempPassword,
@@ -259,7 +259,7 @@ export default function Booking() {
               {step < steps.length - 1 ? (
                 <button onClick={() => setStep((s) => s + 1)} className="btn-primary ml-auto flex items-center gap-xs"
                   disabled={
-                    (step === 0 && selected.length === 0) || 
+                    (step === 0 && selected.length === 0) ||
                     (step === 2 && (!selectedDate || !selectedSlot)) ||
                     (step === 3 && (!patientName || !patientAge || !patientPhone || !patientEmail))
                   }
@@ -268,8 +268,8 @@ export default function Booking() {
                   <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </button>
               ) : (
-                <button 
-                  onClick={handleConfirmBooking} 
+                <button
+                  onClick={handleConfirmBooking}
                   className="btn-primary ml-auto bg-emerald-600 hover:opacity-90 flex items-center gap-xs"
                   disabled={bookingLoading}
                 >
@@ -444,15 +444,15 @@ export default function Booking() {
       <AnimatePresence>
         {showLoginIntercept && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-lg bg-black/60 backdrop-blur-sm">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               className="bg-surface-container-lowest max-w-md w-full rounded-2xl border border-outline-variant/30 p-xl shadow-clinical relative"
             >
-              <button 
+              <button
                 type="button"
-                onClick={() => setShowLoginIntercept(false)} 
+                onClick={() => setShowLoginIntercept(false)}
                 className="absolute top-md right-md text-on-surface-variant hover:text-on-surface"
               >
                 <span className="material-symbols-outlined">close</span>
@@ -471,10 +471,10 @@ export default function Booking() {
               <form onSubmit={handleLoginAndConfirm} className="space-y-md">
                 <div>
                   <label className="text-label-md text-on-surface-variant mb-xs block">Password</label>
-                  <input 
-                    required 
-                    type="password" 
-                    className="input-field" 
+                  <input
+                    required
+                    type="password"
+                    className="input-field"
                     placeholder="Enter your account password"
                     value={patientPassword}
                     onChange={(e) => setPatientPassword(e.target.value)}
@@ -489,16 +489,16 @@ export default function Booking() {
                 )}
 
                 <div className="flex gap-md mt-lg">
-                  <button 
-                    type="button" 
-                    onClick={() => setShowLoginIntercept(false)} 
+                  <button
+                    type="button"
+                    onClick={() => setShowLoginIntercept(false)}
                     className="btn-outline flex-1 justify-center"
                     disabled={bookingLoading}
                   >
                     Cancel
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="btn-primary flex-1 justify-center bg-primary text-on-primary"
                     disabled={bookingLoading}
                   >
