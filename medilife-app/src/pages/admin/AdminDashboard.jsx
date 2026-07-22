@@ -35,22 +35,37 @@ export default function AdminDashboard() {
       setQueueLoading(true)
       const { data, error } = await supabase
         .from('bookings')
-        .select('*')
+        .select(`
+          *,
+          user_profiles:patient_id (
+            full_name,
+            email,
+            gender
+          )
+        `)
         .eq('tenant_id', targetTenantId)
         .order('created_at', { ascending: false })
 
       if (error) throw error
 
       if (data && data.length > 0) {
-        const formatted = data.map((b) => ({
-          id: b.id,
-          name: b.patient_name || 'Patient',
-          age: b.patient_age || 30,
-          gender: b.gender || 'M',
-          tests: Array.isArray(b.tests) ? b.tests : [b.test_name || 'General Checkup'],
-          status: b.status || 'waiting',
-          time: new Date(b.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }))
+        const formatted = data.map((b) => {
+          const dateStr = b.booking_date ? new Date(b.booking_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Today'
+          const timeSlotStr = b.time_slot || (b.created_at ? new Date(b.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '09:00 AM')
+
+          return {
+            id: b.id,
+            patient_id: b.patient_id,
+            name: b.patient_name || b.user_profiles?.full_name || 'Patient',
+            age: b.patient_age || 30,
+            gender: b.gender || b.user_profiles?.gender || 'M',
+            tests: Array.isArray(b.tests) ? b.tests : [b.test_name || 'General Checkup'],
+            status: b.status || 'waiting',
+            dateStr,
+            timeSlotStr,
+            time: `${dateStr} • ${timeSlotStr}`
+          }
+        })
         setPatients(formatted)
       } else {
         setPatients([])
@@ -102,10 +117,26 @@ export default function AdminDashboard() {
     resolveTenant()
   }, [currentTenantSlug])
 
+  // Realtime subscription to live bookings changes
+  useEffect(() => {
+    if (!tenantId) return
+
+    const channel = supabase
+      .channel('public:bookings')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => {
+        fetchLiveQueue(tenantId)
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [tenantId])
+
   const advance = async (id) => {
     const target = patients.find(p => p.id === id)
     if (!target) return
-    const newStatus = target.status === 'waiting' ? 'in-progress' : 'done'
+    const newStatus = (target.status === 'waiting' || target.status === 'pending') ? 'in-progress' : 'done'
 
     // Local state update
     setPatients((prev) => prev.map((p) => p.id === id ? { ...p, status: newStatus } : p))
@@ -116,12 +147,48 @@ export default function AdminDashboard() {
         .from('bookings')
         .update({ status: newStatus })
         .eq('id', id)
+
+      // When test sample collection is completed, automatically route appointment to Send Report section
+      if (newStatus === 'done') {
+        // Find matching test in catalog
+        const { data: catalogMatches } = await supabase
+          .from('test_catalog')
+          .select('id')
+          .limit(1)
+
+        const defaultTestId = catalogMatches && catalogMatches.length > 0 ? catalogMatches[0].id : null
+
+        // Check if report row exists
+        const { data: existingReport } = await supabase
+          .from('patient_reports')
+          .select('id')
+          .eq('appointment_id', id)
+          .maybeSingle()
+
+        if (!existingReport && defaultTestId) {
+          await supabase
+            .from('patient_reports')
+            .insert({
+              appointment_id: id,
+              patient_id: target.patient_id || tenantId,
+              patient_name: target.name || 'Patient',
+              test_id: defaultTestId,
+              status: 'processing',
+              results_data: {}
+            })
+        }
+      }
     } catch (err) {
-      console.error("Failed to update booking status in Supabase:", err)
+      console.error("Failed to update booking status or auto-generate report row in Supabase:", err)
     }
   }
 
-  const filtered = filter === 'all' ? patients : patients.filter((p) => p.status === filter)
+  const filtered = filter === 'all' 
+    ? patients 
+    : patients.filter((p) => {
+        if (filter === 'waiting') return p.status === 'waiting' || p.status === 'pending' || p.status === 'scheduled'
+        return p.status === filter
+      })
 
   return (
     <PageTransition>
@@ -220,9 +287,9 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-md">
                 {[
                   { label: 'Total Today', value: patients.length, icon: 'groups', color: 'text-clinical-teal' },
-                  { label: 'Waiting', value: patients.filter((p) => p.status === 'waiting').length, icon: 'schedule', color: 'text-amber-400' },
-                  { label: 'In Progress', value: patients.filter((p) => p.status === 'in-progress').length, icon: 'hourglass_top', color: 'text-blue-400' },
-                  { label: 'Completed', value: patients.filter((p) => p.status === 'done').length, icon: 'check_circle', color: 'text-emerald-400' },
+                  { label: 'Waiting', value: patients.filter((p) => p.status === 'waiting' || p.status === 'pending' || p.status === 'scheduled').length, icon: 'schedule', color: 'text-amber-400' },
+                  { label: 'In Progress', value: patients.filter((p) => p.status === 'in-progress' || p.status === 'processing').length, icon: 'hourglass_top', color: 'text-blue-400' },
+                  { label: 'Completed', value: patients.filter((p) => p.status === 'done' || p.status === 'completed' || p.status === 'complete').length, icon: 'check_circle', color: 'text-emerald-400' },
                 ].map(({ label, value, icon, color }, i) => (
                   <motion.div key={label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }} className="card-admin p-lg">
                     <div className="flex justify-between items-start mb-sm">
@@ -276,7 +343,15 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="flex items-center gap-md shrink-0">
-                          <span className="text-label-sm text-admin-on-surface-variant">{p.time}</span>
+                          <div className="flex flex-col items-end text-right">
+                            <span className="text-label-sm font-bold text-clinical-teal font-mono flex items-center gap-xs">
+                              <span className="material-symbols-outlined text-[14px]">schedule</span>
+                              {p.timeSlotStr}
+                            </span>
+                            <span className="text-[11px] text-admin-on-surface-variant/80 font-mono">
+                              {p.dateStr}
+                            </span>
+                          </div>
                           <span className={`px-sm py-xs rounded-full border text-label-sm font-bold ${sc.color} ${sc.bg} flex items-center gap-xs`}>
                             <span className="material-symbols-outlined text-[14px]">{sc.icon}</span>
                             {sc.label}

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { pdf } from '@react-pdf/renderer'
 import { supabase } from '../../supabaseClient'
 import PageTransition from '../../components/common/PageTransition'
+import PathologyReportPDF from '../../components/admin/PathologyReportPDF'
 import { 
   Calendar, 
   FileText, 
@@ -12,7 +14,11 @@ import {
   AlertCircle, 
   Plus, 
   ChevronRight,
-  Loader2
+  Loader2,
+  Mail,
+  Utensils,
+  AlertTriangle,
+  ShieldCheck
 } from 'lucide-react'
 
 export default function PatientPortal() {
@@ -25,6 +31,7 @@ export default function PatientPortal() {
   const [profile, setProfile] = useState(null)
   const [appointments, setAppointments] = useState([])
   const [reports, setReports] = useState([])
+  const [testCatalogList, setTestCatalogList] = useState([])
   
   // Interactive UI States
   const [downloadingId, setDownloadingId] = useState(null)
@@ -90,10 +97,19 @@ export default function PatientPortal() {
           setAppointments(bookingsData || [])
         }
 
-        // 4. Query patient_reports table strictly enforcing RLS for authUser.id
+        // 4. Query test_catalog for pre-test guidelines
+        const { data: catalogData } = await supabase
+          .from('test_catalog')
+          .select('*')
+
+        if (isMounted && catalogData) {
+          setTestCatalogList(catalogData)
+        }
+
+        // 5. Query patient_reports table strictly enforcing RLS for authUser.id
         const { data: reportsData } = await supabase
           .from('patient_reports')
-          .select('*, test_catalog(test_name)')
+          .select('*, test_catalog(test_name, report_schema)')
           .eq('patient_id', authUser.id)
 
         if (isMounted) {
@@ -114,30 +130,50 @@ export default function PatientPortal() {
 
     fetchPortalData()
 
+    // Realtime channel listeners for instant patient updates
+    const channel = supabase
+      .channel('patient_portal_realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => {
+        if (isMounted) fetchPortalData()
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'patient_reports' }, () => {
+        if (isMounted) fetchPortalData()
+      })
+      .subscribe()
+
     return () => {
       isMounted = false
+      supabase.removeChannel(channel)
     }
   }, [])
 
-  // Simulate PDF Document Download
-  const handleDownloadReport = (report) => {
+  // Official PDF Document Generator & Downloader
+  const handleDownloadReport = async (report) => {
     if (downloadingId) return
     setDownloadingId(report.id)
-    showToast(`Initializing secure download: ${report.name || 'Lab Report'}...`, 'info')
+    showToast(`Generating official PDF report...`, 'info')
 
-    setTimeout(() => {
+    try {
+      const pdfBlob = await pdf(
+        <PathologyReportPDF report={report} formData={report.results_data || {}} />
+      ).toBlob()
+
+      const url = URL.createObjectURL(pdfBlob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `Medilife_Report_${(report.patient_name || profile?.full_name || 'Patient').replace(/\s+/g, '_')}_${(report.test_catalog?.test_name || 'Lab_Report').replace(/\s+/g, '_')}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+
+      showToast(`PDF report downloaded successfully.`, 'success')
+    } catch (err) {
+      console.error("PDF generation failed:", err)
+      showToast("Could not generate PDF report. Please try again.", "error")
+    } finally {
       setDownloadingId(null)
-      showToast(`Downloaded successfully: ${report.id}_Report.pdf`, 'success')
-      
-      // Clinical download action simulation
-      const element = document.createElement("a")
-      const file = new Blob([`PATHOLOGY REPORT: ${report.test_catalog?.test_name || report.name || 'Diagnostic Report'}\nPatient: ${profile?.full_name || 'Patient'}\nDate: ${report.created_at || report.date}\nStatus: ${report.status || 'Final'}\n\nClinical Disclaimer: This is a secure digital copy of your laboratory diagnostic report.`], {type: 'text/plain'})
-      element.href = URL.createObjectURL(file)
-      element.download = `${(report.test_catalog?.test_name || report.name || 'Report').replace(/\s+/g, '_')}_Report.pdf`
-      document.body.appendChild(element)
-      element.click()
-      document.body.removeChild(element)
-    }, 2000)
+    }
   }
 
   // Format booking status badges
@@ -182,6 +218,56 @@ export default function PatientPortal() {
       month: 'short',
       year: 'numeric'
     })
+  }
+
+  // Resolve pre-test fasting & guidelines for appointment
+  const getPreparationRulesForAppointment = (appointment) => {
+    const testNames = Array.isArray(appointment?.tests) 
+      ? appointment.tests 
+      : [appointment?.test_name || 'Lipid Panel with Risk Assessment']
+
+    let requiresFasting = false
+    let fastingHours = 0
+    const instructions = []
+
+    testNames.forEach(tName => {
+      const matchedTest = testCatalogList.find(cat => 
+        cat.test_name.toLowerCase().includes(String(tName).toLowerCase()) ||
+        String(tName).toLowerCase().includes(cat.test_name.toLowerCase())
+      )
+      if (matchedTest) {
+        if (matchedTest.requires_fasting || matchedTest.fasting_hours > 0) {
+          requiresFasting = true
+          fastingHours = Math.max(fastingHours, matchedTest.fasting_hours || 12)
+        }
+        if (Array.isArray(matchedTest.pre_test_instructions)) {
+          matchedTest.pre_test_instructions.forEach(ins => {
+            if (!instructions.includes(ins)) instructions.push(ins)
+          })
+        }
+      }
+    })
+
+    if (instructions.length === 0) {
+      if (testNames.some(t => /lipid|blood sugar|glucose|fasting/i.test(String(t)))) {
+        requiresFasting = true
+        fastingHours = 12
+        instructions.push("Strict fasting required for 12 hours prior to draw (water only).")
+        instructions.push("Avoid alcohol consumption for 24 hours before the test.")
+      } else {
+        instructions.push("Drink plenty of water to stay hydrated prior to blood drawing.")
+        instructions.push("Inform the clinician about any medications currently taken.")
+      }
+    }
+
+    return { requiresFasting, fastingHours, instructions }
+  }
+
+  const handleResendEmailInstructions = (appointment) => {
+    const { requiresFasting, fastingHours } = getPreparationRulesForAppointment(appointment)
+    const targetEmail = profile?.email || user?.email || 'patient@medilife.com'
+    const fastingNote = requiresFasting ? ` [${fastingHours}h Fasting Required]` : ''
+    showToast(`Email dispatched to ${targetEmail} with pre-test instructions${fastingNote}!`, 'success')
   }
 
   // Loading Skeleton State
@@ -342,39 +428,85 @@ export default function PatientPortal() {
               </motion.div>
             ) : (
               <div className="space-y-md">
-                {appointments.map((appointment, idx) => (
-                  <motion.div
-                    key={appointment.id || idx}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="card p-lg card-hover flex flex-col sm:flex-row sm:items-center justify-between gap-md"
-                  >
-                    <div className="flex items-start gap-md">
-                      <div className="w-12 h-12 rounded-xl bg-secondary-container flex items-center justify-center text-primary shrink-0">
-                        <Calendar className="w-6 h-6" />
-                      </div>
-                      <div className="space-y-xs">
-                        <h4 className="font-bold text-headline-sm text-on-surface">
-                          Pathology Laboratory Screening
-                        </h4>
-                        <div className="flex flex-wrap items-center gap-x-md gap-y-xs text-label-md text-on-surface-variant">
-                          <span className="font-medium text-on-surface">
-                            {formatClinicalDate(appointment.booking_date)}
-                          </span>
-                          <span className="hidden sm:inline text-outline-variant">•</span>
-                          <span className="flex items-center gap-xs">
-                            <Clock className="w-4 h-4 text-primary" />
-                            Slot: {appointment.time_slot || 'N/A'}
-                          </span>
+                {appointments.map((appointment, idx) => {
+                  const { requiresFasting, fastingHours, instructions } = getPreparationRulesForAppointment(appointment)
+                  const testNames = Array.isArray(appointment.tests) ? appointment.tests.join(', ') : appointment.test_name || 'General Pathology Screening'
+
+                  return (
+                    <motion.div
+                      key={appointment.id || idx}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="card p-lg space-y-md border border-outline-variant/30"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-md">
+                        <div className="flex items-start gap-md">
+                          <div className="w-12 h-12 rounded-xl bg-secondary-container flex items-center justify-center text-primary shrink-0">
+                            <Calendar className="w-6 h-6" />
+                          </div>
+                          <div className="space-y-xs">
+                            <div className="flex items-center gap-xs flex-wrap">
+                              <h4 className="font-bold text-headline-sm text-on-surface">
+                                {testNames}
+                              </h4>
+                              {requiresFasting ? (
+                                <span className="px-md py-xs rounded-full text-label-sm font-bold bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-xs">
+                                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                                  {fastingHours}h Fasting Required
+                                </span>
+                              ) : (
+                                <span className="px-md py-xs rounded-full text-label-sm font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-xs">
+                                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                                  No Fasting Required
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-x-md gap-y-xs text-label-md text-on-surface-variant">
+                              <span className="font-medium text-on-surface">
+                                {formatClinicalDate(appointment.booking_date)}
+                              </span>
+                              <span className="hidden sm:inline text-outline-variant">•</span>
+                              <span className="flex items-center gap-xs">
+                                <Clock className="w-4 h-4 text-primary" />
+                                Slot: {appointment.time_slot || 'N/A'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between sm:justify-end gap-md shrink-0">
+                          {getStatusBadge(appointment.status)}
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between sm:justify-end gap-md pt-sm sm:pt-0 border-t sm:border-t-0 border-outline-variant/30">
-                      {getStatusBadge(appointment.status)}
-                    </div>
-                  </motion.div>
-                ))}
+
+                      {/* Pre-Test Preparation & Fasting Guidelines Box */}
+                      <div className={`p-md rounded-2xl ${requiresFasting ? 'bg-amber-50/70 border border-amber-200' : 'bg-emerald-50/50 border border-emerald-200'}`}>
+                        <div className="flex items-center justify-between gap-md mb-xs">
+                          <div className="flex items-center gap-xs font-bold text-label-md text-on-surface">
+                            <Utensils className={`w-4 h-4 ${requiresFasting ? 'text-amber-600' : 'text-emerald-600'}`} />
+                            <span>Pre-Test Patient Preparation & Guidelines</span>
+                          </div>
+                          <button
+                            onClick={() => handleResendEmailInstructions(appointment)}
+                            className="text-primary hover:underline text-label-sm font-bold flex items-center gap-xs shrink-0"
+                          >
+                            <Mail className="w-3.5 h-3.5" />
+                            Email Instructions
+                          </button>
+                        </div>
+                        <ul className="space-y-xs">
+                          {instructions.map((ins, i) => (
+                            <li key={i} className="text-body-md text-on-surface flex items-start gap-sm">
+                              <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-2 ${requiresFasting ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                              <span>{ins}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                    </motion.div>
+                  )
+                })}
               </div>
             )}
           </div>

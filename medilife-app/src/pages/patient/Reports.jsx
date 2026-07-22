@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { PDFDownloadLink } from '@react-pdf/renderer'
 import PageTransition from '../../components/common/PageTransition'
+import PathologyReportPDF from '../../components/admin/PathologyReportPDF'
 import { supabase } from '../../supabaseClient'
 
 const statusMap = { 
@@ -18,6 +20,7 @@ export default function Reports() {
   const [expanded, setExpanded] = useState(null)
 
   useEffect(() => {
+    let isMounted = true
     const fetchReports = async () => {
       try {
         setLoading(true)
@@ -26,18 +29,32 @@ export default function Reports() {
 
         const { data, error } = await supabase
           .from('patient_reports')
-          .select('*, test_catalog(test_name)')
+          .select('*, test_catalog(test_name, report_schema)')
           .eq('patient_id', user.id)
 
         if (error) throw error
-        setReports(data || [])
+        if (isMounted) setReports(data || [])
       } catch (err) {
         console.error("Error fetching reports:", err)
       } finally {
-        setLoading(false)
+        if (isMounted) setLoading(false)
       }
     }
+
     fetchReports()
+
+    // Realtime channel listener for instant report updates
+    const channel = supabase
+      .channel('patient_reports_realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'patient_reports' }, () => {
+        if (isMounted) fetchReports()
+      })
+      .subscribe()
+
+    return () => {
+      isMounted = false
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   const filteredReports = reports.filter((r) => {
@@ -120,10 +137,18 @@ export default function Reports() {
                         )}
                       </div>
                       <div className="flex gap-sm">
-                        <button className="btn-primary text-[13px] py-xs">
-                          <span className="material-symbols-outlined text-[16px]">download</span>
-                          Download PDF
-                        </button>
+                        <PDFDownloadLink
+                          document={<PathologyReportPDF report={r} formData={r.results_data || {}} />}
+                          fileName={`Medilife_Report_${(r.patient_name || 'Patient').replace(/\s+/g, '_')}_${r.id.slice(0, 6)}.pdf`}
+                          className="btn-primary text-[13px] py-xs inline-flex items-center gap-xs text-white"
+                        >
+                          {({ loading: pdfLoading }) => (
+                            <>
+                              <span className="material-symbols-outlined text-[16px]">download</span>
+                              {pdfLoading ? 'Preparing PDF...' : 'Download Official PDF'}
+                            </>
+                          )}
+                        </PDFDownloadLink>
                       </div>
                     </motion.div>
                   )}

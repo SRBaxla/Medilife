@@ -169,9 +169,13 @@ export default function Booking() {
           .insert({
             tenant_id: tenantId,
             patient_id: userId,
+            patient_name: patientName || 'Patient',
+            patient_age: patientAge || '30',
+            gender: patientGender || 'Male',
+            tests: selected.length > 0 ? selected : ['General Checkup'],
             booking_date: selectedDate,
-            time_slot: selectedSlot,
-            status: 'pending'
+            time_slot: selectedSlot || '09:00 AM',
+            status: 'waiting'
           });
 
         if (insertError) throw insertError;
@@ -263,9 +267,13 @@ export default function Booking() {
         .insert({
           tenant_id: tenantId,
           patient_id: userId,
+          patient_name: patientName || 'Patient',
+          patient_age: patientAge || '30',
+          gender: patientGender || 'Male',
+          tests: selected.length > 0 ? selected : ['General Checkup'],
           booking_date: selectedDate,
-          time_slot: selectedSlot,
-          status: 'pending'
+          time_slot: selectedSlot || '09:00 AM',
+          status: 'waiting'
         });
 
       if (insertError) throw insertError;
@@ -305,9 +313,13 @@ export default function Booking() {
         .insert({
           tenant_id: tenantId,
           patient_id: userId,
+          patient_name: patientName || 'Patient',
+          patient_age: patientAge || '30',
+          gender: patientGender || 'Male',
+          tests: selected.length > 0 ? selected : ['General Checkup'],
           booking_date: selectedDate,
-          time_slot: selectedSlot,
-          status: 'pending'
+          time_slot: selectedSlot || '09:00 AM',
+          status: 'waiting'
         });
 
       if (insertError) throw insertError;
@@ -339,7 +351,18 @@ export default function Booking() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <h1 className="text-headline-lg font-bold text-on-surface mb-md">Booking Confirmed!</h1>
             <p className="text-body-lg text-on-surface-variant mb-sm">Booking ID: <span className="font-mono font-bold text-primary">#ML-{Math.random().toString(36).slice(2, 8).toUpperCase()}</span></p>
-            <p className="text-body-md text-on-surface-variant max-w-md mx-auto mb-xl">You'll receive a confirmation on WhatsApp & email. Our team will contact you to confirm the collection time.</p>
+            
+            {/* Pre-Test Fasting & Email Notification Notice Box */}
+            <div className="max-w-md mx-auto mb-lg p-md bg-surface-container border border-outline-variant/30 rounded-2xl text-left space-y-xs">
+              <div className="flex items-center gap-xs font-bold text-label-md text-primary">
+                <span className="material-symbols-outlined text-[20px] text-primary">mail</span>
+                <span>Pre-Test Guidelines Dispatched to Email & Portal</span>
+              </div>
+              <p className="text-body-sm text-on-surface-variant">
+                We have sent an email with your test preparation rules and fasting requirements to your registered address. You can also access these guidelines directly in your Patient Portal.
+              </p>
+            </div>
+
             <div className="flex gap-md justify-center flex-wrap">
               <Link to="/" className="btn-primary">Back to Home</Link>
               <Link to="/portal" className="btn-outline">View Portal</Link>

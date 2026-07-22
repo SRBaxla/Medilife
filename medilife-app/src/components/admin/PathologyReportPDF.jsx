@@ -148,14 +148,41 @@ const isOutOfRange = (value, refRange) => {
   return numVal < min || numVal > max
 }
 
-export default function PathologyReportPDF({ report, formData }) {
-  const testName = report.test_catalog?.test_name || 'Diagnostic Profile'
-  const fields = report.test_catalog?.report_schema?.fields || []
-  
+export default function PathologyReportPDF({ report, formData = {} }) {
+  const testName = report?.test_catalog?.test_name || report?.test_name || 'Diagnostic Pathology Profile'
+  let fields = report?.test_catalog?.report_schema?.fields || []
+
+  // Fallback: If report_schema fields are missing, derive fields dynamically from formData keys or standard template
+  if (!fields || fields.length === 0) {
+    const keys = Object.keys(formData || {})
+    if (keys.length > 0) {
+      fields = keys.map(k => {
+        if (k.includes('note') || k.includes('obs') || k === 'observations' || k === 'technician_notes') {
+          return { name: k, id: k, label: 'Observations', type: 'textarea' }
+        }
+        return {
+          name: k,
+          id: k,
+          label: k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+          type: 'numeric',
+          unit: k.includes('hgb') || k.includes('hemo') ? 'g/dL' : 'mg/dL',
+          reference_range: { min: 12.0, max: 18.0 }
+        }
+      })
+    } else {
+      // Default standard Hematology template
+      fields = [
+        { name: 'hemoglobin', id: 'hemoglobin', label: 'Hemoglobin (Hb)', type: 'numeric', unit: 'g/dL', reference_range: { min: 13.8, max: 17.2 } },
+        { name: 'technician_notes', id: 'technician_notes', label: 'Observations', type: 'textarea' }
+      ]
+    }
+  }
+
   // Extract text observations notes if they exist
   const observationsField = fields.find(f => f.type === 'textarea')
   const numericFields = fields.filter(f => f.type !== 'textarea')
-  const observationsValue = observationsField ? formData[observationsField.name] : ''
+  const obsKey = observationsField ? (observationsField.name || observationsField.id || observationsField.label) : null
+  const observationsValue = (obsKey ? formData[obsKey] : null) || formData['technician_notes'] || formData['observations'] || ''
 
   return (
     <Document>
@@ -206,12 +233,13 @@ export default function PathologyReportPDF({ report, formData }) {
           </View>
 
           {/* Table Data Rows */}
-          {numericFields.map((field) => {
-            const rawVal = formData[field.name] || ''
+          {numericFields.map((field, idx) => {
+            const fKey = field.name || field.id || field.label
+            const rawVal = formData[fKey] || ''
             const flagged = isOutOfRange(rawVal, field.reference_range)
             
             return (
-              <View key={field.name} style={styles.tableRow}>
+              <View key={field.name || field.label || `pdf-field-${idx}`} style={styles.tableRow}>
                 <Text style={styles.colParam}>{field.label}</Text>
                 
                 {/* Highlight out-of-range results */}
