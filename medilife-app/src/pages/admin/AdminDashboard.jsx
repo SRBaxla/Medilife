@@ -5,28 +5,63 @@ import PageTransition from '../../components/common/PageTransition'
 import TestCatalog from '../../components/common/TestCatalog'
 import StaffManagement from '../../components/common/StaffManagement'
 
-const queue = [
-  { id: 'ML-001', name: 'Priya Mehta', age: 34, gender: 'F', tests: ['CBC', 'LFT'], status: 'waiting', time: '8:30 AM' },
-  { id: 'ML-002', name: 'Arjun Singh', age: 52, gender: 'M', tests: ['Lipid Profile', 'Glucose'], status: 'in-progress', time: '8:45 AM' },
-  { id: 'ML-003', name: 'Rekha Sharma', age: 67, gender: 'F', tests: ['TFT', 'Vitamin D'], status: 'waiting', time: '9:00 AM' },
-  { id: 'ML-004', name: 'Vikram Rao', age: 28, gender: 'M', tests: ['CBC'], status: 'done', time: '9:15 AM' },
-  { id: 'ML-005', name: 'Sunita Patel', age: 44, gender: 'F', tests: ['KFT', 'Urine R/M'], status: 'waiting', time: '9:30 AM' },
-]
-
 const statusConfig = {
   waiting: { label: 'Waiting', color: 'text-amber-400', bg: 'bg-amber-400/10 border-amber-400/20', icon: 'schedule' },
+  pending: { label: 'Waiting', color: 'text-amber-400', bg: 'bg-amber-400/10 border-amber-400/20', icon: 'schedule' },
+  scheduled: { label: 'Waiting', color: 'text-amber-400', bg: 'bg-amber-400/10 border-amber-400/20', icon: 'schedule' },
   'in-progress': { label: 'In Progress', color: 'text-clinical-teal', bg: 'bg-clinical-teal/10 border-clinical-teal/20', icon: 'hourglass_top' },
+  processing: { label: 'In Progress', color: 'text-clinical-teal', bg: 'bg-clinical-teal/10 border-clinical-teal/20', icon: 'hourglass_top' },
   done: { label: 'Done', color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/20', icon: 'check_circle' },
+  completed: { label: 'Done', color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/20', icon: 'check_circle' },
+  complete: { label: 'Done', color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/20', icon: 'check_circle' },
 }
 
+const defaultStatusConfig = { label: 'Waiting', color: 'text-amber-400', bg: 'bg-amber-400/10 border-amber-400/20', icon: 'schedule' }
+
 export default function AdminDashboard() {
-  const [patients, setPatients] = useState(queue)
+  const [patients, setPatients] = useState([])
+  const [queueLoading, setQueueLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [currentTenantSlug, setCurrentTenantSlug] = useState('jhansi-medilife-tenant-01')
   const [tenantId, setTenantId] = useState(null)
   const [tenantLoading, setTenantLoading] = useState(true)
   const [tenantError, setTenantError] = useState(null)
   const [dashboardTab, setDashboardTab] = useState('operations') // 'operations' or 'staff'
+
+  // Fetch live queue from Supabase bookings table
+  const fetchLiveQueue = async (targetTenantId) => {
+    if (!targetTenantId) return
+    try {
+      setQueueLoading(true)
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('tenant_id', targetTenantId)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      if (data && data.length > 0) {
+        const formatted = data.map((b) => ({
+          id: b.id,
+          name: b.patient_name || 'Patient',
+          age: b.patient_age || 30,
+          gender: b.gender || 'M',
+          tests: Array.isArray(b.tests) ? b.tests : [b.test_name || 'General Checkup'],
+          status: b.status || 'waiting',
+          time: new Date(b.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }))
+        setPatients(formatted)
+      } else {
+        setPatients([])
+      }
+    } catch (err) {
+      console.warn("Could not fetch live bookings queue from database:", err)
+      setPatients([])
+    } finally {
+      setQueueLoading(false)
+    }
+  }
 
   // Resolve tenant subdomain to UUID
   useEffect(() => {
@@ -41,28 +76,23 @@ export default function AdminDashboard() {
           .eq('subdomain', currentTenantSlug)
           .maybeSingle()
 
-        if (error) {
-          throw new Error(`Tenant lookup failed: ${error.message}`)
-        }
+        if (error) throw error
         
         if (!data || !data.id) {
           throw new Error("No database records match this tenant subdomain.")
         }
 
         setTenantId(data.id)
+        fetchLiveQueue(data.id)
       } catch (err) {
         console.warn("Dynamic tenant lookup failed:", err)
         if (currentTenantSlug === 'invalid-tenant-slug') {
           setTenantError("Requested tenant profile could not be found in active server registries.")
           setTenantId(null)
         } else {
-          // Mock UUID mappings for Delhi, Mumbai, and Jhansi to keep demo clean
-          const mockUuids = {
-            'jhansi-medilife-tenant-01': import.meta.env.VITE_PUBLIC_CURRENT_TENANT_ID || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e',
-            'tenant-delhi-01': '88e89f81-55c3-4c5b-af5e-cc27b8a9708f',
-            'tenant-mumbai-02': '99f99f81-33d3-4c5b-af5e-cc27b8a9709a'
-          }
-          setTenantId(mockUuids[currentTenantSlug] || crypto.randomUUID())
+          const defaultTenantId = import.meta.env.VITE_PUBLIC_CURRENT_TENANT_ID || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e'
+          setTenantId(defaultTenantId)
+          fetchLiveQueue(defaultTenantId)
         }
       } finally {
         setTenantLoading(false)
@@ -72,13 +102,23 @@ export default function AdminDashboard() {
     resolveTenant()
   }, [currentTenantSlug])
 
-  const advance = (id) => {
-    setPatients((prev) => prev.map((p) => {
-      if (p.id !== id) return p
-      if (p.status === 'waiting') return { ...p, status: 'in-progress' }
-      if (p.status === 'in-progress') return { ...p, status: 'done' }
-      return p
-    }))
+  const advance = async (id) => {
+    const target = patients.find(p => p.id === id)
+    if (!target) return
+    const newStatus = target.status === 'waiting' ? 'in-progress' : 'done'
+
+    // Local state update
+    setPatients((prev) => prev.map((p) => p.id === id ? { ...p, status: newStatus } : p))
+
+    // Persist to Supabase
+    try {
+      await supabase
+        .from('bookings')
+        .update({ status: newStatus })
+        .eq('id', id)
+    } catch (err) {
+      console.error("Failed to update booking status in Supabase:", err)
+    }
   }
 
   const filtered = filter === 'all' ? patients : patients.filter((p) => p.status === filter)
@@ -213,14 +253,15 @@ export default function AdminDashboard() {
                 {/* Queue */}
                 <div className="space-y-md">
                   {filtered.map((p, i) => {
-                    const sc = statusConfig[p.status]
+                    const sc = statusConfig[p.status] || defaultStatusConfig
+                    const displayId = p.id ? (String(p.id).includes('-') ? String(p.id).split('-')[1] : String(p.id).substring(0, 4)) : '001'
                     return (
                       <motion.div key={p.id} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                         className="card-admin p-lg flex flex-col sm:flex-row sm:items-center gap-md justify-between"
                       >
                         <div className="flex items-center gap-md">
                           <div className="w-12 h-12 rounded-full bg-clinical-teal/10 border border-clinical-teal/20 flex items-center justify-center text-clinical-teal font-bold font-mono text-[12px]">
-                            {p.id.split('-')[1]}
+                            {displayId}
                           </div>
                           <div>
                             <div className="flex items-center gap-sm">

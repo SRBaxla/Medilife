@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, Outlet, Link, useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { supabase } from '../supabaseClient'
 import ScrollToTop from '../components/common/ScrollToTop'
 
 export default function AdminLayout() {
@@ -74,14 +75,27 @@ export default function AdminLayout() {
 
         {/* Bottom */}
         <ul className="flex flex-col gap-2 border-t border-white/10 pt-4">
-          {[{ icon: 'settings', label: 'Settings' }, { icon: 'logout', label: 'Log Out' }].map(({ icon, label }) => (
-            <li key={label}>
-              <Link to={`/${activeSlug}/admin/login`} className="flex items-center gap-3 px-4 py-2 text-admin-on-surface-variant hover:bg-white/5 rounded-lg transition-colors text-label-sm">
-                <span className="material-symbols-outlined text-[18px]">{icon}</span>
-                {label}
-              </Link>
-            </li>
-          ))}
+          <li>
+            <Link 
+              to={`/${activeSlug}/admin/dashboard`} 
+              className="flex items-center gap-3 px-4 py-2 text-admin-on-surface-variant hover:bg-white/5 rounded-lg transition-colors text-label-sm"
+            >
+              <span className="material-symbols-outlined text-[18px]">settings</span>
+              Settings
+            </Link>
+          </li>
+          <li>
+            <button 
+              onClick={async () => {
+                await supabase.auth.signOut()
+                window.location.href = `/${activeSlug}/admin/login`
+              }} 
+              className="w-full flex items-center gap-3 px-4 py-2 text-admin-on-surface-variant hover:bg-white/5 hover:text-red-400 rounded-lg transition-colors text-label-sm text-left"
+            >
+              <span className="material-symbols-outlined text-[18px]">logout</span>
+              Log Out
+            </button>
+          </li>
         </ul>
       </nav>
 

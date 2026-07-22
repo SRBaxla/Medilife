@@ -41,34 +41,40 @@ export default function SendReport() {
       setLoading(true)
       setError(null)
 
-      // Query patient_reports where status is 'processing' joined with test_catalog
+      // Query patient_reports joined with test_catalog and user_profiles
       const { data, error: fetchError } = await supabase
         .from('patient_reports')
         .select(`
           id,
-          patient_name,
           status,
-          test_catalog_id,
-          test_catalog (
+          test_id,
+          patient_id,
+          results_data,
+          test_catalog!patient_reports_test_id_fkey (
             test_name,
             report_schema
+          ),
+          user_profiles!patient_reports_patient_id_fkey (
+            full_name,
+            email
           )
         `)
-        .eq('status', 'processing')
 
       if (fetchError) throw fetchError
 
-      if (!data || data.length === 0) {
-        // Fallback mock records to keep presentation active and verified
-        console.log("No processing reports found in DB. Loading clinical mock pending queue.")
-        setQueue(getMockPendingQueue())
+      if (data && data.length > 0) {
+        const formatted = data.map(item => ({
+          ...item,
+          patient_name: item.user_profiles?.full_name || 'Patient'
+        }))
+        setQueue(formatted)
       } else {
-        setQueue(data)
+        setQueue([])
       }
     } catch (err) {
       console.error("Supabase pending queue fetch failed:", err)
-      setError(`Supabase connection error: ${err.message || err}. Running in secure offline simulation.`)
-      setQueue(getMockPendingQueue())
+      setError(`Supabase connection error: ${err.message || err}`)
+      setQueue([])
     } finally {
       setLoading(false)
     }

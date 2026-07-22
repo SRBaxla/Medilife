@@ -38,7 +38,7 @@ function AnimatedRoutes() {
   
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+      <Routes location={location}>
         {/* Public / Client Site */}
         <Route element={<ClientLayout />}>
           <Route path="/" element={<Home />} />
@@ -59,11 +59,11 @@ function AnimatedRoutes() {
         <Route path="/patient/login" element={<Navigate to="/jhansi-medilife-tenant-01/patient/login" replace />} />
         <Route path="/403" element={<Unauthorized />} />
 
-        {/* Protected Admin Portal (Requires 'admin' or 'lab_tech' roles) */}
+        {/* Protected Admin Portal (Requires 'super_admin', 'admin', 'lab_tech', or 'worker' roles) */}
         <Route 
           path="/:tenantSlug/admin" 
           element={
-            <ProtectedRoute allowedRoles={['admin', 'lab_tech']}>
+            <ProtectedRoute allowedRoles={['super_admin', 'admin', 'lab_tech', 'worker']}>
               <AdminLayout />
             </ProtectedRoute>
           }

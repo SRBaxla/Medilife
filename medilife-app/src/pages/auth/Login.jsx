@@ -116,7 +116,7 @@ export default function Login() {
 
   const processLoginRedirect = (profile) => {
     // Validate role permissions match active portal segment
-    if (tab === 'admin' && profile.role !== 'admin' && profile.role !== 'lab_tech') {
+    if (tab === 'admin' && !['super_admin', 'admin', 'lab_tech', 'worker'].includes(profile.role)) {
       setErrorMsg("Unauthorized: This account does not possess staff dashboard permissions.")
       setLoading(false)
       return
@@ -128,9 +128,9 @@ export default function Login() {
       return
     }
 
-    // Cross-reference profile tenant_id with resolved subdomain identifier
+    // Super Root Admin has global access to all branches; for branch admins/staff, verify tenant_id
     const targetTenantId = resolvedTenant?.id || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e'
-    if (profile.tenant_id !== targetTenantId) {
+    if (profile.role !== 'super_admin' && profile.tenant_id && profile.tenant_id !== targetTenantId) {
       setErrorMsg("Access Denied: Your account is not registered to this pathology laboratory branch.")
       setLoading(false)
       return

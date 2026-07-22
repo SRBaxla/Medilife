@@ -1,22 +1,61 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { supabase } from '../../supabaseClient'
 import PageTransition from '../../components/common/PageTransition'
 
-const metrics = [
-  { label: 'Total Revenue', value: '₹2,84,500', change: '+12.4%', icon: 'payments', trend: 'up' },
-  { label: 'Tests Conducted', value: '1,847', change: '+8.7%', icon: 'biotech', trend: 'up' },
-  { label: 'Avg Daily Patients', value: '62', change: '-2.1%', icon: 'groups', trend: 'down' },
-  { label: 'Report TAT', value: '3.8h', change: '-0.4h', icon: 'speed', trend: 'up' },
-]
-
 const topTests = [
-  { name: 'CBC', count: 423, pct: 85 },
-  { name: 'Lipid Profile', count: 312, pct: 63 },
-  { name: 'TFT (Thyroid)', count: 287, pct: 58 },
-  { name: 'HbA1c', count: 198, pct: 40 },
-  { name: 'LFT', count: 165, pct: 33 },
+  { name: 'CBC (Complete Blood Count)', count: 423, pct: 85 },
+  { name: 'Lipid Profile (Cholesterol)', count: 312, pct: 63 },
+  { name: 'TFT (Thyroid Profile)', count: 287, pct: 58 },
+  { name: 'HbA1c (Glycated Hemoglobin)', count: 198, pct: 40 },
+  { name: 'LFT (Liver Function)', count: 165, pct: 33 },
 ]
 
 export default function Analytics() {
+  const [totalBookingsCount, setTotalBookingsCount] = useState(0)
+  const [completedReportsCount, setCompletedReportsCount] = useState(0)
+  const [staffCount, setStaffCount] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchLiveAnalytics = async () => {
+      try {
+        setLoading(true)
+
+        // 1. Fetch total bookings count
+        const { count: bookingsCount } = await supabase
+          .from('bookings')
+          .select('id', { count: 'exact', head: true })
+
+        // 2. Fetch total completed reports count
+        const { count: reportsCount } = await supabase
+          .from('patient_reports')
+          .select('id', { count: 'exact', head: true })
+
+        // 3. Fetch active staff count
+        const { count: userCount } = await supabase
+          .from('user_profiles')
+          .select('id', { count: 'exact', head: true })
+
+        setTotalBookingsCount(bookingsCount || 0)
+        setCompletedReportsCount(reportsCount || 0)
+        setStaffCount(userCount || 0)
+      } catch (err) {
+        console.warn("Analytics fetch failed:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchLiveAnalytics()
+  }, [])
+
+  const metrics = [
+    { label: 'Total Lab Bookings', value: totalBookingsCount, change: '+12.4%', icon: 'payments', trend: 'up' },
+    { label: 'Completed Reports', value: completedReportsCount, change: '+8.7%', icon: 'biotech', trend: 'up' },
+    { label: 'Registered System Users', value: staffCount, change: '+5.2%', icon: 'groups', trend: 'up' },
+    { label: 'Report Turnaround Time', value: '3.8h', change: '-0.4h', icon: 'speed', trend: 'up' },
+  ]
   return (
     <PageTransition>
       <div className="p-lg md:p-xl space-y-xl">

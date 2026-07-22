@@ -40,11 +40,51 @@ export default function StaffManagement({ tenantId }) {
   // Mutation states
   const [mutationId, setMutationId] = useState(null)
 
-  // Fetch roster from Supabase user_profiles
+  const [currentUserRole, setCurrentUserRole] = useState(null)
+
+  // Safe helper to extract display name from profile
+  const getStaffDisplayName = (member) => {
+    if (member.full_name) return member.full_name
+    if (member.first_name || member.last_name) {
+      return `${member.first_name || ''} ${member.last_name || ''}`.trim()
+    }
+    return member.email || 'Staff Member'
+  }
+
+  // Safe helper to extract initials
+  const getStaffInitials = (member) => {
+    const name = getStaffDisplayName(member)
+    const parts = name.split(' ').filter(Boolean)
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase()
+    }
+    return name.slice(0, 2).toUpperCase()
+  }
+  
+  // Location Modal State (Super Admin Only)
+  const [locationModalOpen, setLocationModalOpen] = useState(false)
+  const [newLocation, setNewLocation] = useState({ name: '', subdomain: '' })
+  const [locationSubmitting, setLocationSubmitting] = useState(false)
+  const [locationMessage, setLocationMessage] = useState(null)
+
+  // Fetch roster & current user role from Supabase user_profiles
   const fetchStaffRoster = async () => {
     try {
       setLoading(true)
       setError(null)
+
+      // Fetch active user role
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: userProf } = await supabase
+          .from('user_profiles')
+          .select('role')
+          .eq('user_id', user.id)
+          .maybeSingle()
+        if (userProf) {
+          setCurrentUserRole(userProf.role)
+        }
+      }
       
       const { data, error: fetchError } = await supabase
         .from('user_profiles')
@@ -54,16 +94,14 @@ export default function StaffManagement({ tenantId }) {
       if (fetchError) throw fetchError
 
       if (!data || data.length === 0) {
-        // Safe clinical fallback mock data for testing/demo
-        console.log("No staff found for tenant, loading default Jhansi Medilife Pathology Lab roster.")
-        setStaff(getMockRoster(tenantId))
+        setStaff([])
       } else {
         setStaff(data)
       }
     } catch (err) {
-      console.error("Supabase roster fetch failed, fallback to offline demo:", err)
-      setError(`Supabase connection error: ${err.message || err}. Loaded demo database.`)
-      setStaff(getMockRoster(tenantId))
+      console.error("Supabase roster fetch failed:", err)
+      setError(`Supabase connection error: ${err.message || err}`)
+      setStaff([])
     } finally {
       setLoading(false)
     }
@@ -125,17 +163,24 @@ export default function StaffManagement({ tenantId }) {
     setFormError(null)
     setFormSuccess(false)
 
+    // Security check: Only super_admin can create admin accounts
+    if (newStaff.role === 'admin' && currentUserRole !== 'super_admin') {
+      setFormError("Unauthorized: Only the Super Root Admin can register new Administrators.")
+      setSubmitting(false)
+      return
+    }
+
     try {
-      // Simulate auth user creation + user_profile record insert
+      // Insert into user_profiles matching exact schema (full_name)
       const newRecord = {
         id: crypto.randomUUID(),
         user_id: crypto.randomUUID(),
+        full_name: `${newStaff.firstName} ${newStaff.lastName}`.trim(),
         first_name: newStaff.firstName,
         last_name: newStaff.lastName,
         email: newStaff.email,
         role: newStaff.role,
         tenant_id: tenantId,
-        status: 'active',
         created_at: new Date().toISOString()
       }
 
@@ -182,9 +227,48 @@ export default function StaffManagement({ tenantId }) {
     }
   }
 
+  // Handle creating new lab location (Super Admin Only)
+  const handleCreateLocation = async (e) => {
+    e.preventDefault()
+    setLocationSubmitting(true)
+    setLocationMessage(null)
+
+    if (currentUserRole !== 'super_admin') {
+      setLocationMessage({ type: 'error', text: 'Unauthorized: Only Super Root Admin can create new lab locations.' })
+      setLocationSubmitting(false)
+      return
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('tenants')
+        .insert([{
+          id: crypto.randomUUID(),
+          business_name: newLocation.name,
+          subdomain: newLocation.subdomain.toLowerCase().replace(/\s+/g, '-')
+        }])
+        .select()
+        .single()
+
+      if (error) throw error
+
+      setLocationMessage({ type: 'success', text: `Lab Location "${newLocation.name}" created successfully!` })
+      setNewLocation({ name: '', subdomain: '' })
+      setTimeout(() => {
+        setLocationModalOpen(false)
+        setLocationMessage(null)
+      }, 1500)
+    } catch (err) {
+      console.error("Location creation failed:", err)
+      setLocationMessage({ type: 'error', text: err.message || 'Failed to create new lab location.' })
+    } finally {
+      setLocationSubmitting(false)
+    }
+  }
+
   // Filter roster list based on search and roles
   const filteredRoster = staff.filter((member) => {
-    const fullName = `${member.first_name} ${member.last_name}`.toLowerCase()
+    const fullName = getStaffDisplayName(member).toLowerCase()
     const emailMatch = member.email?.toLowerCase().includes(searchQuery.toLowerCase()) || false
     const matchesSearch = fullName.includes(searchQuery.toLowerCase()) || emailMatch
     const matchesRole = roleFilter === 'all' || member.role === roleFilter
@@ -228,6 +312,16 @@ export default function StaffManagement({ tenantId }) {
             <option value="admin">Administrators</option>
             <option value="lab_tech">Lab Technicians</option>
           </select>
+
+          {currentUserRole === 'super_admin' && (
+            <button 
+              onClick={() => setLocationModalOpen(true)}
+              className="btn-outline !py-sm flex items-center justify-center gap-xs font-semibold"
+            >
+              <Shield className="w-4 h-4 text-primary" />
+              New Lab Location
+            </button>
+          )}
 
           <button 
             onClick={() => setModalOpen(true)}
@@ -282,13 +376,13 @@ export default function StaffManagement({ tenantId }) {
                     <td className="p-md">
                       <div className="flex items-center gap-sm">
                         <div className="w-9 h-9 rounded-full bg-secondary-container text-primary flex items-center justify-center font-bold text-label-md">
-                          {member.first_name[0]}{member.last_name[0]}
+                          {getStaffInitials(member)}
                         </div>
                         <div>
                           <p className="font-bold text-on-surface text-body-md">
-                            {member.first_name} {member.last_name}
+                            {getStaffDisplayName(member)}
                           </p>
-                          <span className="text-[11px] font-mono text-on-surface-variant/80">ID: {member.id.substring(0, 8)}</span>
+                          <span className="text-[11px] font-mono text-on-surface-variant/80">ID: {member.id?.substring(0, 8)}</span>
                         </div>
                       </div>
                     </td>
@@ -303,13 +397,14 @@ export default function StaffManagement({ tenantId }) {
                       <div className="flex items-center gap-sm">
                         <Shield className={`w-4 h-4 ${member.role === 'admin' ? 'text-primary' : 'text-on-surface-variant'}`} />
                         <select
-                          disabled={mutationId === member.id}
+                          disabled={mutationId === member.id || (member.role === 'admin' && currentUserRole !== 'super_admin')}
                           value={member.role}
                           onChange={(e) => updateStaffRole(member.id, e.target.value)}
                           className="bg-transparent border border-outline-variant/50 rounded-lg py-xs px-sm font-label-md text-label-md text-on-surface focus:outline-none focus:border-primary disabled:opacity-50"
                         >
                           <option value="lab_tech">Lab Technician</option>
-                          <option value="admin">Administrator</option>
+                          <option value="worker">Lab Worker</option>
+                          {currentUserRole === 'super_admin' && <option value="admin">Administrator</option>}
                         </select>
                       </div>
                     </td>
@@ -437,7 +532,10 @@ export default function StaffManagement({ tenantId }) {
                         className="w-full pl-9 pr-sm py-sm bg-surface-container-low border border-outline-variant/50 rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary"
                       >
                         <option value="lab_tech">Lab Technician (Laboratory Operator)</option>
-                        <option value="admin">Administrator (Tenant Management)</option>
+                        <option value="worker">Lab Worker (Phlebotomist / Staff)</option>
+                        {currentUserRole === 'super_admin' && (
+                          <option value="admin">Administrator (Branch / Location Manager)</option>
+                        )}
                       </select>
                     </div>
                   </div>
@@ -465,6 +563,82 @@ export default function StaffManagement({ tenantId }) {
                 </>
               )}
 
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add New Lab Location Modal (Super Admin Only) */}
+      {locationModalOpen && currentUserRole === 'super_admin' && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-md">
+          <div className="bg-surface-container-lowest border border-outline-variant/30 w-full max-w-md rounded-3xl overflow-hidden shadow-clinical-xl animate-scale-up">
+            <div className="bg-primary text-on-primary p-lg flex justify-between items-center">
+              <div className="flex items-center gap-sm">
+                <Shield className="w-5 h-5" />
+                <h3 className="font-bold text-headline-sm">Create New Lab Location</h3>
+              </div>
+              <button 
+                onClick={() => setLocationModalOpen(false)}
+                className="text-on-primary/80 hover:text-on-primary p-sm rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateLocation} className="p-lg space-y-md">
+              {locationMessage && (
+                <div className={`p-sm rounded-xl text-label-md flex items-center gap-sm ${
+                  locationMessage.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{locationMessage.text}</span>
+                </div>
+              )}
+
+              <div className="space-y-xs">
+                <label className="text-label-sm text-on-surface-variant block">Location / Business Name *</label>
+                <input
+                  required
+                  type="text"
+                  placeholder="e.g. Delhi Central Pathology Lab"
+                  value={newLocation.name}
+                  onChange={(e) => setNewLocation({ ...newLocation, name: e.target.value })}
+                  className="w-full px-md py-sm bg-surface-container-low border border-outline-variant/50 rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              <div className="space-y-xs">
+                <label className="text-label-sm text-on-surface-variant block">Subdomain Slug *</label>
+                <input
+                  required
+                  type="text"
+                  placeholder="e.g. delhi-medilife-tenant-02"
+                  value={newLocation.subdomain}
+                  onChange={(e) => setNewLocation({ ...newLocation, subdomain: e.target.value })}
+                  className="w-full px-md py-sm bg-surface-container-low border border-outline-variant/50 rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary font-mono text-xs"
+                />
+              </div>
+
+              <div className="pt-sm flex justify-end gap-sm">
+                <button 
+                  type="button"
+                  onClick={() => setLocationModalOpen(false)}
+                  className="btn-outline !py-sm !px-md"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  disabled={locationSubmitting}
+                  className="btn-primary !py-sm !px-md flex items-center gap-xs"
+                >
+                  {locationSubmitting ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" />Creating...</>
+                  ) : (
+                    <><Check className="w-4 h-4" />Create Location</>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
