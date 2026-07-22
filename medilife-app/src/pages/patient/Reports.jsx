@@ -124,18 +124,6 @@ export default function Reports() {
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }}
                       className="px-lg pb-lg border-t border-outline-variant/30 pt-md"
                     >
-                      <div className="space-y-sm mb-md">
-                        {r.results_data ? (
-                          <pre className="text-xs bg-surface-container-lowest p-md rounded-xl text-on-surface font-mono overflow-x-auto">
-                            {JSON.stringify(r.results_data, null, 2)}
-                          </pre>
-                        ) : (
-                          <div className="flex items-center gap-sm">
-                            <span className="material-symbols-outlined text-primary text-[16px]">check_circle</span>
-                            <span className="text-body-md text-on-surface">Verified Laboratory Screening Results Available</span>
-                          </div>
-                        )}
-                      </div>
                       <div className="flex gap-sm">
                         <PDFDownloadLink
                           document={<PathologyReportPDF report={r} formData={r.results_data || {}} />}

@@ -192,7 +192,7 @@ export default function AdminDashboard() {
 
   return (
     <PageTransition>
-      <div className="p-lg md:p-xl space-y-xl">
+      <div className="p-lg md:p-xl space-y-xl overflow-x-hidden">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-md border-b border-white/10 pb-md">
           <div>
@@ -201,52 +201,54 @@ export default function AdminDashboard() {
           </div>
           
           {/* Tenant Selector Switcher */}
-          <div className="flex items-center gap-sm bg-white/5 border border-white/10 p-1.5 rounded-2xl self-start">
-            <span className="text-label-sm text-admin-on-surface-variant px-sm font-semibold uppercase">Location:</span>
-            {[
-              { id: 'jhansi-medilife-tenant-01', label: 'Jhansi Lab' },
-              { id: 'tenant-delhi-01', label: 'Delhi Central' },
-              { id: 'tenant-mumbai-02', label: 'Mumbai Lab' },
-              { id: 'invalid-tenant-slug', label: '🚨 Simulate Error' }
-            ].map((tenant) => (
+          <div className="flex flex-col gap-sm w-full md:w-auto">
+            <div className="flex items-center gap-sm bg-white/5 border border-white/10 p-1.5 rounded-2xl overflow-x-auto scrollbar-hide">
+              <span className="text-label-sm text-admin-on-surface-variant px-sm font-semibold uppercase shrink-0">Location:</span>
+              {[
+                { id: 'jhansi-medilife-tenant-01', label: 'Jhansi Lab' },
+                { id: 'tenant-delhi-01', label: 'Delhi Central' },
+                { id: 'tenant-mumbai-02', label: 'Mumbai Lab' },
+                { id: 'invalid-tenant-slug', label: '🚨 Simulate Error' }
+              ].map((tenant) => (
+                <button
+                  key={tenant.id}
+                  onClick={() => setCurrentTenantSlug(tenant.id)}
+                  className={`shrink-0 px-md py-xs rounded-xl text-label-sm font-semibold transition-all ${
+                    currentTenantSlug === tenant.id
+                      ? tenant.id === 'invalid-tenant-slug' 
+                        ? 'bg-red-500 text-white shadow-lg'
+                        : 'bg-clinical-teal text-[#00363d] shadow-admin-glow'
+                      : 'text-admin-on-surface-variant hover:text-white'
+                  }`}
+                >
+                  {tenant.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Dashboard View Selector */}
+            <div className="flex items-center gap-sm bg-white/5 border border-white/10 p-1 rounded-xl w-full">
               <button
-                key={tenant.id}
-                onClick={() => setCurrentTenantSlug(tenant.id)}
-                className={`px-md py-xs rounded-xl text-label-sm font-semibold transition-all ${
-                  currentTenantSlug === tenant.id
-                    ? tenant.id === 'invalid-tenant-slug' 
-                      ? 'bg-red-500 text-white shadow-lg'
-                      : 'bg-clinical-teal text-[#00363d] shadow-admin-glow'
+                onClick={() => setDashboardTab('operations')}
+                className={`flex-1 px-md py-sm rounded-lg text-label-sm font-semibold transition-all ${
+                  dashboardTab === 'operations'
+                    ? 'bg-clinical-teal text-[#00363d]'
                     : 'text-admin-on-surface-variant hover:text-white'
                 }`}
               >
-                {tenant.label}
+                Operations Dashboard
               </button>
-            ))}
-          </div>
-
-          {/* Dashboard View Selector */}
-          <div className="flex items-center gap-sm bg-white/5 border border-white/10 p-1 rounded-xl">
-            <button
-              onClick={() => setDashboardTab('operations')}
-              className={`px-md py-sm rounded-lg text-label-sm font-semibold transition-all ${
-                dashboardTab === 'operations'
-                  ? 'bg-clinical-teal text-[#00363d]'
-                  : 'text-admin-on-surface-variant hover:text-white'
-              }`}
-            >
-              Operations Dashboard
-            </button>
-            <button
-              onClick={() => setDashboardTab('staff')}
-              className={`px-md py-sm rounded-lg text-label-sm font-semibold transition-all ${
-                dashboardTab === 'staff'
-                  ? 'bg-clinical-teal text-[#00363d]'
-                  : 'text-admin-on-surface-variant hover:text-white'
-              }`}
-            >
-              Staff & Role Control
-            </button>
+              <button
+                onClick={() => setDashboardTab('staff')}
+                className={`flex-1 px-md py-sm rounded-lg text-label-sm font-semibold transition-all ${
+                  dashboardTab === 'staff'
+                    ? 'bg-clinical-teal text-[#00363d]'
+                    : 'text-admin-on-surface-variant hover:text-white'
+                }`}
+              >
+                Staff & Role Control
+              </button>
+            </div>
           </div>
         </div>
 

@@ -128,6 +128,26 @@ export default function PatientLayout() {
                   </NavLink>
                 ))}
               </div>
+
+              {/* Drawer Bottom: Logout + Back to Site */}
+              <div className="border-t border-outline-variant/30 pt-4 flex flex-col gap-xs mt-2">
+                <Link
+                  to="/"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-md px-md py-sm rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low transition-all"
+                >
+                  <span className="material-symbols-outlined">home</span>
+                  Back to Site
+                </Link>
+                <Link
+                  to={`/${activeSlug}/patient/login`}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-md px-md py-sm rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-red-400 transition-all"
+                >
+                  <span className="material-symbols-outlined">logout</span>
+                  Log Out
+                </Link>
+              </div>
             </motion.div>
           </>
         )}

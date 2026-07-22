@@ -310,10 +310,10 @@ export default function SendReport() {
         )}
 
         {/* Workspace Sub-Tab Switcher */}
-        <div className="flex items-center gap-sm bg-white/5 border border-white/10 p-1.5 rounded-2xl self-start w-fit">
+        <div className="flex flex-wrap items-center gap-sm bg-white/5 border border-white/10 p-1.5 rounded-2xl w-full sm:w-fit">
           <button
             onClick={() => setActiveTab('pending')}
-            className={`px-lg py-xs rounded-xl text-label-md font-bold transition-all flex items-center gap-xs ${
+            className={`flex-1 sm:flex-initial px-md sm:px-lg py-xs rounded-xl text-label-sm sm:text-label-md font-bold transition-all flex items-center justify-center gap-xs ${
               activeTab === 'pending'
                 ? 'bg-clinical-teal text-[#00363d] shadow-admin-glow'
                 : 'text-admin-on-surface-variant hover:text-white hover:bg-white/10'
@@ -324,7 +324,7 @@ export default function SendReport() {
           </button>
           <button
             onClick={() => setActiveTab('history')}
-            className={`px-lg py-xs rounded-xl text-label-md font-bold transition-all flex items-center gap-xs ${
+            className={`flex-1 sm:flex-initial px-md sm:px-lg py-xs rounded-xl text-label-sm sm:text-label-md font-bold transition-all flex items-center justify-center gap-xs ${
               activeTab === 'history'
                 ? 'bg-clinical-teal text-[#00363d] shadow-admin-glow'
                 : 'text-admin-on-surface-variant hover:text-white hover:bg-white/10'

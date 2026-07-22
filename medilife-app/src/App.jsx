@@ -24,6 +24,7 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import SendReport from './pages/admin/SendReport'
 import Analytics from './pages/admin/Analytics'
 import DaySchedule from './pages/admin/DaySchedule'
+import AdminSettings from './pages/admin/AdminSettings'
 
 // Patient pages
 import PatientPortal from './pages/patient/PatientPortal'
@@ -72,6 +73,7 @@ function AnimatedRoutes() {
           <Route path="reports" element={<SendReport />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="schedule" element={<DaySchedule />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
 
         {/* Protected Patient Portal (Requires 'patient' role) */}

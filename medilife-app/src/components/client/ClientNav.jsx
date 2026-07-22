@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { supabase } from '../../supabaseClient'
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -13,6 +14,8 @@ const navLinks = [
 export default function ClientNav() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [patientUser, setPatientUser] = useState(null)
+  const [tenantSlug, setTenantSlug] = useState('jhansi-medilife-tenant-01')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -22,6 +25,59 @@ export default function ClientNav() {
 
   // Close menu on route change
   useEffect(() => { setMenuOpen(false) }, [])
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        const meta = session.user.user_metadata
+        const role = meta?.role || session.user.app_metadata?.role
+        // Only show greeting for patients, not admins
+        if (!role || role === 'patient') {
+          setPatientUser(session.user)
+          // Try to detect tenant slug from URL or metadata
+          const slug = meta?.tenant_slug || 'jhansi-medilife-tenant-01'
+          setTenantSlug(slug)
+        }
+      }
+    }
+    getSession()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const meta = session.user.user_metadata
+        const role = meta?.role || session.user.app_metadata?.role
+        if (!role || role === 'patient') {
+          setPatientUser(session.user)
+          const slug = meta?.tenant_slug || 'jhansi-medilife-tenant-01'
+          setTenantSlug(slug)
+        } else {
+          setPatientUser(null)
+        }
+      } else {
+        setPatientUser(null)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // Extract first name from user metadata or email
+  const getFirstName = (user) => {
+    if (!user) return null
+    const meta = user.user_metadata
+    if (meta?.full_name) return meta.full_name.split(' ')[0]
+    if (meta?.name) return meta.name.split(' ')[0]
+    if (meta?.first_name) return meta.first_name
+    // Fallback: use part before @ in email
+    return user.email?.split('@')[0] || 'Patient'
+  }
+
+  const firstName = getFirstName(patientUser)
+  const portalLink = patientUser
+    ? `/${tenantSlug}/patient/dashboard`
+    : '/portal'
 
   return (
     <>
@@ -38,7 +94,7 @@ export default function ClientNav() {
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-clinical group-hover:shadow-clinical-lg transition-shadow">
               <span className="material-symbols-outlined text-on-primary text-[20px]">science</span>
             </div>
-            <span className="font-bold text-[18px] text-primary hidden sm:block">
+            <span className="font-bold text-[18px] text-primary">
               Medilife<span className="text-on-surface font-medium"> Pathology</span>
             </span>
           </Link>
@@ -65,12 +121,19 @@ export default function ClientNav() {
 
           {/* Actions */}
           <div className="flex items-center gap-sm">
+            {/* Patient Portal / Greeting Button */}
             <Link
-              to="/portal"
-              className="hidden lg:flex items-center gap-xs px-md py-sm border border-outline-variant rounded-xl text-primary hover:bg-secondary-container/60 transition-all font-label-md text-label-md"
+              to={portalLink}
+              className={`hidden lg:flex items-center gap-xs px-md py-sm rounded-xl transition-all font-label-md text-label-md ${
+                patientUser
+                  ? 'bg-secondary-container text-primary border border-primary/30 hover:bg-secondary-container/80'
+                  : 'border border-outline-variant text-primary hover:bg-secondary-container/60'
+              }`}
             >
-              <span className="material-symbols-outlined text-[18px]">person</span>
-              Patient Portal
+              <span className="material-symbols-outlined text-[18px]">
+                {patientUser ? 'waving_hand' : 'person'}
+              </span>
+              {patientUser ? `Hi, ${firstName}` : 'Patient Portal'}
             </Link>
             <Link to="/booking" className="btn-primary hidden sm:flex">
               Book Now
@@ -108,7 +171,16 @@ export default function ClientNav() {
               className="fixed top-0 right-0 h-full w-72 bg-surface-container-lowest border-l border-outline-variant/30 z-50 md:hidden flex flex-col p-lg shadow-clinical-xl"
             >
               <div className="flex justify-between items-center mb-xl">
-                <span className="font-bold text-primary text-[18px]">Medilife</span>
+                {patientUser ? (
+                  <div className="flex items-center gap-sm">
+                    <div className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+                      <span className="material-symbols-outlined text-[18px]">person</span>
+                    </div>
+                    <span className="font-bold text-primary text-[16px]">Hi, {firstName}!</span>
+                  </div>
+                ) : (
+                  <span className="font-bold text-primary text-[18px]">Medilife</span>
+                )}
                 <button onClick={() => setMenuOpen(false)} className="p-sm text-on-surface-variant hover:text-primary transition-colors">
                   <span className="material-symbols-outlined">close</span>
                 </button>
@@ -133,9 +205,11 @@ export default function ClientNav() {
                 ))}
               </nav>
               <div className="flex flex-col gap-sm mt-xl border-t border-outline-variant/30 pt-lg">
-                <Link to="/portal" onClick={() => setMenuOpen(false)} className="btn-outline justify-center">
-                  <span className="material-symbols-outlined text-[18px]">person</span>
-                  Patient Portal
+                <Link to={portalLink} onClick={() => setMenuOpen(false)} className="btn-outline justify-center">
+                  <span className="material-symbols-outlined text-[18px]">
+                    {patientUser ? 'waving_hand' : 'person'}
+                  </span>
+                  {patientUser ? `Hi, ${firstName}` : 'Patient Portal'}
                 </Link>
                 <Link to="/booking" onClick={() => setMenuOpen(false)} className="btn-primary justify-center">
                   Book Now

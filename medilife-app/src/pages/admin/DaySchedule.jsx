@@ -7,29 +7,42 @@ export default function DaySchedule() {
   const [scheduledBookings, setScheduledBookings] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchSchedule = async () => {
-      try {
-        setLoading(true)
-        const { data, error } = await supabase
-          .from('bookings')
-          .select('*')
-          .order('created_at', { ascending: true })
+  const fetchSchedule = async () => {
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('created_at', { ascending: true })
 
-        if (error) throw error
-        setScheduledBookings(data || [])
-      } catch (err) {
-        console.warn("Could not fetch day schedule:", err)
-        setScheduledBookings([])
-      } finally {
-        setLoading(false)
-      }
+      if (error) throw error
+      setScheduledBookings(data || [])
+    } catch (err) {
+      console.warn("Could not fetch day schedule:", err)
+      setScheduledBookings([])
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchSchedule()
+
+    // Realtime channel for instant status updates when reports are approved
+    const channel = supabase
+      .channel('public:bookings_dayschedule')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => {
+        fetchSchedule()
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   const scheduledCount = scheduledBookings.length
+  const completedCount = scheduledBookings.filter(b => b.status === 'done' || b.status === 'completed' || b.status === 'complete').length
   const homeVisits = scheduledBookings.filter(b => b.collection_type === 'home' || b.address).length
   const walkIns = Math.max(0, scheduledCount - homeVisits)
 
@@ -50,34 +63,36 @@ export default function DaySchedule() {
             <p className="text-admin-on-surface-variant text-body-md">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
           </div>
           <div className="flex gap-sm">
-            <button className="glass-panel flex items-center gap-sm px-md py-sm rounded-xl text-admin-on-surface-variant text-label-md hover:bg-white/10 transition-all">
-              <span className="material-symbols-outlined text-[18px]">chevron_left</span>
-            </button>
-            <button className="glass-panel px-md py-sm rounded-xl text-admin-on-surface-variant text-label-md hover:bg-white/10 transition-all">Today</button>
-            <button className="glass-panel flex items-center gap-sm px-md py-sm rounded-xl text-admin-on-surface-variant text-label-md hover:bg-white/10 transition-all">
-              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+            <button onClick={fetchSchedule} className="glass-panel flex items-center gap-sm px-md py-sm rounded-xl text-admin-on-surface-variant text-label-md hover:bg-white/10 transition-all">
+              <span className="material-symbols-outlined text-[18px]">sync</span>
+              Sync
             </button>
           </div>
         </div>
 
         {/* Quick stats */}
-        <div className="grid grid-cols-3 gap-md">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-sm md:gap-md">
           {[
-            { label: 'Scheduled', value: scheduledCount, color: 'text-clinical-teal' },
+            { label: 'Total Scheduled', value: scheduledCount, color: 'text-clinical-teal' },
+            { label: 'Completed (Done)', value: completedCount, color: 'text-emerald-400' },
             { label: 'Home Visits', value: homeVisits, color: 'text-amber-400' },
             { label: 'Walk-ins', value: walkIns, color: 'text-purple-400' },
           ].map(({ label, value, color }) => (
-            <div key={label} className="card-admin p-lg text-center">
-              <p className={`text-display-lg-mobile font-bold font-mono ${color}`}>{value}</p>
-              <p className="text-admin-on-surface-variant text-label-md">{label}</p>
+            <div key={label} className="card-admin p-md md:p-lg text-center">
+              <p className={`text-headline-lg sm:text-display-lg-mobile font-bold font-mono ${color}`}>{value}</p>
+              <p className="text-admin-on-surface-variant text-label-sm sm:text-label-md">{label}</p>
             </div>
           ))}
         </div>
 
         {/* Timeline */}
         <div className="card-admin overflow-hidden">
-          <div className="p-lg border-b border-white/10">
+          <div className="p-lg border-b border-white/10 flex justify-between items-center">
             <h3 className="font-bold text-admin-on-surface">Today's Timeline</h3>
+            <span className="text-label-sm text-emerald-400 font-mono flex items-center gap-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Green = Completed
+            </span>
           </div>
           <div className="divide-y divide-white/5">
             {timeSlots.map(({ time, patients }, i) => (
@@ -91,11 +106,32 @@ export default function DaySchedule() {
                       <span className="text-admin-on-surface-variant/30 text-label-sm">Free slot</span>
                     </div>
                   ) : (
-                    patients.map((p) => (
-                      <div key={p.id} className="px-sm py-xs rounded-lg border bg-clinical-teal/20 border-clinical-teal/30 text-clinical-teal text-label-sm font-bold">
-                        {p.patient_name || 'Patient'} — {Array.isArray(p.tests) ? p.tests.join(', ') : p.test_name || 'General Test'}
-                      </div>
-                    ))
+                    patients.map((p) => {
+                      const isDone = p.status === 'done' || p.status === 'completed' || p.status === 'complete'
+
+                      return (
+                        <div 
+                          key={p.id} 
+                          className={`px-md py-xs rounded-xl border flex items-center gap-xs text-label-sm font-bold transition-all shadow-sm ${
+                            isDone
+                              ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-emerald-950/20'
+                              : 'bg-amber-400/10 border-amber-400/30 text-amber-300'
+                          }`}
+                        >
+                          <span className="material-symbols-outlined text-[15px]">
+                            {isDone ? 'check_circle' : 'schedule'}
+                          </span>
+                          <span>{p.patient_name || 'Patient'}</span>
+                          <span className="opacity-60">•</span>
+                          <span className="font-normal opacity-90">{Array.isArray(p.tests) ? p.tests.join(', ') : p.test_name || 'Diagnostic Screening'}</span>
+                          {isDone && (
+                            <span className="ml-xs text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/30 text-emerald-300 font-extrabold uppercase tracking-wider">
+                              Done
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })
                   )}
                 </div>
               </motion.div>

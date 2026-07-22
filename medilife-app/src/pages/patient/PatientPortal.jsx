@@ -189,20 +189,45 @@ export default function PatientPortal() {
       case 'pending':
         return (
           <span className="badge badge-warning bg-amber-50 text-amber-700 border border-amber-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
             Pending
           </span>
         )
-      case 'completed':
+      case 'scheduled':
         return (
-          <span className="badge bg-cyan-50 text-cyan-700 border border-cyan-200">
+          <span className="badge bg-blue-50 text-blue-700 border border-blue-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            Scheduled
+          </span>
+        )
+      case 'in-progress':
+      case 'processing':
+        return (
+          <span className="badge bg-violet-50 text-violet-700 border border-violet-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
+            In Progress
+          </span>
+        )
+      case 'done':
+      case 'completed':
+      case 'complete':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm font-bold bg-emerald-500 text-white shadow-md shadow-emerald-200">
             <CheckCircle className="w-3.5 h-3.5" />
-            Completed
+            Done ✓
+          </span>
+        )
+      case 'cancelled':
+      case 'canceled':
+        return (
+          <span className="badge bg-red-50 text-red-700 border border-red-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+            Cancelled
           </span>
         )
       default:
         return (
-          <span className="badge bg-slate-100 text-slate-700 border border-slate-200">
+          <span className="badge bg-slate-100 text-slate-600 border border-slate-200">
             {status || 'Unknown'}
           </span>
         )
@@ -486,13 +511,6 @@ export default function PatientPortal() {
                             <Utensils className={`w-4 h-4 ${requiresFasting ? 'text-amber-600' : 'text-emerald-600'}`} />
                             <span>Pre-Test Patient Preparation & Guidelines</span>
                           </div>
-                          <button
-                            onClick={() => handleResendEmailInstructions(appointment)}
-                            className="text-primary hover:underline text-label-sm font-bold flex items-center gap-xs shrink-0"
-                          >
-                            <Mail className="w-3.5 h-3.5" />
-                            Email Instructions
-                          </button>
                         </div>
                         <ul className="space-y-xs">
                           {instructions.map((ins, i) => (

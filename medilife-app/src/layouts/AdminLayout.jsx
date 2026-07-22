@@ -21,6 +21,7 @@ export default function AdminLayout() {
     { to: `/${activeSlug}/admin/reports`, icon: 'send', label: 'Reports' },
     { to: `/${activeSlug}/admin/analytics`, icon: 'insights', label: 'Analytics' },
     { to: `/${activeSlug}/admin/schedule`, icon: 'calendar_today', label: 'Schedule' },
+    { to: `/${activeSlug}/admin/settings`, icon: 'settings', label: 'Settings' },
   ]
 
   return (
@@ -76,13 +77,19 @@ export default function AdminLayout() {
         {/* Bottom */}
         <ul className="flex flex-col gap-2 border-t border-white/10 pt-4">
           <li>
-            <Link 
-              to={`/${activeSlug}/admin/dashboard`} 
-              className="flex items-center gap-3 px-4 py-2 text-admin-on-surface-variant hover:bg-white/5 rounded-lg transition-colors text-label-sm"
+            <NavLink 
+              to={`/${activeSlug}/admin/settings`} 
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-label-sm ${
+                  isActive
+                    ? 'bg-admin-secondary-container text-admin-on-secondary-container font-bold'
+                    : 'text-admin-on-surface-variant hover:bg-white/5'
+                }`
+              }
             >
               <span className="material-symbols-outlined text-[18px]">settings</span>
               Settings
-            </Link>
+            </NavLink>
           </li>
           <li>
             <button 
@@ -139,13 +146,40 @@ export default function AdminLayout() {
                   </li>
                 ))}
               </ul>
+
+              {/* Drawer Bottom: Settings + Logout */}
+              <div className="border-t border-white/10 pt-4 flex flex-col gap-2">
+                <NavLink
+                  to={`/${activeSlug}/admin/settings`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-label-md ${
+                      isActive ? 'bg-admin-secondary-container text-admin-on-secondary-container font-bold' : 'text-admin-on-surface-variant hover:bg-white/5'
+                    }`
+                  }
+                >
+                  <span className="material-symbols-outlined">settings</span>
+                  Settings
+                </NavLink>
+                <button
+                  onClick={async () => {
+                    setMobileMenuOpen(false)
+                    await supabase.auth.signOut()
+                    window.location.href = `/${activeSlug}/admin/login`
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-label-md text-admin-on-surface-variant hover:bg-white/5 hover:text-red-400 w-full text-left"
+                >
+                  <span className="material-symbols-outlined">logout</span>
+                  Log Out
+                </button>
+              </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
       {/* Main content */}
-      <main className="flex-1 md:ml-64 mt-14 md:mt-0 min-h-screen overflow-y-auto">
+      <main className="flex-1 md:ml-64 mt-14 md:mt-0 min-h-screen pb-20 md:pb-0 overflow-y-auto">
         <Outlet />
       </main>
 
