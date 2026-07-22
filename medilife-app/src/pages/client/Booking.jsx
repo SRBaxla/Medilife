@@ -379,14 +379,24 @@ export default function Booking() {
         <div className="max-w-[1280px] mx-auto">
           <h1 className="text-display-lg-mobile font-bold mb-lg">Book a Test</h1>
           {/* Progress Steps */}
-          <div className="flex items-center gap-xs overflow-x-auto pb-sm">
+          <div className="flex items-center justify-between w-full">
             {steps.map((s, i) => (
-              <div key={s} className="flex items-center gap-xs shrink-0">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold transition-all ${i <= step ? 'bg-on-primary text-primary' : 'bg-on-primary/20 text-on-primary/60'}`}>
-                  {i < step ? <span className="material-symbols-outlined text-[16px]">check</span> : i + 1}
+              <div key={s} className="flex items-center flex-1 last:flex-none">
+                <div className="flex flex-col items-center gap-0.5">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold transition-all shrink-0 ${
+                    i < step ? 'bg-on-primary text-primary' : i === step ? 'bg-on-primary text-primary ring-2 ring-white/50' : 'bg-on-primary/20 text-on-primary/50'
+                  }`}>
+                    {i < step ? <span className="material-symbols-outlined text-[14px]">check</span> : i + 1}
+                  </div>
+                  <span className={`text-[9px] sm:text-label-sm font-semibold text-center leading-tight max-w-[56px] sm:max-w-none ${
+                    i <= step ? 'text-on-primary' : 'text-on-primary/50'
+                  }`}>{s}</span>
                 </div>
-                <span className={`text-label-sm hidden sm:block ${i <= step ? 'text-on-primary font-bold' : 'text-on-primary/60'}`}>{s}</span>
-                {i < steps.length - 1 && <div className={`h-0.5 w-8 rounded ${i < step ? 'bg-on-primary' : 'bg-on-primary/20'}`} />}
+                {i < steps.length - 1 && (
+                  <div className={`flex-1 h-0.5 mx-1 rounded transition-all ${
+                    i < step ? 'bg-on-primary' : 'bg-on-primary/20'
+                  }`} />
+                )}
               </div>
             ))}
           </div>
@@ -461,19 +471,34 @@ export default function Booking() {
                 {step === 1 && (
                   <div className="space-y-md">
                     <h2 className="text-headline-md font-bold text-on-surface">Collection Method</h2>
+                    <p className="text-body-md text-on-surface-variant -mt-1">Tap an option to continue automatically.</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
                       {[
                         { value: 'home', icon: 'home', title: 'Home Collection', desc: 'Trained phlebotomist visits your home. Free for orders above ₹999.' },
                         { value: 'walkin', icon: 'local_hospital', title: 'Walk-in to Clinic', desc: 'Visit our clinic at your convenience. No wait time with booking.' },
                       ].map(({ value, icon, title, desc }) => (
-                        <button key={value} onClick={() => setCollection(value)}
-                          className={`p-lg rounded-2xl border-2 text-left transition-all ${collection === value ? 'border-primary bg-secondary-container' : 'border-outline-variant/30 bg-surface-container-lowest hover:border-primary/40'}`}
+                        <button
+                          key={value}
+                          onClick={() => {
+                            setCollection(value)
+                            // Auto-advance to Schedule step after a brief highlight
+                            setTimeout(() => setStep(2), 250)
+                          }}
+                          className={`p-lg rounded-2xl border-2 text-left transition-all ${collection === value ? 'border-primary bg-secondary-container shadow-clinical' : 'border-outline-variant/30 bg-surface-container-lowest hover:border-primary/40'}`}
                         >
-                          <div className="w-12 h-12 rounded-xl bg-secondary-container flex items-center justify-center text-primary mb-md">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-md transition-all ${
+                            collection === value ? 'bg-primary text-on-primary' : 'bg-secondary-container text-primary'
+                          }`}>
                             <span className="material-symbols-outlined">{icon}</span>
                           </div>
                           <h3 className="font-bold text-on-surface mb-xs">{title}</h3>
                           <p className="text-body-md text-on-surface-variant">{desc}</p>
+                          {collection === value && (
+                            <div className="mt-sm flex items-center gap-xs text-primary text-label-sm font-semibold">
+                              <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                              Selected — moving to next step…
+                            </div>
+                          )}
                         </button>
                       ))}
                     </div>
