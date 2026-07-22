@@ -8,11 +8,11 @@ export default function Login() {
   const { tenantSlug } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
-  
+
   // Resolve target tab from active URL path (default to patient if unspecified)
   const isPatientPath = location.pathname.includes('/patient/login')
   const [tab, setTab] = useState(isPatientPath ? 'patient' : 'admin')
-  
+
   const [form, setForm] = useState({ email: '', password: '' })
   const [errorMsg, setErrorMsg] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -32,9 +32,10 @@ export default function Login() {
           .from('tenants')
           .select('id, name, subdomain')
           .eq('subdomain', activeSlug)
-          .single()
+          .maybeSingle()
 
         if (error) throw error
+        if (!data) throw new Error("Tenant profile not found in registries")
         setResolvedTenant(data)
       } catch (err) {
         console.warn("Tenant lookup failed, falling back to mock Jhansi context for offline support:", err)
@@ -70,21 +71,35 @@ export default function Login() {
         password: form.password
       })
 
-      if (authError) throw authError
+      if (authError) {
+        if (authError.message?.includes('Invalid login credentials')) {
+          setErrorMsg('Invalid email or password. Please verify your login credentials.')
+        } else if (authError.message?.includes('Email not confirmed')) {
+          setErrorMsg('Your email address has not been confirmed yet. Please check your inbox.')
+        } else if (authError.status === 400 || authError.message?.includes('token')) {
+          setErrorMsg('Session token validation failed or account disabled. Please try logging in again.')
+        } else {
+          setErrorMsg(authError.message || 'Authentication failed.')
+        }
+        setLoading(false)
+        return
+      }
+
+      if (!user) throw new Error("No active user session returned.")
 
       // 2. Fetch public profile to match tenant context and role
       const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
         .select('role, tenant_id')
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
 
-      if (profileError) {
-        // Safe offline mock credentials match for presentation verification
+      if (profileError || !profile) {
+        // Safe fallback context if profile is missing
         const isEmailAdmin = form.email.includes('admin')
         const simulatedProfile = {
           role: isEmailAdmin ? 'admin' : 'patient',
-          tenant_id: '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e'
+          tenant_id: resolvedTenant?.id || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e'
         }
         processLoginRedirect(simulatedProfile)
         return
@@ -154,7 +169,7 @@ export default function Login() {
     <div className={`min-h-screen flex items-center justify-center px-lg py-xxl bg-[#051424] transition-colors duration-300`}>
       <div className="w-full max-w-sm">
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-          
+
           {/* Tenant Identity Header */}
           <div className="text-center mb-lg">
             <p className="text-label-sm text-clinical-teal uppercase tracking-widest font-bold">
@@ -178,14 +193,13 @@ export default function Login() {
           {/* Tab Switcher */}
           <div className="flex rounded-xl p-1 mb-xl bg-white/10">
             {['patient', 'admin'].map((t) => (
-              <button 
-                key={t} 
+              <button
+                key={t}
                 onClick={() => handleTabSwitch(t)}
-                className={`flex-1 py-sm rounded-lg font-label-md text-label-md capitalize transition-all duration-200 ${
-                  tab === t
-                    ? 'bg-clinical-teal text-white shadow-admin-glow font-bold'
-                    : 'text-admin-on-surface-variant hover:text-white'
-                }`}
+                className={`flex-1 py-sm rounded-lg font-label-md text-label-md capitalize transition-all duration-200 ${tab === t
+                  ? 'bg-clinical-teal text-white shadow-admin-glow font-bold'
+                  : 'text-admin-on-surface-variant hover:text-white'
+                  }`}
               >
                 {t === 'patient' ? '🧑‍💊 Patient' : '🔬 Admin / Staff'}
               </button>
@@ -194,11 +208,11 @@ export default function Login() {
 
           {/* Form card */}
           <div className="rounded-2xl p-xl shadow-clinical-lg glass-panel border border-white/10 relative overflow-hidden bg-white/5 backdrop-blur-md">
-            
+
             {/* Warning alerts banner */}
             <AnimatePresence>
               {errorMsg && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
@@ -224,31 +238,31 @@ export default function Login() {
                 <label className="text-label-md mb-xs block text-admin-on-surface-variant">
                   {tab === 'admin' ? 'Staff ID / Email' : 'Email Address'}
                 </label>
-                <input 
-                  required 
-                  type="email" 
-                  className="w-full px-md py-sm rounded-xl font-body-md focus:outline-none transition-all bg-white/10 border border-white/20 text-white placeholder:text-admin-on-surface-variant/40 focus:border-clinical-teal focus:bg-white/15" 
-                  placeholder={tab === 'admin' ? 'staff@medilife.in' : 'you@email.com'} 
-                  value={form.email} 
-                  onChange={(e) => setForm({ ...form, email: e.target.value })} 
+                <input
+                  required
+                  type="email"
+                  className="w-full px-md py-sm rounded-xl font-body-md focus:outline-none transition-all bg-white/10 border border-white/20 text-white placeholder:text-admin-on-surface-variant/40 focus:border-clinical-teal focus:bg-white/15"
+                  placeholder={tab === 'admin' ? 'staff@medilife.in' : 'you@email.com'}
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                 />
               </div>
               <div>
                 <label className="text-label-md mb-xs block text-admin-on-surface-variant">Password</label>
-                <input 
-                  required 
-                  type="password" 
-                  className="w-full px-md py-sm rounded-xl font-body-md focus:outline-none transition-all bg-white/10 border border-white/20 text-white placeholder:text-admin-on-surface-variant/40 focus:border-clinical-teal focus:bg-white/15" 
-                  placeholder="••••••••" 
-                  value={form.password} 
-                  onChange={(e) => setForm({ ...form, password: e.target.value })} 
+                <input
+                  required
+                  type="password"
+                  className="w-full px-md py-sm rounded-xl font-body-md focus:outline-none transition-all bg-white/10 border border-white/20 text-white placeholder:text-admin-on-surface-variant/40 focus:border-clinical-teal focus:bg-white/15"
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
                 />
               </div>
               <div className="flex justify-end">
                 <button type="button" className="text-label-sm hover:underline text-clinical-teal">Forgot password?</button>
               </div>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={loading}
                 className="w-full py-sm rounded-xl font-label-md font-bold transition-all active:scale-[0.98] bg-clinical-teal text-white hover:opacity-90 flex items-center justify-center gap-xs shadow-admin-glow disabled:opacity-50"
               >

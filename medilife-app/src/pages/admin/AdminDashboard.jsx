@@ -39,7 +39,7 @@ export default function AdminDashboard() {
           .from('tenants')
           .select('id')
           .eq('subdomain', currentTenantSlug)
-          .single()
+          .maybeSingle()
 
         if (error) {
           throw new Error(`Tenant lookup failed: ${error.message}`)

@@ -30,7 +30,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
             .from('tenants')
             .select('id')
             .eq('subdomain', activeSlug)
-            .single()
+            .maybeSingle()
 
           if (!tenantErr && tenant) {
             resolvedId = tenant.id
@@ -39,12 +39,25 @@ export default function ProtectedRoute({ children, allowedRoles }) {
           console.warn("Tenant UUID resolution failed inside ProtectedRoute, using Jhansi default context:", tErr)
         }
 
-        // 2. Fetch current authenticated session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        // 2. Fetch current authenticated session & validate user
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
         
-        if (sessionError) throw sessionError
+        if (userError && (userError.status === 403 || userError.status === 401 || userError.message?.includes('User not found'))) {
+          console.warn("Session invalid or user deleted on backend. Signing out locally.")
+          await supabase.auth.signOut() // Clears stale token from Local Storage
+          if (mounted) {
+            setAuthState({
+              loading: false,
+              authenticated: false,
+              authorized: false,
+              error: 'Session invalid or user deleted',
+              resolvedTenantId: resolvedId
+            })
+          }
+          return
+        }
         
-        if (!session) {
+        if (!user) {
           if (mounted) {
             setAuthState({
               loading: false,
@@ -61,15 +74,15 @@ export default function ProtectedRoute({ children, allowedRoles }) {
         const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
           .select('role, tenant_id')
-          .eq('user_id', session.user.id)
-          .single()
+          .eq('user_id', user.id)
+          .maybeSingle()
 
         // Handle profile fetch error (e.g. database RLS or offline mock fallback)
         if (profileError) {
           console.warn("Could not query user profile from Supabase:", profileError)
           
           // Secure clinical mock authentication fallback for presentation/demo mode
-          const userEmail = session.user.email || ''
+          const userEmail = user?.email || ''
           const guessedRole = userEmail.includes('admin') ? 'admin' : 'patient'
 
           const simulatedProfile = {

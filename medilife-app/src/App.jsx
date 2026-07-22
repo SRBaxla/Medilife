@@ -26,7 +26,7 @@ import Analytics from './pages/admin/Analytics'
 import DaySchedule from './pages/admin/DaySchedule'
 
 // Patient pages
-import PatientDashboard from './pages/patient/PatientDashboard'
+import PatientPortal from './pages/patient/PatientPortal'
 import Reports from './pages/patient/Reports'
 import Statistics from './pages/patient/Statistics'
 import Profile from './pages/patient/Profile'
@@ -83,7 +83,7 @@ function AnimatedRoutes() {
             </ProtectedRoute>
           }
         >
-          <Route path="dashboard" element={<PatientDashboard />} />
+          <Route path="dashboard" element={<PatientPortal />} />
           <Route path="reports" element={<Reports />} />
           <Route path="statistics" element={<Statistics />} />
           <Route path="profile" element={<Profile />} />

@@ -38,6 +38,8 @@ export default function Booking() {
   const [patientEmail, setPatientEmail] = useState('')
   const [patientPassword, setPatientPassword] = useState('')
   const [registerPassword, setRegisterPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [authenticatedUser, setAuthenticatedUser] = useState(null)
   
   // Submission / Overlay States
   const [bookingLoading, setBookingLoading] = useState(false)
@@ -56,8 +58,9 @@ export default function Booking() {
           .from('tenants')
           .select('id, name, subdomain')
           .eq('subdomain', activeSlug)
-          .single()
+          .maybeSingle()
         if (error) throw error
+        if (!data) throw new Error("Tenant not found")
         setResolvedTenant(data)
       } catch (err) {
         console.warn("Tenant lookup in Booking failed, fallback to default:", err)
@@ -70,6 +73,51 @@ export default function Booking() {
     }
     resolveActiveTenant()
   }, [tenantSlug])
+
+  useEffect(() => {
+    const checkUserSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) throw error
+        if (session?.user) {
+          setAuthenticatedUser(session.user)
+          // Prefill details from user_profiles
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('full_name, email, phone_number, dob, gender')
+            .eq('user_id', session.user.id)
+            .maybeSingle()
+
+          if (profile) {
+            setPatientName(profile.full_name || '')
+            setPatientEmail(profile.email || session.user.email || '')
+            setPatientPhone(profile.phone_number || '')
+            if (profile.gender) setPatientGender(profile.gender)
+            if (profile.dob) {
+              const birthYear = new Date(profile.dob).getFullYear()
+              const currentYear = new Date().getFullYear()
+              if (birthYear && birthYear > 1900) {
+                setPatientAge(String(currentYear - birthYear))
+              }
+            }
+          } else {
+            setPatientEmail(session.user.email || '')
+          }
+        }
+      } catch (err) {
+        console.warn("Error checking user session:", err)
+      }
+    }
+    checkUserSession()
+  }, [])
+
+  const getCalculatedDob = (ageStr) => {
+    if (!ageStr) return null
+    const ageNum = parseInt(ageStr, 10)
+    if (isNaN(ageNum) || ageNum <= 0) return null
+    const birthYear = new Date().getFullYear() - ageNum
+    return `${birthYear}-01-01`
+  }
 
   const getLocalDateStr = (d) => {
     const yyyy = d.getFullYear()
@@ -92,6 +140,46 @@ export default function Booking() {
 
     try {
       const tenantId = resolvedTenant?.id || DEFAULT_TENANT_ID;
+
+      // Check if user is already authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const userId = session.user.id;
+
+        const calculatedDob = getCalculatedDob(patientAge);
+        // Make sure we update the profile with latest details if they edited them
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .update({
+            full_name: patientName,
+            phone_number: patientPhone,
+            email: patientEmail,
+            dob: calculatedDob,
+            gender: patientGender
+          })
+          .eq('user_id', userId);
+
+        if (profileError) {
+          console.warn("Could not update profile on direct booking:", profileError);
+        }
+
+        // Insert booking directly
+        const { error: insertError } = await supabase
+          .from('bookings')
+          .insert({
+            tenant_id: tenantId,
+            patient_id: userId,
+            booking_date: selectedDate,
+            time_slot: selectedSlot,
+            status: 'pending'
+          });
+
+        if (insertError) throw insertError;
+
+        setSubmitted(true);
+        setBookingLoading(false);
+        return;
+      }
 
       // 1. Invoke RPC check_user_exists
       const { data: checkData, error: checkError } = await supabase.rpc('check_user_exists', {
@@ -126,6 +214,12 @@ export default function Booking() {
     setBookingLoading(true);
     setBookingError(null);
 
+    if (registerPassword !== confirmPassword) {
+      setBookingError("Passwords do not match.");
+      setBookingLoading(false);
+      return;
+    }
+
     try {
       const tenantId = resolvedTenant?.id || DEFAULT_TENANT_ID;
 
@@ -145,6 +239,22 @@ export default function Booking() {
 
       const userId = authData.user?.id;
       if (!userId) throw new Error("Failed to register new account.");
+
+      const calculatedDob = getCalculatedDob(patientAge);
+      // Update the user profile phone number, dob, and gender
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .update({
+          full_name: patientName,
+          phone_number: patientPhone,
+          dob: calculatedDob,
+          gender: patientGender
+        })
+        .eq('user_id', userId);
+
+      if (profileError) {
+        console.warn("Could not update profile phone number after register:", profileError);
+      }
 
       // 2. Insert booking
       console.log("Tenant ID being inserted:", tenantId);
@@ -567,6 +677,18 @@ export default function Booking() {
                     placeholder="Choose a password (min 6 characters)"
                     value={registerPassword}
                     onChange={(e) => setRegisterPassword(e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-label-md text-on-surface-variant mb-xs block">Confirm Password</label>
+                  <input 
+                    required 
+                    type="password" 
+                    className="input-field" 
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                 </div>
 

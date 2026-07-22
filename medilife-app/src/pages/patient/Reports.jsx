@@ -1,18 +1,49 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import PageTransition from '../../components/common/PageTransition'
+import { supabase } from '../../supabaseClient'
 
-const reports = [
-  { id: 'R001', name: 'Complete Blood Count', date: 'Oct 12, 2024', status: 'Normal', doctor: 'Dr. Patel', tests: ['Haemoglobin: 13.8 g/dL', 'WBC: 6.2 K/µL', 'Platelets: 245 K/µL'] },
-  { id: 'R002', name: 'Lipid Profile', date: 'Sep 28, 2024', status: 'Borderline', doctor: 'Dr. Patel', tests: ['Total Cholesterol: 215 mg/dL', 'LDL: 142 mg/dL', 'HDL: 45 mg/dL'] },
-  { id: 'R003', name: 'Thyroid Function (TFT)', date: 'Aug 15, 2024', status: 'Normal', doctor: 'Dr. Mehta', tests: ['TSH: 2.1 mIU/L', 'T3: 1.2 ng/mL', 'T4: 8.5 µg/dL'] },
-  { id: 'R004', name: 'HbA1c', date: 'Jul 10, 2024', status: 'Normal', doctor: 'Dr. Patel', tests: ['HbA1c: 5.4%', 'Estimated Average Glucose: 108 mg/dL'] },
-]
-
-const statusMap = { Normal: 'badge-success', Borderline: 'badge-warning', Abnormal: 'badge-error' }
+const statusMap = { 
+  Normal: 'badge-success', 
+  Borderline: 'badge-warning', 
+  Abnormal: 'badge-error',
+  Final: 'badge-success',
+  Pending: 'badge-warning'
+}
 
 export default function Reports() {
+  const [reports, setReports] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
   const [expanded, setExpanded] = useState(null)
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        setLoading(true)
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
+        const { data, error } = await supabase
+          .from('patient_reports')
+          .select('*, test_catalog(test_name)')
+          .eq('patient_id', user.id)
+
+        if (error) throw error
+        setReports(data || [])
+      } catch (err) {
+        console.error("Error fetching reports:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchReports()
+  }, [])
+
+  const filteredReports = reports.filter((r) => {
+    const name = r.test_catalog?.test_name || r.name || ''
+    return name.toLowerCase().includes(searchTerm.toLowerCase())
+  })
 
   return (
     <PageTransition>
@@ -25,57 +56,82 @@ export default function Reports() {
           <div className="flex items-center gap-sm">
             <div className="input-field flex items-center gap-sm py-sm max-w-xs">
               <span className="material-symbols-outlined text-on-surface-variant text-[18px]">search</span>
-              <input className="bg-transparent outline-none text-body-md text-on-surface placeholder:text-on-surface-variant/50 w-full" placeholder="Search reports…" />
+              <input 
+                className="bg-transparent outline-none text-body-md text-on-surface placeholder:text-on-surface-variant/50 w-full" 
+                placeholder="Search reports…" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
         </div>
 
-        <div className="space-y-md">
-          {reports.map((r, i) => (
-            <motion.div key={r.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="card card-hover overflow-hidden">
-              <button onClick={() => setExpanded(expanded === r.id ? null : r.id)} className="w-full p-lg flex items-center justify-between text-left">
-                <div className="flex items-center gap-md">
-                  <div className="w-12 h-12 rounded-xl bg-secondary-container flex items-center justify-center text-primary">
-                    <span className="material-symbols-outlined">description</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-headline-sm text-on-surface">{r.name}</p>
-                    <p className="text-label-sm text-on-surface-variant">{r.date} • {r.doctor}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-md">
-                  <span className={statusMap[r.status]}>{r.status}</span>
-                  <span className={`material-symbols-outlined text-on-surface-variant transition-transform duration-300 ${expanded === r.id ? 'rotate-180' : ''}`}>expand_more</span>
-                </div>
-              </button>
+        {loading ? (
+          <div className="p-xl text-center text-on-surface-variant">Loading reports...</div>
+        ) : filteredReports.length === 0 ? (
+          <div className="card p-xl text-center space-y-sm">
+            <span className="material-symbols-outlined text-4xl text-on-surface-variant/40">description</span>
+            <p className="font-bold text-on-surface">No diagnostic reports found</p>
+            <p className="text-body-md text-on-surface-variant max-w-md mx-auto">
+              {searchTerm ? 'No reports matched your search term.' : 'Your lab reports will appear here automatically once processed by our pathology team.'}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-md">
+            {filteredReports.map((r, i) => {
+              const reportName = r.test_catalog?.test_name || r.name || 'Diagnostic Report'
+              const dateStr = new Date(r.created_at || r.date || Date.now()).toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'short', year: 'numeric'
+              })
+              const status = r.status || 'Final'
 
-              {expanded === r.id && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }}
-                  className="px-lg pb-lg border-t border-outline-variant/30 pt-md"
-                >
-                  <div className="space-y-sm mb-md">
-                    {r.tests.map((t) => (
-                      <div key={t} className="flex items-center gap-sm">
-                        <span className="material-symbols-outlined text-primary text-[16px]">arrow_right</span>
-                        <span className="text-body-md text-on-surface">{t}</span>
+              return (
+                <motion.div key={r.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="card card-hover overflow-hidden">
+                  <button onClick={() => setExpanded(expanded === r.id ? null : r.id)} className="w-full p-lg flex items-center justify-between text-left">
+                    <div className="flex items-center gap-md">
+                      <div className="w-12 h-12 rounded-xl bg-secondary-container flex items-center justify-center text-primary">
+                        <span className="material-symbols-outlined">description</span>
                       </div>
-                    ))}
-                  </div>
-                  <div className="flex gap-sm">
-                    <button className="btn-primary text-[13px] py-xs">
-                      <span className="material-symbols-outlined text-[16px]">download</span>
-                      Download PDF
-                    </button>
-                    <button className="btn-outline text-[13px] py-xs">
-                      <span className="material-symbols-outlined text-[16px]">share</span>
-                      Share
-                    </button>
-                  </div>
+                      <div>
+                        <p className="font-bold text-headline-sm text-on-surface">{reportName}</p>
+                        <p className="text-label-sm text-on-surface-variant">{dateStr} • Ref: #{r.id.slice(0, 8)}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-md">
+                      <span className={statusMap[status] || 'badge-success'}>{status}</span>
+                      <span className={`material-symbols-outlined text-on-surface-variant transition-transform duration-300 ${expanded === r.id ? 'rotate-180' : ''}`}>expand_more</span>
+                    </div>
+                  </button>
+
+                  {expanded === r.id && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }}
+                      className="px-lg pb-lg border-t border-outline-variant/30 pt-md"
+                    >
+                      <div className="space-y-sm mb-md">
+                        {r.results_data ? (
+                          <pre className="text-xs bg-surface-container-lowest p-md rounded-xl text-on-surface font-mono overflow-x-auto">
+                            {JSON.stringify(r.results_data, null, 2)}
+                          </pre>
+                        ) : (
+                          <div className="flex items-center gap-sm">
+                            <span className="material-symbols-outlined text-primary text-[16px]">check_circle</span>
+                            <span className="text-body-md text-on-surface">Verified Laboratory Screening Results Available</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-sm">
+                        <button className="btn-primary text-[13px] py-xs">
+                          <span className="material-symbols-outlined text-[16px]">download</span>
+                          Download PDF
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
                 </motion.div>
-              )}
-            </motion.div>
-          ))}
-        </div>
+              )
+            })}
+          </div>
+        )}
       </div>
     </PageTransition>
   )
