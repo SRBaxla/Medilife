@@ -7,19 +7,22 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Keep heavy PDF library in its own chunk — only loads when user downloads
-          'pdf-renderer': ['@react-pdf/renderer'],
-          // Separate React core from app code
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          // Animation library chunk
-          'framer': ['framer-motion'],
-          // Supabase client
-          'supabase': ['@supabase/supabase-js'],
+        manualChunks(id) {
+          if (id.includes('@react-pdf/renderer') || id.includes('pdfjs-dist')) {
+            return 'pdf-renderer'
+          }
+          if (id.includes('@supabase')) {
+            return 'supabase'
+          }
+          if (id.includes('framer-motion')) {
+            return 'framer'
+          }
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/') || id.includes('react-router-dom')) {
+            return 'react-vendor'
+          }
         },
       },
     },
-    // Increase chunk size warning threshold (PDF library is inherently large)
     chunkSizeWarningLimit: 1000,
   },
 })
