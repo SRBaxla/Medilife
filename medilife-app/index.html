@@ -21,25 +21,39 @@
     <meta name="twitter:title" content="Medilife Pathology" />
     <meta name="twitter:description" content="Professional diagnostic services with home collection and online reports." />
 
-    <!-- Preconnect for faster font load -->
+    <!-- Preconnect FIRST (before any font requests) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <!-- DNS prefetch for third-party services -->
     <link rel="dns-prefetch" href="https://ylnorywjugrdxyzehvwc.supabase.co" />
-    <link rel="dns-prefetch" href="https://www.gstatic.com" />
 
-    <!-- Fonts with display=swap to prevent render blocking -->
+    <!--
+      NON-BLOCKING font loading using preload + onload swap trick.
+      This eliminates the "render-blocking requests" PageSpeed penalty.
+      Fonts load after first paint instead of blocking it.
+    -->
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=optional"
-      rel="stylesheet"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <!-- Fallback for no-JS browsers -->
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=optional" />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
+
