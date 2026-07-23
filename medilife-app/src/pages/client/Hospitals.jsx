@@ -88,8 +88,34 @@ export default function Hospitals() {
           </div>
         </div>
 
-        {/* Right Column: Hospital Test Booking & Tie-up Form */}
-        <div>
+        {/* Right Column: Option 1 (Direct Patient Booking) OR Option 2 (Hospital Booking Form) */}
+        <div className="space-y-lg">
+          {/* Option 1: Individual Patient Booking Box */}
+          <div className="p-lg bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-clinical flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md">
+            <div>
+              <span className="badge-primary inline-flex mb-xs">Option 1 • Individual Patient</span>
+              <h3 className="font-bold text-headline-sm text-on-surface">Direct Patient Test Booking</h3>
+              <p className="text-body-sm text-on-surface-variant">Book tests or checkup packages for yourself or family with free home sample collection.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate('/booking')}
+              className="btn-primary shrink-0 bg-primary hover:bg-[#E31837] text-white transition-colors"
+            >
+              Book Patient Test
+              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+          </div>
+
+          {/* OR Divider */}
+          <div className="relative flex items-center justify-center my-md">
+            <div className="border-t border-outline-variant/40 w-full" />
+            <span className="absolute bg-surface px-lg py-1 text-xs font-bold uppercase tracking-widest text-on-surface-variant/80 border border-outline-variant/30 rounded-full shadow-xs">
+              — OR —
+            </span>
+          </div>
+
+          {/* Option 2: Hospital & Clinic Bulk Tie-up Form */}
           {submitted ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-xl bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-clinical">
               <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', damping: 15 }}
@@ -103,6 +129,9 @@ export default function Hospitals() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-md bg-surface-container-lowest p-xl rounded-2xl border border-outline-variant/30 shadow-clinical">
+              <div className="flex items-center gap-sm mb-xs">
+                <span className="badge-primary inline-flex">Option 2 • Healthcare Providers</span>
+              </div>
               <div className="flex items-center gap-sm mb-sm">
                 <span className="material-symbols-outlined text-primary text-[28px]">medical_services</span>
                 <div>
@@ -148,17 +177,10 @@ export default function Hospitals() {
                 <textarea required rows={4} className="input-field resize-none" placeholder="List required tests (e.g. CBC, LFT, KFT for 5 patients)..." value={form.details} onChange={(e) => setForm({ ...form, details: e.target.value })} />
               </div>
 
-              <div className="pt-xs flex flex-col sm:flex-row gap-md">
-                <button type="submit" className="btn-primary flex-1 justify-center bg-primary text-white">
+              <div className="pt-xs">
+                <button type="submit" className="btn-primary w-full justify-center bg-primary hover:bg-[#E31837] text-white">
                   Submit Hospital Booking
                   <span className="material-symbols-outlined text-[18px]">send</span>
-                </button>
-                <button 
-                  type="button" 
-                  onClick={() => navigate('/booking', { state: { selectedItem: 'Hospital Bulk Order' } })} 
-                  className="btn-outline justify-center"
-                >
-                  Direct Patient Booking
                 </button>
               </div>
             </form>

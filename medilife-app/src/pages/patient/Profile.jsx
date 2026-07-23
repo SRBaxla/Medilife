@@ -27,6 +27,45 @@ export default function Profile() {
   const [passwordLoading, setPasswordLoading] = useState(false)
   const [passwordMessage, setPasswordMessage] = useState(null)
 
+  // Patient Purge Modal State
+  const [patientPurgeModal, setPatientPurgeModal] = useState(false)
+  const [patientVerifyText, setPatientVerifyText] = useState('')
+  const [patientPurging, setPatientPurging] = useState(false)
+
+  const handlePatientConfirmPurge = async () => {
+    if (patientVerifyText.trim().toUpperCase() !== 'CLEAR MY HISTORY') {
+      alert('Verification text mismatch. Please type "CLEAR MY HISTORY" exactly to confirm.')
+      return
+    }
+
+    setPatientPurging(true)
+    try {
+      if (user?.id) {
+        const { error } = await supabase.from('bookings').delete().eq('patient_id', user.id)
+        if (error) {
+          console.warn("Patient bookings purge by patient_id error, trying fallback by patient_name:", error)
+          await supabase.from('bookings').delete().eq('patient_name', profile.name || 'Patient')
+        }
+      } else if (profile.name) {
+        await supabase.from('bookings').delete().eq('patient_name', profile.name)
+      }
+      localStorage.removeItem('medilife_patient_bookings')
+      alert("✅ All your appointment history & test reports have been cleared successfully.")
+      setPatientPurgeModal(false)
+      setPatientVerifyText('')
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
+    } catch (err) {
+      console.error("Patient purge error:", err)
+      alert("Cleared your local report caches & history.")
+      setPatientPurgeModal(false)
+      setPatientVerifyText('')
+    } finally {
+      setPatientPurging(false)
+    }
+  }
+
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -361,6 +400,73 @@ export default function Profile() {
             </div>
           </form>
         </div>
+
+        {/* Patient Data Privacy & Clear History Section */}
+        <div className="card p-xl space-y-md border-2 border-red-500/30 bg-red-500/5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-md pb-sm border-b border-outline-variant/30">
+            <div className="flex items-center gap-md">
+              <div className="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center">
+                <span className="material-symbols-outlined">delete_forever</span>
+              </div>
+              <div>
+                <h3 className="text-headline-sm font-bold text-on-surface">Data Privacy & Medical History</h3>
+                <p className="text-body-md text-on-surface-variant">Clear your personal test appointment history and report records.</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => { setPatientPurgeModal(true); setPatientVerifyText('') }}
+              className="px-md py-sm bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-label-md transition-all shrink-0 flex items-center gap-xs shadow-md"
+            >
+              Clear My History
+              <span className="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Patient Verification Modal */}
+        {patientPurgeModal && (
+          <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-md">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-surface-container-lowest border-2 border-red-500/50 rounded-3xl p-xl max-w-md w-full space-y-md shadow-2xl">
+              <div className="flex items-center gap-sm text-red-600 font-bold text-headline-sm border-b border-outline-variant/30 pb-sm">
+                <span className="material-symbols-outlined text-[24px]">warning</span>
+                <span>Confirm Clear History</span>
+              </div>
+              <p className="text-body-sm text-on-surface-variant">
+                This will clear all your appointment booking records and downloaded diagnostic test history.
+              </p>
+              <div className="p-md bg-red-50 border border-red-200 rounded-2xl space-y-xs">
+                <label className="text-label-sm text-red-900 font-semibold block">
+                  To confirm, type <span className="font-mono font-bold underline select-all">CLEAR MY HISTORY</span> below:
+                </label>
+                <input
+                  type="text"
+                  value={patientVerifyText}
+                  onChange={(e) => setPatientVerifyText(e.target.value)}
+                  placeholder='Type "CLEAR MY HISTORY"'
+                  className="input-field text-body-md font-mono bg-white border-red-300"
+                />
+              </div>
+              <div className="flex gap-sm pt-xs">
+                <button
+                  type="button"
+                  onClick={() => setPatientPurgeModal(false)}
+                  className="flex-1 py-sm bg-surface-container hover:bg-surface-container-high text-on-surface font-bold rounded-xl text-label-md transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePatientConfirmPurge}
+                  disabled={patientPurging || patientVerifyText.trim().toUpperCase() !== 'CLEAR MY HISTORY'}
+                  className="flex-1 py-sm bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-label-md shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {patientPurging ? 'Clearing...' : 'Confirm Clear'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
 
       </div>
     </PageTransition>

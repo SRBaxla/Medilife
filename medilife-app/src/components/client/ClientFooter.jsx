@@ -2,14 +2,26 @@ import { Link } from 'react-router-dom'
 
 export default function ClientFooter() {
   return (
-    <footer className="bg-[#071338] text-[#F1F5F9] mt-0 border-t-4 border-[#E31837]">
-      <div className="max-w-[1280px] mx-auto px-lg py-xxl grid grid-cols-1 md:grid-cols-4 gap-xl">
-        {/* Brand */}
-        <div className="md:col-span-2 space-y-md">
+    <footer className="bg-[#071338] text-white border-t border-white/10">
+      {/* Top CTA Bar */}
+      <div className="border-b border-white/10 py-lg px-lg">
+        <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-md text-center md:text-left">
+          <div>
+            <h3 className="font-bold text-headline-sm text-white">Need Urgent Blood Tests or Health Checkup?</h3>
+            <p className="text-body-md text-slate-300">Free home sample collection available across Khati Baba & Jhansi city.</p>
+          </div>
+          <Link to="/booking" className="btn-primary bg-[#E31837] hover:bg-red-700 text-white shrink-0">
+            Book Home Collection
+          </Link>
+        </div>
+      </div>
+
+      <div className="max-w-[1280px] mx-auto px-lg py-xxl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-xl">
+        {/* Brand Column */}
+        <div className="space-y-md">
           <div className="flex items-center gap-sm">
-            <div className="w-10 h-10 rounded-xl bg-[#0A1F6E] flex items-center justify-center relative border border-white/20 shadow-md">
-              <span className="material-symbols-outlined text-white text-[22px]">science</span>
-              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#E31837] rounded-full border-2 border-[#071338]"></span>
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-clinical shrink-0">
+              <span className="material-symbols-outlined text-white text-[20px]">science</span>
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-[19px] text-white leading-tight">
@@ -34,10 +46,31 @@ export default function ClientFooter() {
           <h4 className="font-label-md text-label-md uppercase tracking-wider text-[#E31837] font-bold mb-md">Services</h4>
           <ul className="space-y-sm">
             {[
-              { label: 'Individual Diagnostic Tests', to: '/tests' },
+              { label: 'Individual Pathology Tests', to: '/tests' },
               { label: 'Health Packages (BharatFit)', to: '/packages' },
-              { label: 'Hospital & Clinic Test Booking', to: '/hospitals' },
+              { label: 'Hospital & Clinic Tie-ups', to: '/hospitals' },
               { label: 'Free Home Collection', to: '/booking' },
+            ].map(({ label, to }) => (
+              <li key={label}>
+                <Link to={to} className="text-body-md text-slate-300 hover:text-white hover:translate-x-1 transition-all flex items-center gap-xs">
+                  <span className="text-[#E31837] font-bold text-[12px]">›</span>
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Quick & Legal Links */}
+        <div>
+          <h4 className="font-label-md text-label-md uppercase tracking-wider text-[#E31837] font-bold mb-md">Quick & Legal</h4>
+          <ul className="space-y-sm">
+            {[
+              { label: 'About Us', to: '/about' },
+              { label: 'Frequently Asked Questions (FAQ)', to: '/faq' },
+              { label: 'Privacy Policy', to: '/privacy-policy' },
+              { label: 'Terms & Legal Disclaimer', to: '/terms' },
+              { label: 'Contact Lab', to: '/contact' },
             ].map(({ label, to }) => (
               <li key={label}>
                 <Link to={to} className="text-body-md text-slate-300 hover:text-white hover:translate-x-1 transition-all flex items-center gap-xs">
@@ -62,7 +95,7 @@ export default function ClientFooter() {
                 <div className="w-6 h-6 rounded-full bg-[#E31837]/20 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[14px] text-[#E31837]">call</span>
                 </div>
-                +91 8299487062
+                +91 8299487062 (Shivam Sharma)
               </a>
             </li>
             <li className="flex items-center gap-sm text-body-md text-slate-300 pt-xs">
@@ -100,8 +133,9 @@ export default function ClientFooter() {
       <div className="border-t border-white/10 px-lg py-md max-w-[1280px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-sm">
         <p className="text-label-sm text-slate-400">© 2026 Medipath Diagnostics (Redcliffe Labs Authorised Center). All rights reserved.</p>
         <div className="flex gap-md">
-          <Link to="/contact" className="text-label-sm text-slate-400 hover:text-white transition-colors">Privacy Policy</Link>
-          <Link to="/contact" className="text-label-sm text-slate-400 hover:text-white transition-colors">Terms of Service</Link>
+          <Link to="/faq" className="text-label-sm text-slate-400 hover:text-white transition-colors">FAQ</Link>
+          <Link to="/privacy-policy" className="text-label-sm text-slate-400 hover:text-white transition-colors">Privacy Policy</Link>
+          <Link to="/terms" className="text-label-sm text-slate-400 hover:text-white transition-colors">Terms of Service</Link>
         </div>
       </div>
     </footer>

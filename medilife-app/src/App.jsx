@@ -15,6 +15,9 @@ const Hospitals = lazy(() => import('./pages/client/Hospitals'))
 const AboutUs = lazy(() => import('./pages/client/AboutUs'))
 const Contact = lazy(() => import('./pages/client/Contact'))
 const Booking = lazy(() => import('./pages/client/Booking'))
+const Faq = lazy(() => import('./pages/client/Faq'))
+import DataPrivacy from './pages/client/DataPrivacy'
+const Terms = lazy(() => import('./pages/client/Terms'))
 
 // Auth
 const Login = lazy(() => import('./pages/auth/Login'))
@@ -64,6 +67,9 @@ function AnimatedRoutes() {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/booking" element={<Booking />} />
+            <Route path="/faq" element={<Faq />} />
+            <Route path="/privacy-policy" element={<DataPrivacy />} />
+            <Route path="/terms" element={<Terms />} />
           </Route>
 
           {/* Multi-Tenant Public Login routes */}

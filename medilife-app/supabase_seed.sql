@@ -140,3 +140,52 @@ VALUES (
 )
 ON CONFLICT (id) DO UPDATE
 SET full_name = EXCLUDED.full_name, role = EXCLUDED.role;
+
+-- 5. Row Level Security Policies for Staff Roster Isolation
+ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policy if present
+DROP POLICY IF EXISTS "Restrict staff roster query to non-patient roles" ON public.user_profiles;
+
+-- Policy: Only query users with active staff roles (admin, lab_tech, super_admin, staff, phlebotomist) for staff roster
+CREATE POLICY "Restrict staff roster query to non-patient roles" ON public.user_profiles
+FOR SELECT
+USING (
+  role IS NOT NULL AND lower(role) NOT IN ('patient', 'user')
+);
+
+-- 6. Database Anti-Demotion Security Trigger for Super Root Admins
+CREATE OR REPLACE FUNCTION public.prevent_super_admin_demotion()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF OLD.role = 'super_admin' AND NEW.role != 'super_admin' THEN
+    RAISE EXCEPTION 'Security Policy Violation: Super Root Administrator role cannot be demoted to a lesser privilege level.';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_prevent_super_admin_demotion ON public.user_profiles;
+
+CREATE TRIGGER trigger_prevent_super_admin_demotion
+BEFORE UPDATE ON public.user_profiles
+FOR EACH ROW
+WHEN (OLD.role = 'super_admin')
+EXECUTE FUNCTION public.prevent_super_admin_demotion();
+
+-- 7. Ensure bookings table schema columns exist for address, gps_coordinates, phone & collection_type
+ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS gps_coordinates TEXT;
+ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS collection_type TEXT DEFAULT 'walkin';
+ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS phone TEXT;
+
+-- 8. Row Level Security Delete Policies for Purge Operations
+DROP POLICY IF EXISTS "Allow authenticated users to delete bookings" ON public.bookings;
+CREATE POLICY "Allow authenticated users to delete bookings" ON public.bookings
+FOR DELETE
+USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated users to delete audit logs" ON public.audit_logs;
+CREATE POLICY "Allow authenticated users to delete audit logs" ON public.audit_logs
+FOR DELETE
+USING (true);

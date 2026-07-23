@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink, Outlet, Link, useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { supabase } from '../supabaseClient'
@@ -8,6 +8,76 @@ export default function AdminLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { tenantSlug } = useParams()
   const activeSlug = tenantSlug || 'jhansi-medilife-tenant-01'
+
+  // Staff Break System State (Persisted in localStorage across reloads)
+  const [breakStatus, setBreakStatus] = useState(() => {
+    try {
+      const saved = localStorage.getItem('medilife_staff_break')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        const elapsedSec = Math.floor((Date.now() - parsed.timestamp) / 1000)
+        const remaining = parsed.totalSeconds - elapsedSec
+        if (remaining > 0) {
+          return { ...parsed, secondsLeft: remaining }
+        }
+      }
+    } catch (e) {}
+    return null
+  })
+
+  useEffect(() => {
+    let interval = null
+    if (breakStatus && breakStatus.secondsLeft > 0) {
+      interval = setInterval(() => {
+        setBreakStatus((prev) => {
+          if (!prev || prev.secondsLeft <= 1) {
+            clearInterval(interval)
+            localStorage.removeItem('medilife_staff_break')
+            window.dispatchEvent(new Event('staff-break-change'))
+            alert("⏰ Break Time Completed! Welcome back to shift duty.")
+            return null
+          }
+          return { ...prev, secondsLeft: prev.secondsLeft - 1 }
+        })
+      }, 1000)
+    } else if (breakStatus && breakStatus.secondsLeft <= 0) {
+      localStorage.removeItem('medilife_staff_break')
+      window.dispatchEvent(new Event('staff-break-change'))
+      setBreakStatus(null)
+    }
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [breakStatus?.secondsLeft])
+
+  const startBreak = (minutes) => {
+    const seconds = minutes * 60
+    const breakData = {
+      durationMinutes: minutes,
+      totalSeconds: seconds,
+      secondsLeft: seconds,
+      startTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: Date.now()
+    }
+    
+    setBreakStatus(breakData)
+    try {
+      localStorage.setItem('medilife_staff_break', JSON.stringify(breakData))
+      window.dispatchEvent(new Event('staff-break-change'))
+    } catch (e) {}
+  }
+
+  const endBreakEarly = () => {
+    localStorage.removeItem('medilife_staff_break')
+    setBreakStatus(null)
+    window.dispatchEvent(new Event('staff-break-change'))
+  }
+
+  const formatSeconds = (sec) => {
+    const mins = Math.floor(sec / 60)
+    const secs = sec % 60
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+  }
 
   const adminNavItems = [
     { to: `/${activeSlug}/admin/dashboard`, icon: 'how_to_reg', label: 'Check-in', end: true },
@@ -65,13 +135,45 @@ export default function AdminLayout() {
           ))}
         </ul>
 
-        {/* Staff Well-being */}
-        <div className="mt-auto mb-4">
-          <h3 className="text-label-sm text-admin-on-surface-variant uppercase mb-2 px-4">Staff Well-being</h3>
-          <div className="px-4 flex gap-2">
-            <button className="flex-1 glass-panel text-admin-on-surface-variant text-label-sm py-2 rounded-lg hover:glass-panel-teal hover:text-clinical-teal transition-all">15m Break</button>
-            <button className="flex-1 glass-panel text-admin-on-surface-variant text-label-sm py-2 rounded-lg hover:glass-panel-teal hover:text-clinical-teal transition-all">30m Break</button>
+        {/* Staff Well-being & Worker Break System */}
+        <div className="mt-auto mb-4 px-2 space-y-2">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="text-[11px] font-bold text-admin-on-surface-variant uppercase tracking-wider">Staff Well-being</h3>
+            {breakStatus && (
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            )}
           </div>
+
+          {breakStatus ? (
+            <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-1 text-center">
+              <div className="flex items-center justify-between text-xs text-amber-300 font-bold">
+                <span>☕ On Break</span>
+                <span className="font-mono text-base font-extrabold text-amber-200">{formatSeconds(breakStatus.secondsLeft)}</span>
+              </div>
+              <p className="text-[11px] text-amber-400/80">Started at {breakStatus.startTime}</p>
+              <button
+                onClick={endBreakEarly}
+                className="w-full py-1 mt-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg text-xs font-bold transition-all border border-amber-500/40"
+              >
+                End Break Early
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={() => startBreak(15)}
+                className="flex-1 glass-panel text-admin-on-surface-variant text-label-sm py-2 rounded-lg hover:glass-panel-teal hover:text-clinical-teal transition-all font-bold"
+              >
+                15m Break
+              </button>
+              <button
+                onClick={() => startBreak(30)}
+                className="flex-1 glass-panel text-admin-on-surface-variant text-label-sm py-2 rounded-lg hover:glass-panel-teal hover:text-clinical-teal transition-all font-bold"
+              >
+                30m Break
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Bottom */}
@@ -146,6 +248,47 @@ export default function AdminLayout() {
                   </li>
                 ))}
               </ul>
+
+              {/* Mobile Staff Well-being & Worker Break System */}
+              <div className="mb-4 space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="text-[11px] font-bold text-admin-on-surface-variant uppercase tracking-wider">Staff Well-being</h3>
+                  {breakStatus && (
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                  )}
+                </div>
+
+                {breakStatus ? (
+                  <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-1 text-center">
+                    <div className="flex items-center justify-between text-xs text-amber-300 font-bold">
+                      <span>☕ On Break</span>
+                      <span className="font-mono text-base font-extrabold text-amber-200">{formatSeconds(breakStatus.secondsLeft)}</span>
+                    </div>
+                    <p className="text-[11px] text-amber-400/80">Started at {breakStatus.startTime}</p>
+                    <button
+                      onClick={endBreakEarly}
+                      className="w-full py-1 mt-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg text-xs font-bold transition-all border border-amber-500/40"
+                    >
+                      End Break Early
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => startBreak(15)}
+                      className="flex-1 glass-panel text-admin-on-surface-variant text-label-sm py-2 rounded-lg hover:glass-panel-teal hover:text-clinical-teal transition-all font-bold"
+                    >
+                      15m Break
+                    </button>
+                    <button
+                      onClick={() => startBreak(30)}
+                      className="flex-1 glass-panel text-admin-on-surface-variant text-label-sm py-2 rounded-lg hover:glass-panel-teal hover:text-clinical-teal transition-all font-bold"
+                    >
+                      30m Break
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* Drawer Bottom: Settings + Logout */}
               <div className="border-t border-white/10 pt-4 flex flex-col gap-2">

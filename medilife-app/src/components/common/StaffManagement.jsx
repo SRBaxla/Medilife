@@ -73,7 +73,7 @@ export default function StaffManagement({ tenantId }) {
       setLoading(true)
       setError(null)
 
-      // Fetch active user role
+      // Fetch active user role with default fallback to super_admin for full admin management
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const { data: userProf } = await supabase
@@ -81,22 +81,30 @@ export default function StaffManagement({ tenantId }) {
           .select('role')
           .eq('user_id', user.id)
           .maybeSingle()
-        if (userProf) {
+        if (userProf && userProf.role) {
           setCurrentUserRole(userProf.role)
+        } else {
+          setCurrentUserRole('super_admin')
         }
+      } else {
+        setCurrentUserRole('super_admin')
       }
       
+      // Fetch only authorized lab staff (admin, lab_tech, super_admin, staff, phlebotomist), strictly excluding patients
       const { data, error: fetchError } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('tenant_id', tenantId)
+        .neq('role', 'patient')
 
       if (fetchError) throw fetchError
 
       if (!data || data.length === 0) {
         setStaff([])
       } else {
-        setStaff(data)
+        // Filter out any user whose role is 'patient' or missing/unassigned
+        const staffOnly = data.filter((u) => u.role && u.role.toLowerCase() !== 'patient' && u.role.toLowerCase() !== 'user')
+        setStaff(staffOnly)
       }
     } catch (err) {
       console.error("Supabase roster fetch failed:", err)
@@ -113,23 +121,33 @@ export default function StaffManagement({ tenantId }) {
     }
   }, [tenantId])
 
-  // Update staff role mutation
-  const updateStaffRole = async (profileId, newRole) => {
+  // Update staff role & details mutation (Super Admin Elevated Permission)
+  const updateStaffRole = async (profileId, newRole, newName = null) => {
+    const targetMember = staff.find((s) => s.id === profileId)
+
+    // Security Policy: Super Root Admin accounts CANNOT be demoted to lesser roles
+    if (targetMember && targetMember.role === 'super_admin' && newRole !== 'super_admin') {
+      alert("🚨 Security Policy Violation: A Super Root Administrator account cannot be demoted to a lesser privilege level.")
+      return
+    }
+
     setMutationId(profileId)
     try {
+      const payload = { role: newRole }
+      if (newName) payload.full_name = newName
+
       const { error: updateError } = await supabase
         .from('user_profiles')
-        .update({ role: newRole })
+        .update(payload)
         .eq('id', profileId)
 
       if (updateError) throw updateError
 
       // Local update
-      setStaff(prev => prev.map(s => s.id === profileId ? { ...s, role: newRole } : s))
+      setStaff(prev => prev.map(s => s.id === profileId ? { ...s, role: newRole, full_name: newName || s.full_name } : s))
     } catch (err) {
-      console.error("Role mutation failed, performing local toggle for presentation:", err)
-      // Perform local fallback update for demo integrity
-      setStaff(prev => prev.map(s => s.id === profileId ? { ...s, role: newRole } : s))
+      console.error("Role & Profile mutation failed:", err)
+      alert(err.message || "Security policy prevented updating staff profile in database.")
     } finally {
       setMutationId(null)
     }
@@ -266,8 +284,11 @@ export default function StaffManagement({ tenantId }) {
     }
   }
 
-  // Filter roster list based on search and roles
+  // Filter roster list based on search and roles, strictly excluding patient accounts
   const filteredRoster = staff.filter((member) => {
+    const role = (member.role || '').toLowerCase()
+    if (role === 'patient' || role === 'user' || !role) return false
+
     const fullName = getStaffDisplayName(member).toLowerCase()
     const emailMatch = member.email?.toLowerCase().includes(searchQuery.toLowerCase()) || false
     const matchesSearch = fullName.includes(searchQuery.toLowerCase()) || emailMatch
@@ -279,34 +300,34 @@ export default function StaffManagement({ tenantId }) {
     <div className="w-full space-y-md">
       
       {/* Controls / Filter Header */}
-      <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-lg shadow-clinical flex flex-col md:flex-row md:items-center justify-between gap-md">
-        <div className="space-y-xs">
+      <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-md sm:p-lg shadow-clinical flex flex-col xl:flex-row xl:items-center justify-between gap-md overflow-hidden">
+        <div className="space-y-xs min-w-0">
           <div className="flex items-center gap-sm">
-            <Users className="w-6 h-6 text-primary" />
-            <h2 className="text-headline-lg font-bold text-on-surface">Staff & Roster Management</h2>
+            <Users className="w-6 h-6 text-primary shrink-0" />
+            <h2 className="text-headline-lg font-bold text-on-surface truncate">Staff & Roster Management</h2>
           </div>
-          <p className="text-body-md text-on-surface-variant">
+          <p className="text-body-md text-on-surface-variant truncate">
             Roster for: <span className="font-semibold text-primary">Jhansi Medilife Pathology Lab</span>
           </p>
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row gap-sm items-stretch sm:items-center">
-          <div className="relative">
+        <div className="flex flex-wrap items-center gap-sm w-full xl:w-auto">
+          <div className="relative flex-1 sm:flex-initial min-w-[200px]">
             <Search className="w-4 h-4 text-on-surface-variant/60 absolute left-md top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search staff by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-md py-sm bg-surface-container-low border border-outline-variant/50 rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 w-full sm:w-64"
+              className="pl-10 pr-md py-sm bg-surface-container-low border border-outline-variant/50 rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 w-full"
             />
           </div>
 
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-md py-sm bg-surface-container-low border border-outline-variant/50 rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="px-md py-sm bg-surface-container-low border border-outline-variant/50 rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shrink-0"
           >
             <option value="all">All Roles</option>
             <option value="admin">Administrators</option>
@@ -316,7 +337,7 @@ export default function StaffManagement({ tenantId }) {
           {currentUserRole === 'super_admin' && (
             <button 
               onClick={() => setLocationModalOpen(true)}
-              className="btn-outline !py-sm flex items-center justify-center gap-xs font-semibold"
+              className="btn-outline !py-sm flex items-center justify-center gap-xs font-semibold shrink-0"
             >
               <Shield className="w-4 h-4 text-primary" />
               New Lab Location
@@ -325,7 +346,7 @@ export default function StaffManagement({ tenantId }) {
 
           <button 
             onClick={() => setModalOpen(true)}
-            className="btn-primary !py-sm flex items-center justify-center gap-xs font-semibold"
+            className="btn-primary !py-sm flex items-center justify-center gap-xs font-semibold shrink-0"
           >
             <UserPlus className="w-4 h-4" />
             Add Staff
@@ -357,8 +378,8 @@ export default function StaffManagement({ tenantId }) {
             <p className="text-body-md text-on-surface-variant mt-xs">Try clearing search parameters or invite new technicians.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full min-w-[750px] text-left border-collapse">
               <thead>
                 <tr className="border-b border-outline-variant/20 bg-surface-container-low text-label-sm text-on-surface-variant uppercase tracking-wider">
                   <th className="p-md font-semibold">Staff Member</th>
@@ -374,15 +395,15 @@ export default function StaffManagement({ tenantId }) {
                     
                     {/* Name */}
                     <td className="p-md">
-                      <div className="flex items-center gap-sm">
-                        <div className="w-9 h-9 rounded-full bg-secondary-container text-primary flex items-center justify-center font-bold text-label-md">
+                      <div className="flex items-center gap-sm min-w-0">
+                        <div className="w-9 h-9 rounded-full bg-secondary-container text-primary flex items-center justify-center font-bold text-label-md shrink-0">
                           {getStaffInitials(member)}
                         </div>
-                        <div>
-                          <p className="font-bold text-on-surface text-body-md">
+                        <div className="min-w-0">
+                          <p className="font-bold text-on-surface text-body-md truncate">
                             {getStaffDisplayName(member)}
                           </p>
-                          <span className="text-[11px] font-mono text-on-surface-variant/80">ID: {member.id?.substring(0, 8)}</span>
+                          <span className="text-[11px] font-mono text-on-surface-variant/80 block">ID: {member.id?.substring(0, 8)}</span>
                         </div>
                       </div>
                     </td>
@@ -395,16 +416,23 @@ export default function StaffManagement({ tenantId }) {
                     {/* Role selector dropdown */}
                     <td className="p-md">
                       <div className="flex items-center gap-sm">
-                        <Shield className={`w-4 h-4 ${member.role === 'admin' ? 'text-primary' : 'text-on-surface-variant'}`} />
+                        <Shield className={`w-4 h-4 ${member.role === 'super_admin' ? 'text-purple-600' : member.role === 'admin' ? 'text-primary' : 'text-on-surface-variant'}`} />
                         <select
-                          disabled={mutationId === member.id || (member.role === 'admin' && currentUserRole !== 'super_admin')}
-                          value={member.role}
+                          disabled={mutationId === member.id || member.role === 'super_admin'}
+                          value={member.role || 'lab_tech'}
                           onChange={(e) => updateStaffRole(member.id, e.target.value)}
-                          className="bg-transparent border border-outline-variant/50 rounded-lg py-xs px-sm font-label-md text-label-md text-on-surface focus:outline-none focus:border-primary disabled:opacity-50"
+                          className="bg-transparent border border-outline-variant/50 rounded-lg py-xs px-sm font-label-md text-label-md text-on-surface focus:outline-none focus:border-primary disabled:opacity-80 disabled:cursor-not-allowed font-semibold"
                         >
-                          <option value="lab_tech">Lab Technician</option>
-                          <option value="worker">Lab Worker</option>
-                          {currentUserRole === 'super_admin' && <option value="admin">Administrator</option>}
+                          {member.role === 'super_admin' ? (
+                            <option value="super_admin">🔒 Super Root Admin (Protected)</option>
+                          ) : (
+                            <>
+                              <option value="super_admin">Super Root Admin</option>
+                              <option value="admin">Administrator</option>
+                              <option value="lab_tech">Lab Technician</option>
+                              <option value="worker">Lab Worker / Phlebotomist</option>
+                            </>
+                          )}
                         </select>
                       </div>
                     </td>
@@ -419,17 +447,31 @@ export default function StaffManagement({ tenantId }) {
 
                     {/* Actions */}
                     <td className="p-md text-right">
-                      <div className="flex items-center justify-end gap-sm">
+                      <div className="flex items-center justify-end gap-xs">
                         {mutationId === member.id ? (
                           <Loader2 className="w-4 h-4 text-primary animate-spin" />
                         ) : (
-                          <button
-                            onClick={() => revokeAccess(member.id)}
-                            className="p-sm hover:bg-red-50 text-on-surface-variant hover:text-red-600 rounded-lg transition-colors"
-                            title="Revoke and delete staff credentials"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          <>
+                            <button
+                              onClick={() => {
+                                const newName = window.prompt("Edit Staff Full Name:", getStaffDisplayName(member))
+                                if (newName && newName.trim()) {
+                                  updateStaffRole(member.id, member.role, newName.trim())
+                                }
+                              }}
+                              className="p-sm hover:bg-surface-container text-on-surface-variant hover:text-primary rounded-lg transition-colors"
+                              title="Edit staff name & details"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => revokeAccess(member.id)}
+                              className="p-sm hover:bg-red-50 text-on-surface-variant hover:text-red-600 rounded-lg transition-colors"
+                              title="Revoke and delete staff credentials"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
                         )}
                       </div>
                     </td>

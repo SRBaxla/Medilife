@@ -55,10 +55,41 @@ export default function Booking() {
   const [patientGender, setPatientGender] = useState('Male')
   const [patientPhone, setPatientPhone] = useState('')
   const [patientEmail, setPatientEmail] = useState('')
+  const [patientAddress, setPatientAddress] = useState('')
+  const [gpsLocation, setGpsLocation] = useState(null)
+  const [locating, setLocating] = useState(false)
   const [patientPassword, setPatientPassword] = useState('')
   const [registerPassword, setRegisterPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [authenticatedUser, setAuthenticatedUser] = useState(null)
+  const [resolvedTenant, setResolvedTenant] = useState(null)
+
+  const detectGpsLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.")
+      return
+    }
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        }
+        setGpsLocation(coords)
+        setLocating(false)
+        if (!patientAddress) {
+          setPatientAddress(`Jhansi Home Pickup Location (${coords.lat.toFixed(4)}°, ${coords.lng.toFixed(4)}°)`)
+        }
+      },
+      (err) => {
+        console.warn("GPS lookup error:", err)
+        alert("Could not fetch precise GPS position. Please enter your street address manually.")
+        setLocating(false)
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }
   
   // Submission / Overlay States
   const [bookingLoading, setBookingLoading] = useState(false)
@@ -141,6 +172,33 @@ export default function Booking() {
     checkUserSession()
   }, [])
 
+  const [activeBreak, setActiveBreak] = useState(null)
+
+  useEffect(() => {
+    const checkBreak = () => {
+      try {
+        const saved = localStorage.getItem('medilife_staff_break')
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          const elapsedSec = Math.floor((Date.now() - parsed.timestamp) / 1000)
+          if (parsed.totalSeconds - elapsedSec > 0) {
+            setActiveBreak(parsed)
+            return
+          }
+        }
+      } catch (e) {}
+      setActiveBreak(null)
+    }
+
+    checkBreak()
+    window.addEventListener('staff-break-change', checkBreak)
+    window.addEventListener('storage', checkBreak)
+    return () => {
+      window.removeEventListener('staff-break-change', checkBreak)
+      window.removeEventListener('storage', checkBreak)
+    }
+  }, [])
+
   const getCalculatedDob = (ageStr) => {
     if (!ageStr) return null
     const ageNum = parseInt(ageStr, 10)
@@ -162,6 +220,54 @@ export default function Booking() {
   const maxStr = getLocalDateStr(maxDate)
 
   const [selectedDate, setSelectedDate] = useState(todayStr)
+
+  const createBookingRecord = async (userId, tenantId) => {
+    const testsWithInfo = collection === 'home'
+      ? (selected.length > 0 ? selected : ['General Checkup']).map(t => `${t} (Home Visit: ${patientAddress || 'Jhansi'}${gpsLocation ? ` GPS:${gpsLocation.lat},${gpsLocation.lng}` : ''})`)
+      : (selected.length > 0 ? selected : ['General Checkup'])
+
+    const basePayload = {
+      tenant_id: tenantId,
+      patient_id: userId,
+      patient_name: patientName || 'Patient',
+      patient_age: patientAge || '30',
+      gender: patientGender || 'Male',
+      tests: testsWithInfo,
+      booking_date: selectedDate,
+      time_slot: selectedSlot || '09:00 AM',
+      status: 'waiting'
+    }
+
+    // Tier 1: Try inserting with all custom columns (address, gps_coordinates, collection_type, phone)
+    const tier1Payload = {
+      ...basePayload,
+      phone: patientPhone || null,
+      collection_type: collection === 'home' ? 'home' : 'walkin',
+      address: collection === 'home' ? (patientAddress || 'Home Sample Collection (Jhansi)') : null,
+      gps_coordinates: collection === 'home' && gpsLocation ? `${gpsLocation.lat},${gpsLocation.lng}` : null,
+    }
+
+    const { error: err1 } = await supabase.from('bookings').insert(tier1Payload)
+    if (!err1) return;
+
+    console.warn("Tier 1 insert failed, trying Tier 2 (collection_type & phone):", err1);
+
+    // Tier 2: Try inserting with collection_type & phone
+    const tier2Payload = {
+      ...basePayload,
+      phone: patientPhone || null,
+      collection_type: collection === 'home' ? 'home' : 'walkin',
+    }
+
+    const { error: err2 } = await supabase.from('bookings').insert(tier2Payload)
+    if (!err2) return;
+
+    console.warn("Tier 2 insert failed, executing Tier 3 guaranteed baseline insert:", err2);
+
+    // Tier 3: Guaranteed Baseline insert (only core columns, embedded info in tests array)
+    const { error: err3 } = await supabase.from('bookings').insert(basePayload)
+    if (err3) throw err3;
+  }
 
   const handleConfirmBooking = async (e) => {
     if (e) e.preventDefault();
@@ -194,21 +300,7 @@ export default function Booking() {
         }
 
         // Insert booking directly
-        const { error: insertError } = await supabase
-          .from('bookings')
-          .insert({
-            tenant_id: tenantId,
-            patient_id: userId,
-            patient_name: patientName || 'Patient',
-            patient_age: patientAge || '30',
-            gender: patientGender || 'Male',
-            tests: selected.length > 0 ? selected : ['General Checkup'],
-            booking_date: selectedDate,
-            time_slot: selectedSlot || '09:00 AM',
-            status: 'waiting'
-          });
-
-        if (insertError) throw insertError;
+        await createBookingRecord(userId, tenantId);
 
         setSubmitted(true);
         setBookingLoading(false);
@@ -291,22 +383,7 @@ export default function Booking() {
       }
 
       // 2. Insert booking
-      console.log("Tenant ID being inserted:", tenantId);
-      const { error: insertError } = await supabase
-        .from('bookings')
-        .insert({
-          tenant_id: tenantId,
-          patient_id: userId,
-          patient_name: patientName || 'Patient',
-          patient_age: patientAge || '30',
-          gender: patientGender || 'Male',
-          tests: selected.length > 0 ? selected : ['General Checkup'],
-          booking_date: selectedDate,
-          time_slot: selectedSlot || '09:00 AM',
-          status: 'waiting'
-        });
-
-      if (insertError) throw insertError;
+      await createBookingRecord(userId, tenantId);
 
       setShowRegisterIntercept(false);
       setSubmitted(true);
@@ -337,22 +414,7 @@ export default function Booking() {
       const tenantId = resolvedTenant?.id || DEFAULT_TENANT_ID;
 
       // Insert booking using existing user UUID
-      console.log("Tenant ID being inserted:", tenantId);
-      const { error: insertError } = await supabase
-        .from('bookings')
-        .insert({
-          tenant_id: tenantId,
-          patient_id: userId,
-          patient_name: patientName || 'Patient',
-          patient_age: patientAge || '30',
-          gender: patientGender || 'Male',
-          tests: selected.length > 0 ? selected : ['General Checkup'],
-          booking_date: selectedDate,
-          time_slot: selectedSlot || '09:00 AM',
-          status: 'waiting'
-        });
-
-      if (insertError) throw insertError;
+      await createBookingRecord(userId, tenantId);
 
       setShowLoginIntercept(false);
       setSubmitted(true);
@@ -447,6 +509,12 @@ export default function Booking() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-xl">
           {/* Main step content */}
           <div className="lg:col-span-2">
+            {activeBreak && (
+              <div className="p-md bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-sm text-amber-800 text-body-sm font-semibold mb-lg">
+                <Coffee className="w-5 h-5 text-amber-600 shrink-0" />
+                <span>Notice: Jhansi Lab phlebotomy team is currently taking a short scheduled break ({activeBreak.durationMinutes}m). Your booking slots remain active & confirmed!</span>
+              </div>
+            )}
             {/* Form navigation at the top */}
             <div className="flex gap-md mb-xl items-center pb-md border-b border-outline-variant/30">
               {step > 0 && (
@@ -631,7 +699,7 @@ export default function Booking() {
 
                 {step === 3 && (
                   <div className="space-y-md">
-                    <h2 className="text-headline-md font-bold text-on-surface">Patient Details</h2>
+                    <h2 className="text-headline-md font-bold text-on-surface">Patient Details & Home Location</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
                       <div>
                         <label className="text-label-md text-on-surface-variant mb-xs block">Full Name *</label>
@@ -657,6 +725,51 @@ export default function Booking() {
                         <label className="text-label-md text-on-surface-variant mb-xs block">Email *</label>
                         <input required type="email" className="input-field" placeholder="email@example.com" value={patientEmail} onChange={(e) => setPatientEmail(e.target.value)} />
                       </div>
+
+                      {/* Home Collection Address & GPS Location Selector */}
+                      {collection === 'home' && (
+                        <div className="sm:col-span-2 space-y-sm bg-blue-50/70 border border-blue-200 p-md rounded-2xl">
+                          <div className="flex items-center justify-between flex-wrap gap-xs">
+                            <label className="text-label-md font-bold text-blue-900 flex items-center gap-xs">
+                              <span className="material-symbols-outlined text-blue-600 text-[18px]">home_pin</span>
+                              Home Visit Pickup Address *
+                            </label>
+                            <button
+                              type="button"
+                              onClick={detectGpsLocation}
+                              disabled={locating}
+                              className="px-sm py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-xs shadow-sm disabled:opacity-50"
+                            >
+                              <span className="material-symbols-outlined text-[14px]">my_location</span>
+                              {locating ? 'Detecting GPS...' : '📍 Pin My Location (GPS)'}
+                            </button>
+                          </div>
+                          <textarea
+                            required
+                            rows={2}
+                            className="input-field text-body-md bg-white border-blue-200"
+                            placeholder="House/Flat No., Landmark, Area/Colony, Jhansi (e.g. House #14, Near Elite Crossing, Sipri Bazar)"
+                            value={patientAddress}
+                            onChange={(e) => setPatientAddress(e.target.value)}
+                          />
+                          {gpsLocation && (
+                            <div className="p-xs bg-white rounded-xl border border-blue-300 flex items-center justify-between text-xs text-blue-900 font-mono">
+                              <span className="flex items-center gap-xs font-bold">
+                                <span className="material-symbols-outlined text-emerald-600 text-[16px]">check_circle</span>
+                                GPS Coordinates: {gpsLocation.lat.toFixed(5)}°, {gpsLocation.lng.toFixed(5)}°
+                              </span>
+                              <a
+                                href={`https://www.google.com/maps?q=${gpsLocation.lat},${gpsLocation.lng}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-blue-600 underline font-sans font-bold hover:text-blue-800 flex items-center gap-xs"
+                              >
+                                View Pin on Map 🗺️
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

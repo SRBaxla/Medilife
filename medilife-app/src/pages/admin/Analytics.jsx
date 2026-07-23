@@ -65,15 +65,15 @@ export default function Analytics() {
         </div>
 
         {/* KPI cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-md">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-md">
           {metrics.map(({ label, value, change, icon, trend }, i) => (
             <motion.div key={label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
-              className="card-admin p-lg"
+              className="card-admin p-md sm:p-lg"
             >
-              <div className="flex justify-between items-start mb-md">
-                <p className="text-admin-on-surface-variant text-label-md">{label}</p>
-                <div className="w-10 h-10 rounded-lg bg-clinical-teal/10 border border-clinical-teal/20 flex items-center justify-center text-clinical-teal">
-                  <span className="material-symbols-outlined text-[20px]">{icon}</span>
+              <div className="flex justify-between items-start gap-xs mb-sm">
+                <p className="text-admin-on-surface-variant text-label-sm sm:text-label-md font-bold leading-snug flex-1 min-w-0">{label}</p>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-clinical-teal/10 border border-clinical-teal/20 flex items-center justify-center text-clinical-teal shrink-0">
+                  <span className="material-symbols-outlined text-[18px] sm:text-[20px]">{icon}</span>
                 </div>
               </div>
               <p className="text-display-lg-mobile font-bold text-admin-on-surface font-mono">{value}</p>

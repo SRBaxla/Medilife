@@ -36,6 +36,9 @@ export default function PatientPortal() {
   // Interactive UI States
   const [downloadingId, setDownloadingId] = useState(null)
   const [toasts, setToasts] = useState([])
+  const [rescheduleModalApp, setRescheduleModalApp] = useState(null)
+  const [newRescheduleDate, setNewRescheduleDate] = useState('')
+  const [newRescheduleSlot, setNewRescheduleSlot] = useState('07:00 AM - 08:00 AM')
 
   // Helper to add simulated toasts/notifications
   const showToast = (message, type = 'success') => {
@@ -45,6 +48,86 @@ export default function PatientPortal() {
       setToasts((prev) => prev.filter((t) => t.id !== id))
     }, 4000)
   }
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this sample collection appointment?')) return
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status: 'cancelled' })
+        .eq('id', bookingId)
+
+      if (error) throw error
+
+      setAppointments((prev) =>
+        prev.map((app) => (app.id === bookingId ? { ...app, status: 'cancelled' } : app))
+      )
+      showToast('Sample collection appointment has been cancelled successfully.')
+    } catch (err) {
+      showToast(err.message || 'Failed to cancel. Please call +91 8299487062.', 'error')
+    }
+  }
+
+  const handleConfirmReschedule = async () => {
+    if (!rescheduleModalApp || !newRescheduleDate) {
+      showToast('Please select a valid date for rescheduling.', 'error')
+      return
+    }
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .update({
+          booking_date: newRescheduleDate,
+          time_slot: newRescheduleSlot,
+          status: 'scheduled'
+        })
+        .eq('id', rescheduleModalApp.id)
+
+      if (error) throw error
+
+      setAppointments((prev) =>
+        prev.map((app) =>
+          app.id === rescheduleModalApp.id
+            ? { ...app, booking_date: newRescheduleDate, time_slot: newRescheduleSlot, status: 'scheduled' }
+            : app
+        )
+      )
+      showToast(`Appointment rescheduled to ${newRescheduleDate} (${newRescheduleSlot}).`)
+      setRescheduleModalApp(null)
+    } catch (err) {
+      showToast(err.message || 'Failed to reschedule. Please call +91 8299487062.', 'error')
+    }
+  }
+
+  // Sort Appointments: Active/Upcoming FIRST (ordered by booking_date), Historical/Done/Cancelled SECOND
+  const sortedAppointments = React.useMemo(() => {
+    if (!appointments || appointments.length === 0) return []
+
+    const isDoneOrCancelled = (status) => {
+      const s = (status || '').toLowerCase()
+      return s === 'done' || s === 'completed' || s === 'complete' || s === 'cancelled' || s === 'canceled'
+    }
+
+    const upcoming = appointments
+      .filter((a) => !isDoneOrCancelled(a.status))
+      .sort((a, b) => new Date(a.booking_date || a.created_at) - new Date(b.booking_date || b.created_at))
+
+    const historical = appointments
+      .filter((a) => isDoneOrCancelled(a.status))
+      .sort((a, b) => new Date(b.booking_date || b.created_at) - new Date(a.booking_date || a.created_at))
+
+    return [...upcoming, ...historical]
+  }, [appointments])
+
+  // Pagination for Appointments (3 items per page)
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 3
+  const totalPages = Math.ceil(sortedAppointments.length / ITEMS_PER_PAGE) || 1
+
+  const paginatedAppointments = React.useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    return sortedAppointments.slice(start, start + ITEMS_PER_PAGE)
+  }, [sortedAppointments, currentPage])
 
   // Get active session and fetch user appointments on mount
   useEffect(() => {
@@ -403,10 +486,10 @@ export default function PatientPortal() {
             </div>
             <Link 
               to="/booking" 
-              className="btn-primary"
+              className="btn-primary inline-flex items-center justify-center gap-xs whitespace-nowrap shrink-0 px-lg py-sm font-bold bg-primary text-white"
             >
-              <Plus className="w-4 h-4" />
-              Book Test
+              <Plus className="w-4 h-4 shrink-0" />
+              <span>Book Test</span>
             </Link>
           </div>
         </div>
@@ -428,7 +511,7 @@ export default function PatientPortal() {
               </span>
             </div>
 
-            {appointments.length === 0 ? (
+            {paginatedAppointments.length === 0 ? (
               /* Clean Minimal Empty State for Appointments */
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
@@ -453,7 +536,7 @@ export default function PatientPortal() {
               </motion.div>
             ) : (
               <div className="space-y-md">
-                {appointments.map((appointment, idx) => {
+                {paginatedAppointments.map((appointment, idx) => {
                   const { requiresFasting, fastingHours, instructions } = getPreparationRulesForAppointment(appointment)
                   const testNames = Array.isArray(appointment.tests) ? appointment.tests.join(', ') : appointment.test_name || 'General Pathology Screening'
 
@@ -522,9 +605,62 @@ export default function PatientPortal() {
                         </ul>
                       </div>
 
+                      {/* Reschedule & Cancellation Policy & Action Buttons */}
+                      {appointment.status?.toLowerCase() !== 'cancelled' && appointment.status?.toLowerCase() !== 'done' && (
+                        <div className="pt-xs border-t border-outline-variant/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-md">
+                          <p className="text-xs text-on-surface-variant leading-tight max-w-md">
+                            ℹ️ <strong className="text-on-surface">Slot Policy:</strong> You can reschedule or cancel your sample collection slot anytime up to 1 hour before the scheduled time by calling <a href="tel:+918299487062" className="text-[#E31837] font-bold hover:underline">+91 8299487062</a> or using the options here.
+                          </p>
+                          <div className="flex items-center gap-xs flex-wrap shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setRescheduleModalApp(appointment)
+                                setNewRescheduleDate(appointment.booking_date || new Date().toISOString().split('T')[0])
+                                setNewRescheduleSlot(appointment.time_slot || '07:00 AM - 08:00 AM')
+                              }}
+                              className="px-md py-xs rounded-xl border border-primary/30 text-primary text-xs font-bold hover:bg-primary/10 transition-colors flex items-center gap-xs"
+                            >
+                              <Calendar className="w-3.5 h-3.5" />
+                              Reschedule Slot
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleCancelBooking(appointment.id)}
+                              className="px-md py-xs rounded-xl border border-red-200 text-red-600 text-xs font-bold hover:bg-red-50 transition-colors flex items-center gap-xs"
+                            >
+                              <AlertCircle className="w-3.5 h-3.5" />
+                              Cancel Booking
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </motion.div>
                   )
                 })}
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="card p-md flex items-center justify-between gap-md border border-outline-variant/30">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="btn-outline px-md py-xs text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      ← Previous
+                    </button>
+                    <span className="text-xs text-on-surface-variant font-bold">
+                      Page {currentPage} of {totalPages} ({sortedAppointments.length} Total Bookings)
+                    </span>
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="btn-outline px-md py-xs text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -619,6 +755,89 @@ export default function PatientPortal() {
         </div>
 
       </div>
+
+      {/* Reschedule Slot Modal Dialog */}
+      <AnimatePresence>
+        {rescheduleModalApp && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-md bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-xl max-w-md w-full shadow-clinical-xl space-y-md"
+            >
+              <div className="flex items-center justify-between border-b border-outline-variant/20 pb-sm">
+                <div className="flex items-center gap-xs font-bold text-headline-sm text-on-surface">
+                  <Calendar className="w-5 h-5 text-primary" />
+                  <span>Reschedule Collection Slot</span>
+                </div>
+                <button
+                  onClick={() => setRescheduleModalApp(null)}
+                  className="p-xs text-on-surface-variant hover:text-primary transition-colors rounded-lg"
+                >
+                  <span className="material-symbols-outlined text-[20px]">close</span>
+                </button>
+              </div>
+
+              <div className="space-y-xs">
+                <p className="text-body-sm text-on-surface-variant">
+                  Rescheduling sample collection for: <strong className="text-on-surface">{Array.isArray(rescheduleModalApp.tests) ? rescheduleModalApp.tests.join(', ') : rescheduleModalApp.test_name || 'Diagnostic Screening'}</strong>
+                </p>
+                <p className="text-xs text-[#E31837] font-semibold">
+                  ℹ️ Slots can be rescheduled up to 1 hour before scheduled time free of charge.
+                </p>
+              </div>
+
+              <div className="space-y-sm">
+                <div>
+                  <label className="text-label-md text-on-surface-variant mb-xs block">New Date *</label>
+                  <input
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    value={newRescheduleDate}
+                    onChange={(e) => setNewRescheduleDate(e.target.value)}
+                    className="input-field"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-label-md text-on-surface-variant mb-xs block">New Time Slot *</label>
+                  <select
+                    value={newRescheduleSlot}
+                    onChange={(e) => setNewRescheduleSlot(e.target.value)}
+                    className="input-field"
+                  >
+                    <option value="07:00 AM - 08:00 AM">07:00 AM - 08:00 AM (Early Morning)</option>
+                    <option value="08:00 AM - 09:00 AM">08:00 AM - 09:00 AM</option>
+                    <option value="09:00 AM - 10:00 AM">09:00 AM - 10:00 AM</option>
+                    <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+                    <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+                    <option value="02:00 PM - 04:00 PM">02:00 PM - 04:00 PM (Afternoon)</option>
+                    <option value="05:00 PM - 07:00 PM">05:00 PM - 07:00 PM (Evening)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-md pt-sm">
+                <button
+                  type="button"
+                  onClick={() => setRescheduleModalApp(null)}
+                  className="btn-outline flex-1 justify-center"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmReschedule}
+                  className="btn-primary flex-1 justify-center bg-primary text-white"
+                >
+                  Confirm Reschedule
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </PageTransition>
   )
 }
