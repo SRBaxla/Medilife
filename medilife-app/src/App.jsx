@@ -11,6 +11,7 @@ const PatientLayout = lazy(() => import('./layouts/PatientLayout'))
 import Home from './pages/client/Home'
 const Tests = lazy(() => import('./pages/client/Tests'))
 const Packages = lazy(() => import('./pages/client/Packages'))
+const Hospitals = lazy(() => import('./pages/client/Hospitals'))
 const AboutUs = lazy(() => import('./pages/client/AboutUs'))
 const Contact = lazy(() => import('./pages/client/Contact'))
 const Booking = lazy(() => import('./pages/client/Booking'))
@@ -59,6 +60,7 @@ function AnimatedRoutes() {
             <Route path="/" element={<Home />} />
             <Route path="/tests" element={<Tests />} />
             <Route path="/packages" element={<Packages />} />
+            <Route path="/hospitals" element={<Hospitals />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/booking" element={<Booking />} />

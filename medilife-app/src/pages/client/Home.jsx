@@ -1,5 +1,6 @@
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import PageTransition from '../../components/common/PageTransition'
 
 const fadeUp = {
@@ -11,126 +12,357 @@ const fadeUp = {
   }),
 }
 
+const featuredSchemes = [
+  {
+    id: 1,
+    badge: '★ Most Popular Scheme',
+    title: 'BharatFit Pro',
+    price: '₹599/-',
+    originalPrice: '₹1,499',
+    bullets: [
+      '37+ Essential Health Parameters',
+      'Free Home Sample Collection',
+      'Express Digital Report in 4–6 Hours'
+    ],
+    targetItem: 'BharatFit Pro'
+  },
+  {
+    id: 2,
+    badge: '🔥 Best Value Checkup',
+    title: 'Basic Health Checkup',
+    price: '₹999/-',
+    originalPrice: '₹2,200',
+    bullets: [
+      '29 Pathology & Blood Tests',
+      'Includes HbA1c, LFT, KFT & Lipid',
+      'Free Home Collection (Jhansi)'
+    ],
+    targetItem: 'Basic Health Checkup'
+  },
+  {
+    id: 3,
+    badge: '💎 Comprehensive Screening',
+    title: 'Advanced Health Checkup',
+    price: '₹1,599/-',
+    originalPrice: '₹3,500',
+    bullets: [
+      '55 Full Body Health Tests',
+      'Thyroid, Diabetes, Cardiac & Renal',
+      'Priority Laboratory Processing'
+    ],
+    targetItem: 'Advanced Health Checkup'
+  },
+  {
+    id: 4,
+    badge: '🛡️ Complete Family Shield',
+    title: 'BharatFit Complete',
+    price: '₹3,999/-',
+    originalPrice: '₹8,000',
+    bullets: [
+      '107–108 Total Health Parameters',
+      'Complete Organ & Hormonal Profile',
+      'Free Home Collection + Priority Delivery'
+    ],
+    targetItem: 'BharatFit Complete'
+  }
+]
+
 const services = [
-  { icon: 'bloodtype', title: 'Routine Blood Tests', desc: 'Complete Blood Count (CBC), Lipid Profile, and more with clinical precision.', price: 'Starting ₹499' },
-  { icon: 'home_health', title: 'Home Collection', desc: 'Trained phlebotomists collect samples from the comfort of your home or office.', price: 'Free for Seniors' },
-  { icon: 'medical_information', title: 'Health Packages', desc: 'Comprehensive wellness checkups designed for all life stages and needs.', price: 'Starting ₹1,199' },
-  { icon: 'vaccines', title: 'Specialised Tests', desc: 'Advanced hormonal, genetic, and cancer marker diagnostics by certified labs.', price: 'Starting ₹799' },
+  { icon: 'bloodtype', title: 'Comprehensive Pathology', desc: 'Blood testing, CBC, Lipid profiles, HbA1c, Liver & Kidney profiles with Redcliffe accuracy.', price: 'Starting ₹599' },
+  { icon: 'home_health', title: 'Free Home Sample Collection', desc: 'Trained phlebotomists collect samples from your home anywhere in Jhansi (T&C apply).', price: 'Free Home Collection' },
+  { icon: 'medical_information', title: 'BharatFit Health Packages', desc: 'Curated wellness packages ranging from essential 37 parameters to 108+ full body tests.', price: 'Starting ₹599' },
+  { icon: 'speed', title: 'Fast & On-Time Reports', desc: 'Accurate reports delivered digitally directly to your WhatsApp, Email & Patient Portal.', price: 'Fast Turnaround' },
 ]
 
 const stats = [
-  { value: '15,000+', label: 'Happy Patients' },
-  { value: '200+', label: 'Tests Offered' },
-  { value: '4 Hrs', label: 'Report Turnaround' },
-  { value: '12+', label: 'Years of Excellence' },
+  { value: '50,000+', label: 'Tests Conducted' },
+  { value: '200+', label: 'Diagnostic Packages' },
+  { value: 'On-Time', label: 'Accurate Reports' },
+  { value: '7AM–8PM', label: 'Open Mon–Sun' },
 ]
 
 const testimonials = [
-  { name: 'Anjali Sharma', role: 'Senior Patient', text: 'The home collection service is a lifesaver. Reports were delivered digitally within hours. Excellent precision and care!', rating: 5 },
-  { name: 'Rajesh Kumar', role: 'Corporate Client', text: 'We run corporate health camps with Medilife every quarter. Efficient, professional, and always accurate results.', rating: 5 },
-  { name: 'Priya Mehta', role: 'Regular Patient', text: 'Booking online is so convenient. The staff is courteous and the lab is spotlessly clean. Highly recommended!', rating: 5 },
+  { name: 'Anjali Sharma', role: 'Jhansi Resident', text: 'The home collection service in Khati Baba was prompt and seamless. Got my Redcliffe test report on WhatsApp in no time!', rating: 5 },
+  { name: 'Rajesh Kumar', role: 'Local Business Owner', text: 'Medipath Diagnostics Shivam Sharma and team provided genuine care. Highly professional and accurate results.', rating: 5 },
+  { name: 'Priya Mehta', role: 'Regular Patient', text: 'Very clean collection center near Kalyan Petrol Pump. Staff is helpful and booking online is super easy.', rating: 5 },
 ]
 
+function FlipCounter({ endValue, suffix = '', duration = 2200 }) {
+  const [count, setCount] = useState(0)
+  const [inView, setInView] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true)
+        }
+      },
+      { threshold: 0.2 }
+    )
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!inView) return
+    let startTimestamp = null
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1)
+      const easeProgress = 1 - Math.pow(1 - progress, 3)
+      setCount(Math.floor(easeProgress * endValue))
+      if (progress < 1) {
+        requestAnimationFrame(step)
+      }
+    }
+    requestAnimationFrame(step)
+  }, [inView, endValue, duration])
+
+  const formattedStr = count.toLocaleString('en-IN')
+
+  return (
+    <span ref={ref} className="inline-flex items-center justify-center font-bold tracking-tight">
+      {formattedStr.split('').map((char, idx) => {
+        if (char === ',') return <span key={`comma-${idx}`} className="mx-1 text-[#E31837]">,</span>
+        return (
+          <span key={`digit-${idx}`} className="inline-block relative overflow-hidden h-[1.25em] w-[0.72em] mx-[1px] perspective-[400px]">
+            <AnimatePresence mode="popLayout">
+              <motion.span
+                key={char}
+                initial={{ y: '100%', rotateX: -90, opacity: 0 }}
+                animate={{ y: '0%', rotateX: 0, opacity: 1 }}
+                exit={{ y: '-100%', rotateX: 90, opacity: 0 }}
+                transition={{ duration: 0.16, ease: 'easeOut' }}
+                className="absolute inset-0 flex items-center justify-center bg-white/15 rounded-lg border border-white/30 backdrop-blur-md shadow-md text-white font-mono text-[0.9em]"
+              >
+                {char}
+              </motion.span>
+            </AnimatePresence>
+          </span>
+        )
+      })}
+      {suffix && <span className="ml-1 text-[#E31837] font-extrabold">{suffix}</span>}
+    </span>
+  )
+}
+
 export default function Home() {
+  const [activeSchemeIndex, setActiveSchemeIndex] = useState(0)
+  const [isHovered, setIsHovered] = useState(false)
+
+  // Auto-rotate featured schemes every 4.5 seconds
+  useEffect(() => {
+    if (isHovered) return
+    const timer = setInterval(() => {
+      setActiveSchemeIndex((prev) => (prev + 1) % featuredSchemes.length)
+    }, 4500)
+    return () => clearInterval(timer)
+  }, [isHovered])
+
+  const currentScheme = featuredSchemes[activeSchemeIndex]
+
   return (
     <PageTransition>
       {/* ── Hero ── */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-surface">
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-surface pt-24 pb-xl">
         {/* BG blobs */}
         <div className="absolute top-0 right-0 w-1/2 h-full pointer-events-none">
-          <div className="absolute top-20 right-20 w-96 h-96 bg-primary-fixed-dim/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-10 w-64 h-64 bg-secondary-fixed/30 rounded-full blur-2xl" />
+          <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#0A1F6E]/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 right-1/4 w-80 h-80 bg-[#E31837]/5 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="max-w-[1280px] mx-auto px-lg grid grid-cols-1 lg:grid-cols-2 gap-xl items-center relative z-10 py-xxl">
-          {/* Text */}
-          <div className="space-y-lg">
-            <motion.div custom={0} variants={fadeUp} initial="initial" animate="animate"
-              className="inline-flex items-center gap-sm px-md py-xs bg-secondary-container text-primary rounded-full border border-outline-variant"
-            >
-              <span className="material-symbols-outlined text-[18px]">verified_user</span>
-              <span className="font-label-sm text-label-sm uppercase tracking-wider">Trusted Local Clinic</span>
+        <div className="max-w-[1280px] mx-auto px-md sm:px-lg py-xl w-full grid grid-cols-1 lg:grid-cols-2 gap-[#E31837]/10 items-center relative z-10">
+          {/* Left Text Content */}
+          <div className="space-y-lg text-center lg:text-left">
+            <motion.div custom={0} variants={fadeUp} initial="initial" animate="animate" className="space-y-md">
+              <div className="inline-flex items-center gap-xs px-md py-xs bg-secondary-container rounded-full text-primary text-xs font-semibold uppercase tracking-wider">
+                <span className="material-symbols-outlined text-[16px] text-[#E31837]">verified</span>
+                <span>Redcliffe Labs Authorised Collection Center</span>
+              </div>
+
+              <h1 className="text-[32px] sm:text-display-lg-mobile lg:text-display-lg text-on-surface font-bold tracking-tight leading-tight">
+                Medipath Diagnostics.{' '}
+                <span className="text-[#E31837] block sm:inline">Accurate & On-Time.</span>
+              </h1>
+
+              <p className="text-body-md sm:text-body-lg text-on-surface-variant max-w-xl mx-auto lg:mx-0">
+                Bringing Redcliffe Labs' national diagnostic precision right to your doorstep in Khati Baba, Jhansi. Comprehensive pathology tests with free home sample collection.
+              </p>
             </motion.div>
 
-            <motion.h1 custom={1} variants={fadeUp} initial="initial" animate="animate"
-              className="text-display-lg-mobile md:text-display-lg font-bold text-on-surface leading-tight"
-            >
-              Professional Care,{' '}
-              <span className="text-primary">Local Heart.</span>
-            </motion.h1>
-
-            <motion.p custom={2} variants={fadeUp} initial="initial" animate="animate"
-              className="text-body-lg text-on-surface-variant max-w-lg"
-            >
-              Medilife Pathology brings world-class clinical diagnostics to your doorstep. We prioritize accuracy and your comfort above all else.
-            </motion.p>
-
-            <motion.div custom={3} variants={fadeUp} initial="initial" animate="animate" className="flex flex-wrap gap-md">
-              <Link to="/booking" className="btn-primary">
+            {/* CTAs */}
+            <motion.div custom={1} variants={fadeUp} initial="initial" animate="animate" className="flex flex-col sm:flex-row gap-md justify-center lg:justify-start">
+              <Link to="/booking" className="btn-primary justify-center">
                 Book a Test
                 <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
               </Link>
-              <Link to="/packages" className="btn-secondary">
-                View All Packages
+              <Link to="/packages" className="btn-outline justify-center">
+                View Health Packages
               </Link>
             </motion.div>
 
-            {/* Social proof */}
-            <motion.div custom={4} variants={fadeUp} initial="initial" animate="animate" className="flex items-center gap-lg pt-md">
-              <div className="flex -space-x-3">
-                {['👩‍⚕️','👨‍⚕️','👩‍🔬','👨‍🔬'].map((e, i) => (
-                  <div key={i} className="w-10 h-10 rounded-full border-2 border-surface bg-secondary-container flex items-center justify-center text-[18px]">
-                    {e}
+            {/* Trust badge */}
+            <motion.div custom={2} variants={fadeUp} initial="initial" animate="animate" className="pt-md border-t border-outline-variant/30 flex items-center justify-center lg:justify-start gap-md">
+              <div className="flex -space-x-2">
+                {[1, 2, 3, 4].map((n) => (
+                  <div key={n} className="w-8 h-8 rounded-full bg-secondary-container border-2 border-surface flex items-center justify-center text-[10px] font-bold text-primary">
+                    <span className="material-symbols-outlined text-[14px]">person</span>
                   </div>
                 ))}
               </div>
-              <div>
-                <p className="font-bold text-on-surface">15,000+</p>
-                <p className="text-label-sm text-on-surface-variant">Happy Local Patients</p>
+              <div className="text-left">
+                <p className="text-label-md font-bold text-on-surface">Trusted in Jhansi</p>
+                <p className="text-label-sm text-on-surface-variant">In Front of Kalyan Petrol Pump, Khati Baba</p>
               </div>
             </motion.div>
           </div>
 
-          {/* Hero image */}
-          <motion.div custom={1} variants={fadeUp} initial="initial" animate="animate" className="relative hidden lg:block">
-            <div className="relative z-10 rounded-4xl overflow-hidden shadow-clinical-xl border-8 border-white aspect-[4/5] bg-secondary-container flex items-center justify-center">
-              <div className="text-center p-xl">
-                <span className="material-symbols-outlined text-primary" style={{ fontSize: '96px' }}>local_hospital</span>
-                <p className="text-headline-md font-bold text-primary mt-md">Modern Pathology Lab</p>
-                <p className="text-body-md text-on-surface-variant mt-sm">ISO Certified • NABL Accredited</p>
+          {/* Hero right-side visual: Static-Size Drag-to-Slide Schemes Card */}
+          <motion.div
+            custom={1}
+            variants={fadeUp}
+            initial="initial"
+            animate="animate"
+            className="relative hidden lg:flex items-center justify-center select-none"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            {/* Fixed static dimension container (390px x 370px) */}
+            <div className="w-[390px] h-[370px] relative z-1 bg-surface-container-lowest rounded-3xl p-lg shadow-clinical-xl border border-outline-variant/30 flex flex-col justify-between overflow-hidden">
+              {/* Top controls & scheme count */}
+              <div className="flex justify-between items-center pb-xs border-b border-outline-variant/20 shrink-0">
+                <span className="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-[#E31837] animate-ping inline-block" />
+                  Offers ({activeSchemeIndex + 1}/{featuredSchemes.length}) • Drag to slide
+                </span>
+                <div className="flex items-center gap-xs">
+                  <button
+                    type="button"
+                    onClick={() => setActiveSchemeIndex((prev) => (prev === 0 ? featuredSchemes.length - 1 : prev - 1))}
+                    className="p-1 rounded-full text-on-surface-variant hover:text-primary hover:bg-secondary-container transition-colors"
+                    title="Previous Scheme"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">chevron_left</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveSchemeIndex((prev) => (prev + 1) % featuredSchemes.length)}
+                    className="p-1 rounded-full text-on-surface-variant hover:text-primary hover:bg-secondary-container transition-colors"
+                    title="Next Scheme"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Draggable Animated Slide Area */}
+              <div className="flex-grow flex flex-col justify-between py-xs cursor-grab active:cursor-grabbing overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentScheme.id}
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={0.2}
+                    onDragEnd={(_e, info) => {
+                      if (info.offset.x < -40 || info.velocity.x < -200) {
+                        setActiveSchemeIndex((prev) => (prev + 1) % featuredSchemes.length)
+                      } else if (info.offset.x > 40 || info.velocity.x > 200) {
+                        setActiveSchemeIndex((prev) => (prev === 0 ? featuredSchemes.length - 1 : prev - 1))
+                      }
+                    }}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.25 }}
+                    className="flex flex-col justify-between h-full"
+                  >
+                    {/* Header Info */}
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E31837]/10 text-[#E31837] text-[10px] font-bold uppercase tracking-wider mb-xs">
+                            {currentScheme.badge}
+                          </span>
+                          <h3 className="font-bold text-headline-sm text-on-surface leading-tight line-clamp-1">{currentScheme.title}</h3>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="text-display-lg-mobile font-bold text-primary block leading-none">{currentScheme.price}</span>
+                          <span className="text-[11px] line-through text-on-surface-variant font-medium">{currentScheme.originalPrice}</span>
+                        </div>
+                      </div>
+
+                      {/* Bullets (Fixed height container) */}
+                      <div className="space-y-xs py-xs my-xs border-y border-outline-variant/20 min-h-[96px]">
+                        {currentScheme.bullets.map((bullet) => (
+                          <div key={bullet} className="flex items-center gap-sm text-body-sm text-on-surface font-medium line-clamp-1">
+                            <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] shrink-0 font-bold">✓</span>
+                            <span className="truncate">{bullet}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Action Link */}
+                    <Link
+                      to="/booking"
+                      state={{ selectedItem: currentScheme.targetItem }}
+                      className="btn-primary w-full justify-center bg-primary hover:bg-[#E31837] text-white transition-colors py-xs text-body-sm shrink-0"
+                    >
+                      Book Scheme Now
+                      <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                    </Link>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Indicator Dots (Fixed bottom) */}
+              <div className="flex justify-center items-center gap-xs pt-xs border-t border-outline-variant/10 shrink-0">
+                {featuredSchemes.map((scheme, idx) => (
+                  <button
+                    key={scheme.id}
+                    type="button"
+                    onClick={() => setActiveSchemeIndex(idx)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      activeSchemeIndex === idx ? 'w-5 bg-primary' : 'w-1.5 bg-outline-variant/40 hover:bg-primary/50'
+                    }`}
+                    aria-label={`Go to scheme ${idx + 1}`}
+                  />
+                ))}
               </div>
             </div>
-            {/* Decorative blobs */}
-            <div className="absolute -bottom-6 -left-6 w-48 h-48 bg-primary-fixed-dim/30 rounded-3xl -z-10 blur-2xl" />
-            <div className="absolute -top-6 -right-6 w-32 h-32 bg-secondary-fixed/50 rounded-full -z-10 blur-xl" />
-            {/* Floating badge */}
+
+            {/* Floating badge 1 (Top Right) */}
             <motion.div
               animate={{ y: [-4, 4, -4] }}
               transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-              className="absolute top-1/4 -right-6 frosted-glass-white p-md rounded-2xl shadow-clinical-lg border border-white/60"
+              className="absolute -top-3 -right-4 z-20 bg-white/95 backdrop-blur-md px-md py-xs rounded-xl shadow-clinical border border-outline-variant/30 pointer-events-none"
             >
-              <div className="flex items-center gap-sm">
-                <div className="w-9 h-9 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-                  <span className="material-symbols-outlined text-[18px]">bolt</span>
+              <div className="flex items-center gap-xs">
+                <div className="w-7 h-7 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 shrink-0">
+                  <span className="material-symbols-outlined text-[15px]">home_health</span>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-tight text-on-surface-variant">Fast Results</p>
-                  <p className="text-xs font-bold text-on-surface">Reports in 4 Hours</p>
+                  <p className="text-[9px] font-bold uppercase tracking-tight text-on-surface-variant">Doorstep Pickup</p>
+                  <p className="text-[11px] font-bold text-on-surface">Free Home Collection</p>
                 </div>
               </div>
             </motion.div>
+
+            {/* Floating badge 2 (Bottom Left) */}
             <motion.div
               animate={{ y: [4, -4, 4] }}
               transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut' }}
-              className="absolute bottom-1/4 -left-6 frosted-glass-white p-md rounded-2xl shadow-clinical-lg border border-white/60"
+              className="absolute -bottom-3 -left-4 z-20 bg-white/95 backdrop-blur-md px-md py-xs rounded-xl shadow-clinical border border-outline-variant/30 pointer-events-none"
             >
-              <div className="flex items-center gap-sm">
-                <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
-                  <span className="material-symbols-outlined text-[18px]">verified</span>
+              <div className="flex items-center gap-xs">
+                <div className="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-[#0A1F6E] shrink-0">
+                  <span className="material-symbols-outlined text-[15px]">schedule</span>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-tight text-on-surface-variant">NABL Certified</p>
-                  <p className="text-xs font-bold text-on-surface">ISO 15189:2022</p>
+                  <p className="text-[9px] font-bold uppercase tracking-tight text-on-surface-variant">Working Hours</p>
+                  <p className="text-[11px] font-bold text-on-surface">Mon–Sun | 7AM–8PM</p>
                 </div>
               </div>
             </motion.div>
@@ -139,165 +371,170 @@ export default function Home() {
       </section>
 
       {/* ── Stats Bar ── */}
-      <section className="bg-primary py-xl">
+      <section className="bg-[#071338] py-xxl border-y border-white/10 relative overflow-hidden">
         <div className="max-w-[1280px] mx-auto px-lg grid grid-cols-2 md:grid-cols-4 gap-lg">
-          {stats.map(({ value, label }, i) => (
+          {stats.map(({ value, label }, i) => {
+            const isNumeric50k = value.includes('50,000');
+            const isNumeric200 = value.includes('200');
+            return (
+              <motion.div
+                key={label}
+                custom={i}
+                variants={fadeUp}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true, margin: '-40px' }}
+                className="text-center text-on-primary flex flex-col items-center justify-center p-md rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md"
+              >
+                <div className="text-[28px] sm:text-display-lg-mobile lg:text-display-lg font-bold min-h-[56px] flex items-center justify-center">
+                  {isNumeric50k ? (
+                    <FlipCounter endValue={50000} suffix="+" />
+                  ) : isNumeric200 ? (
+                    <FlipCounter endValue={200} suffix="+" />
+                  ) : (
+                    <span className="text-white font-bold tracking-tight">{value}</span>
+                  )}
+                </div>
+                <p className="text-body-md opacity-85 mt-xs font-semibold text-slate-200">{label}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── Services Section ── */}
+      <section className="py-xxl max-w-[1280px] mx-auto px-lg">
+        <div className="text-center max-w-xl mx-auto mb-xxl space-y-xs">
+          <span className="badge-primary inline-flex">Diagnostic Services</span>
+          <h2 className="text-display-lg-mobile sm:text-headline-md font-bold text-on-surface">Comprehensive Pathology Care</h2>
+          <p className="text-body-md text-on-surface-variant">State-of-the-art testing equipment powered by Redcliffe Labs quality control.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-lg">
+          {services.map(({ icon, title, desc, price }, i) => (
             <motion.div
-              key={label}
+              key={title}
               custom={i}
               variants={fadeUp}
               initial="initial"
               whileInView="animate"
-              viewport={{ once: true }}
-              className="text-center"
+              viewport={{ once: true, margin: '-60px' }}
+              className="bg-white p-lg rounded-2xl shadow-clinical hover-lift border border-outline-variant/30 flex flex-col"
             >
-              <p className="text-display-lg-mobile font-bold text-on-primary">{value}</p>
-              <p className="text-label-md text-on-primary/70">{label}</p>
+              <div className="w-12 h-12 bg-secondary-container rounded-xl flex items-center justify-center text-primary mb-md">
+                <span className="material-symbols-outlined">{icon}</span>
+              </div>
+              <h3 className="text-headline-sm font-bold mb-sm text-on-surface">{title}</h3>
+              <p className="text-body-md text-on-surface-variant mb-lg flex-grow">{desc}</p>
+              <div className="pt-md border-t border-outline-variant flex justify-between items-center">
+                <span className="font-bold text-primary text-label-md">{price}</span>
+                <Link 
+                  to="/booking" 
+                  state={{ selectedItem: title.includes('BharatFit') ? 'BharatFit Pro' : 'Complete Blood Count (CBC)' }}
+                  className="p-sm rounded-full bg-secondary-container text-primary hover:bg-primary hover:text-white transition-colors flex items-center justify-center"
+                  title="Book This Service"
+                >
+                  <span className="material-symbols-outlined text-[18px]">add</span>
+                </Link>
+              </div>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* ── Services ── */}
-      <section className="py-xxl px-lg bg-surface-bright">
-        <div className="max-w-[1280px] mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-xl gap-md">
-            <div className="max-w-xl">
-              <p className="text-primary font-label-md uppercase tracking-widest mb-xs">Our Expertise</p>
-              <h2 className="text-headline-lg font-bold text-on-surface">Comprehensive Diagnostic Services</h2>
-            </div>
-            <Link to="/tests" className="text-primary font-label-md flex items-center gap-xs hover:underline shrink-0">
-              Browse all tests <span className="material-symbols-outlined text-[18px]">open_in_new</span>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-lg">
-            {services.map(({ icon, title, desc, price }, i) => (
-              <motion.div
-                key={title}
-                custom={i}
-                variants={fadeUp}
-                initial="initial"
-                whileInView="animate"
-                viewport={{ once: true, margin: '-60px' }}
-                className="bg-white p-lg rounded-2xl shadow-clinical hover-lift border border-outline-variant/30 flex flex-col"
-              >
-                <div className="w-12 h-12 bg-secondary-container rounded-xl flex items-center justify-center text-primary mb-md">
-                  <span className="material-symbols-outlined">{icon}</span>
-                </div>
-                <h3 className="text-headline-sm font-bold mb-sm text-on-surface">{title}</h3>
-                <p className="text-body-md text-on-surface-variant mb-lg flex-grow">{desc}</p>
-                <div className="pt-md border-t border-outline-variant flex justify-between items-center">
-                  <span className="font-bold text-primary text-label-md">{price}</span>
-                  <Link to="/booking" className="p-sm rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary-container transition-colors">
-                    <span className="material-symbols-outlined text-[18px]">add</span>
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── Why Us ── */}
-      <section className="py-xxl px-lg bg-surface">
-        <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-xxl items-center">
-          <motion.div variants={fadeUp} initial="initial" whileInView="animate" viewport={{ once: true }}>
-            <p className="text-primary font-label-md uppercase tracking-widest mb-xs">Why Choose Us</p>
-            <h2 className="text-headline-lg font-bold text-on-surface mb-lg">Clinical Excellence, Every Time</h2>
-            <div className="space-y-lg">
-              {[
-                { icon: 'verified', title: 'NABL Accredited', desc: 'All tests conducted in our ISO 15189:2022 certified laboratory.' },
-                { icon: 'speed', title: 'Fast Reports', desc: 'Most routine results delivered digitally within 4–6 hours of sample collection.' },
-                { icon: 'home', title: 'Home Collection', desc: 'Trained phlebotomists come to you — no need to visit the clinic.' },
-                { icon: 'support_agent', title: '24/7 Support', desc: 'Our medical helpline is always available for report interpretation guidance.' },
-              ].map(({ icon, title, desc }, i) => (
-                <motion.div key={title} custom={i} variants={fadeUp} initial="initial" whileInView="animate" viewport={{ once: true }} className="flex gap-md">
-                  <div className="w-12 h-12 rounded-xl bg-secondary-container flex items-center justify-center text-primary shrink-0">
-                    <span className="material-symbols-outlined">{icon}</span>
+      <section className="bg-surface-container-low py-xxl">
+        <div className="max-w-[1280px] mx-auto px-lg">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-xxl items-center">
+            <motion.div variants={fadeUp} initial="initial" whileInView="animate" viewport={{ once: true }} className="space-y-lg">
+              <span className="badge-primary inline-flex">Why Choose Medipath</span>
+              <h2 className="text-display-lg-mobile sm:text-headline-md font-bold text-on-surface">Redcliffe National Quality Right Here in Jhansi</h2>
+              <p className="text-body-md text-on-surface-variant">
+                Under the leadership of Shivam Sharma, Medipath Diagnostics ensures precision diagnostics, sample integrity, and compassionate patient care.
+              </p>
+              <div className="space-y-md">
+                {[
+                  { title: 'NABL-Standard Quality', desc: 'Samples processed under strict quality controls and calibrated machinery.' },
+                  { title: 'Phlebotomist Doorstep Service', desc: 'Safe, hygienic sample collection right from your residence in Jhansi.' },
+                  { title: 'Digital PDF Dispatch', desc: 'Receive instant report notifications on WhatsApp and view them in your patient portal.' },
+                ].map(({ title, desc }) => (
+                  <div key={title} className="flex gap-md">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-1 font-bold">✓</div>
+                    <div>
+                      <h4 className="font-bold text-on-surface text-body-md">{title}</h4>
+                      <p className="text-body-md text-on-surface-variant">{desc}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-headline-sm text-on-surface">{title}</h3>
-                    <p className="text-body-md text-on-surface-variant">{desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeUp} initial="initial" whileInView="animate" viewport={{ once: true }}
-            className="bg-gradient-to-br from-primary to-primary-container rounded-4xl p-xl text-on-primary space-y-lg"
-          >
-            <h3 className="text-headline-md font-bold">Book Your Test Today</h3>
-            <p className="text-body-lg opacity-90">Schedule online, collect at home or visit our clinic. Get digital reports instantly.</p>
-            <div className="space-y-sm">
-              {['Select your tests', 'Choose home or walk-in', 'Pay securely online', 'Get reports on WhatsApp & email'].map((step, i) => (
-                <div key={step} className="flex items-center gap-sm">
-                  <div className="w-6 h-6 rounded-full bg-on-primary/20 flex items-center justify-center text-[12px] font-bold shrink-0">{i + 1}</div>
-                  <span className="text-body-md">{step}</span>
+                ))}
+              </div>
+              <div className="pt-md">
+                <Link to="/about" className="btn-primary">Learn More About Us</Link>
+              </div>
+            </motion.div>
+            
+            <div className="relative">
+              <div className="aspect-[4/3] rounded-3xl bg-gradient-to-br from-primary to-primary-container p-xl text-on-primary flex flex-col justify-between shadow-clinical-xl">
+                <span className="material-symbols-outlined text-[48px]">local_hospital</span>
+                <div>
+                  <p className="text-headline-sm font-bold">Shivam Sharma</p>
+                  <p className="text-body-md opacity-80">Franchise Owner & Manager, Medipath Diagnostics</p>
+                  <p className="text-body-sm opacity-70 mt-xs">In Front of Kalyan Petrol Pump, Khati Baba, Jhansi</p>
                 </div>
-              ))}
+              </div>
             </div>
-            <Link to="/booking" className="inline-flex items-center gap-sm px-xl py-sm bg-on-primary text-primary rounded-xl font-label-md hover:bg-on-primary/90 transition-all">
-              Book Now <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-            </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── Testimonials ── */}
-      <section className="py-xxl px-lg bg-surface-bright">
-        <div className="max-w-[1280px] mx-auto">
-          <div className="text-center mb-xl">
-            <p className="text-primary font-label-md uppercase tracking-widest mb-xs">Testimonials</p>
-            <h2 className="text-headline-lg font-bold text-on-surface">What Our Patients Say</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
-            {testimonials.map(({ name, role, text, rating }, i) => (
-              <motion.div key={name} custom={i} variants={fadeUp} initial="initial" whileInView="animate" viewport={{ once: true }}
-                className="bg-white p-lg rounded-2xl shadow-clinical border border-outline-variant/30 flex flex-col gap-md hover-lift"
-              >
-                <div className="flex gap-xs">
-                  {Array.from({ length: rating }).map((_, j) => (
-                    <span key={j} className="material-symbols-outlined text-amber-400 text-[18px] icon-fill">star</span>
+      <section className="py-xxl max-w-[1280px] mx-auto px-lg">
+        <div className="text-center max-w-xl mx-auto mb-xxl space-y-xs">
+          <span className="badge-primary inline-flex">Patient Reviews</span>
+          <h2 className="text-display-lg-mobile sm:text-headline-md font-bold text-on-surface">Trusted by Families Across Jhansi</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
+          {testimonials.map(({ name, role, text, rating }, i) => (
+            <motion.div
+              key={name}
+              custom={i}
+              variants={fadeUp}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              className="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/30 shadow-clinical flex flex-col justify-between"
+            >
+              <div className="space-y-md">
+                <div className="flex gap-xs text-amber-500">
+                  {[...Array(rating)].map((_, idx) => (
+                    <span key={idx} className="material-symbols-outlined text-[18px] icon-fill">star</span>
                   ))}
                 </div>
-                <p className="text-body-md text-on-surface-variant flex-grow italic">"{text}"</p>
-                <div className="flex items-center gap-sm">
-                  <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary font-bold text-[16px]">
-                    {name[0]}
-                  </div>
-                  <div>
-                    <p className="font-bold text-label-md text-on-surface">{name}</p>
-                    <p className="text-label-sm text-on-surface-variant">{role}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                <p className="text-body-md text-on-surface-variant font-italic">"{text}"</p>
+              </div>
+              <div className="pt-md border-t border-outline-variant/30 mt-md">
+                <p className="font-bold text-on-surface text-label-md">{name}</p>
+                <p className="text-label-sm text-on-surface-variant">{role}</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* ── CTA Banner ── */}
-      <section className="py-xxl px-lg bg-surface">
-        <motion.div
-          variants={fadeUp}
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true }}
-          className="max-w-[1280px] mx-auto bg-primary rounded-4xl p-xl md:p-xxl text-center text-on-primary"
-        >
-          <h2 className="text-display-lg-mobile md:text-headline-lg font-bold mb-md">Ready to prioritise your health?</h2>
-          <p className="text-body-lg opacity-90 mb-xl max-w-lg mx-auto">Book a test today and get results you can trust — fast, accurate, and right at your fingertips.</p>
-          <div className="flex flex-wrap gap-md justify-center">
-            <Link to="/booking" className="px-xl py-sm bg-on-primary text-primary rounded-xl font-label-md hover:bg-on-primary/90 transition-all flex items-center gap-sm">
-              Book a Test <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+      {/* ── CTA Strip ── */}
+      <section className="bg-gradient-to-r from-primary via-primary-container to-primary py-xxl text-on-primary">
+        <div className="max-w-[1280px] mx-auto px-lg text-center space-y-lg">
+          <h2 className="text-display-lg-mobile sm:text-headline-md font-bold">Book Your Health Test Today</h2>
+          <p className="text-body-lg opacity-90 max-w-xl mx-auto">Get accurate diagnostic results from Redcliffe Labs with free doorstep collection in Jhansi.</p>
+          <div className="flex flex-col sm:flex-row gap-md justify-center">
+            <Link to="/booking" className="btn-primary bg-on-primary text-primary hover:bg-secondary-container">
+              Book Test Now
             </Link>
-            <Link to="/contact" className="px-xl py-sm border border-on-primary/30 text-on-primary rounded-xl font-label-md hover:bg-on-primary/10 transition-all">
-              Contact Us
-            </Link>
+            <a href="tel:+918299487062" className="btn-outline border-white text-white hover:bg-white/10">
+              Call +91 8299487062
+            </a>
           </div>
-        </motion.div>
+        </div>
       </section>
     </PageTransition>
   )

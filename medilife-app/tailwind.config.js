@@ -5,17 +5,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Client / Patient Portal (light theme)
-        primary: '#006574',
-        'primary-container': '#008092',
+        // Client / Patient Portal (Redcliffe Labs theme)
+        primary: '#0A1F6E',          // Redcliffe Navy
+        'primary-container': '#1A3A9E',
         'on-primary': '#ffffff',
         'on-primary-container': '#f8fdff',
         'primary-fixed': '#a3eeff',
-        'primary-fixed-dim': '#63d6ec',
+        'primary-fixed-dim': '#E31837', // Redcliffe Red Accent
         'on-primary-fixed': '#001f25',
         'on-primary-fixed-variant': '#004e5a',
         secondary: '#516161',
-        'secondary-container': '#d4e6e5',
+        'secondary-container': '#EEF1FA',
         'on-secondary': '#ffffff',
         'on-secondary-container': '#576867',
         'secondary-fixed': '#d4e6e5',
@@ -39,7 +39,7 @@ export default {
         'surface-container-high': '#e6e8ea',
         'surface-container-highest': '#e0e3e5',
         'surface-variant': '#e0e3e5',
-        'surface-tint': '#006877',
+        'surface-tint': '#0A1F6E',
         'on-surface': '#191c1e',
         'on-surface-variant': '#3d494b',
         background: '#f7f9fb',
@@ -50,9 +50,9 @@ export default {
         'error-container': '#ffdad6',
         'on-error': '#ffffff',
         'on-error-container': '#93000a',
-        'inverse-surface': '#2d3133',
-        'inverse-on-surface': '#eff1f3',
-        'inverse-primary': '#63d6ec',
+        'inverse-surface': '#071338',
+        'inverse-on-surface': '#f1f5f9',
+        'inverse-primary': '#E31837',
         // Admin Portal (dark theme overrides — applied via .dark class)
         'admin-bg': '#051424',
         'admin-surface': '#051424',

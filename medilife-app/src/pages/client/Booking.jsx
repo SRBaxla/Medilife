@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useParams, useNavigate } from 'react-router-dom'
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageTransition from '../../components/common/PageTransition'
 import TimeSlotPicker from '../../components/client/TimeSlotPicker';
@@ -7,23 +7,42 @@ import { supabase } from '../../supabaseClient'
 
 const steps = ['Select Tests', 'Collection Method', 'Schedule', 'Patient Details', 'Confirm']
 
-const sampleTests = [
-  { name: 'Complete Blood Count (CBC)', price: 299 },
-  { name: 'Lipid Profile', price: 499 },
-  { name: 'Thyroid Function Test', price: 599 },
-  { name: 'Blood Glucose Fasting', price: 149 },
-  { name: 'Liver Function Test', price: 549 },
-  { name: 'Kidney Function Test', price: 549 },
+const allSelectableItems = [
+  // Health Packages
+  { name: 'BharatFit Pro', cat: 'Packages', price: 599, badge: 'Essential Parameters' },
+  { name: 'BharatFit-1', cat: 'Packages', price: 899, badge: '37 Parameters' },
+  { name: 'Basic Health Checkup', cat: 'Packages', price: 999, badge: '29 Tests' },
+  { name: 'Advanced Health Checkup', cat: 'Packages', price: 1599, badge: '55 Tests' },
+  { name: 'Premium Health Checkup', cat: 'Packages', price: 2499, badge: '80+ Tests' },
+  { name: 'BharatFit Complete', cat: 'Packages', price: 3999, badge: '107-108 Tests' },
+  // Individual Diagnostic Tests
+  { name: 'Complete Blood Count (CBC)', cat: 'Blood Tests', price: 299, badge: 'Blood Tests' },
+  { name: 'Lipid Profile', cat: 'Blood Tests', price: 499, badge: 'Blood Tests' },
+  { name: 'Blood Glucose Fasting', cat: 'Diabetes', price: 149, badge: 'Diabetes' },
+  { name: 'HbA1c (Glycated Haemoglobin)', cat: 'Diabetes', price: 399, badge: 'Diabetes' },
+  { name: 'Thyroid Function Test (TFT)', cat: 'Thyroid', price: 599, badge: 'Thyroid' },
+  { name: 'T3, T4, TSH', cat: 'Thyroid', price: 449, badge: 'Thyroid' },
+  { name: 'Liver Function Test (LFT)', cat: 'Liver', price: 549, badge: 'Liver' },
+  { name: 'Kidney Function Test (KFT)', cat: 'Kidney', price: 549, badge: 'Kidney' },
+  { name: 'Testosterone (Total)', cat: 'Hormones', price: 699, badge: 'Hormones' },
+  { name: 'Oestradiol (E2)', cat: 'Hormones', price: 699, badge: 'Hormones' },
+  { name: 'Urine Routine & Microscopy', cat: 'Urine Tests', price: 149, badge: 'Urine Tests' },
+  { name: 'Cardiac Risk Markers', cat: 'Heart', price: 999, badge: 'Heart' },
 ]
+
+const testCategories = ['All', 'Packages', 'Blood Tests', 'Diabetes', 'Thyroid', 'Liver', 'Kidney', 'Hormones', 'Urine Tests', 'Heart']
 
 const DEFAULT_TENANT_ID = import.meta.env.VITE_PUBLIC_CURRENT_TENANT_ID || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e';
 
 export default function Booking() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { tenantSlug } = useParams()
 
   const [step, setStep] = useState(0)
   const [selected, setSelected] = useState([])
+  const [activeCategory, setActiveCategory] = useState('All')
+  const [testSearch, setTestSearch] = useState('')
   const [collection, setCollection] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState('')
@@ -47,8 +66,19 @@ export default function Booking() {
   const [showLoginIntercept, setShowLoginIntercept] = useState(false)
   const [showRegisterIntercept, setShowRegisterIntercept] = useState(false)
 
-  // Tenant Context Resolution
-  const [resolvedTenant, setResolvedTenant] = useState(null)
+  // Pre-select test or package passed from Tests, Packages, or Home pages
+  useEffect(() => {
+    if (location.state?.selectedItem) {
+      const incomingItem = location.state.selectedItem;
+      const match = allSelectableItems.find(
+        (t) => t.name.toLowerCase() === incomingItem.toLowerCase() ||
+               incomingItem.toLowerCase().includes(t.name.toLowerCase()) ||
+               t.name.toLowerCase().includes(incomingItem.toLowerCase())
+      );
+      const nameToAdd = match ? match.name : incomingItem;
+      setSelected((prev) => (prev.includes(nameToAdd) ? prev : [...prev, nameToAdd]));
+    }
+  }, [location.state])
 
   useEffect(() => {
     const resolveActiveTenant = async () => {
@@ -337,7 +367,17 @@ export default function Booking() {
   const toggle = (name) =>
     setSelected((prev) => prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name])
 
-  const total = sampleTests.filter((t) => selected.includes(t.name)).reduce((a, t) => a + t.price, 0)
+  const total = selected.reduce((acc, selectedName) => {
+    const item = allSelectableItems.find((t) => t.name === selectedName);
+    return acc + (item ? item.price : 0);
+  }, 0);
+
+  const filteredItems = allSelectableItems.filter((item) => {
+    const matchCat = activeCategory === 'All' || item.cat === activeCategory;
+    const matchSearch = item.name.toLowerCase().includes(testSearch.toLowerCase()) ||
+                        item.badge.toLowerCase().includes(testSearch.toLowerCase());
+    return matchCat && matchSearch;
+  });
 
   if (submitted) {
     return (
@@ -375,7 +415,7 @@ export default function Booking() {
 
   return (
     <PageTransition>
-      <div className="bg-primary py-xl px-lg text-on-primary">
+      <div className="bg-primary pt-24 pb-xl px-md sm:px-lg text-on-primary">
         <div className="max-w-[1280px] mx-auto">
           <h1 className="text-display-lg-mobile font-bold mb-lg">Book a Test</h1>
           {/* Progress Steps */}
@@ -446,25 +486,90 @@ export default function Booking() {
 
                 {step === 0 && (
                   <div className="space-y-md">
-                    <h2 className="text-headline-md font-bold text-on-surface">Select Your Tests</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-                      {sampleTests.map((t) => (
-                        <button key={t.name} onClick={() => toggle(t.name)}
-                          className={`p-lg rounded-2xl border-2 text-left transition-all duration-200 ${selected.includes(t.name) ? 'border-primary bg-secondary-container shadow-clinical' : 'border-outline-variant/30 bg-surface-container-lowest hover:border-primary/40'}`}
-                        >
-                          <div className="flex justify-between items-center">
-                            <span className="font-label-md text-on-surface">{t.name}</span>
-                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selected.includes(t.name) ? 'bg-primary border-primary' : 'border-outline-variant'}`}>
-                              {selected.includes(t.name) && <span className="material-symbols-outlined text-on-primary text-[14px]">check</span>}
-                            </div>
-                          </div>
-                          <span className="text-label-md font-bold text-primary mt-sm block">₹{t.price}</span>
-                        </button>
-                      ))}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md">
+                      <div>
+                        <h2 className="text-headline-md font-bold text-on-surface">Select Your Tests & Packages</h2>
+                        <p className="text-body-md text-on-surface-variant">Choose from individual pathology tests or full health checkup packages.</p>
+                      </div>
+                      <span className="px-md py-xs bg-primary/10 text-primary font-bold rounded-full text-xs shrink-0">
+                        {selected.length} Selected
+                      </span>
                     </div>
-                    <p className="text-label-sm text-on-surface-variant">
-                      <Link to="/tests" className="text-primary underline">Browse all 200+ tests</Link>
-                    </p>
+
+                    {/* Search & Filter Bar */}
+                    <div className="space-y-sm">
+                      <div className="relative">
+                        <span className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant/60">search</span>
+                        <input
+                          value={testSearch}
+                          onChange={(e) => setTestSearch(e.target.value)}
+                          placeholder="Search tests or packages..."
+                          className="w-full pl-12 pr-md py-sm bg-surface-container-lowest border border-outline-variant/50 rounded-xl text-body-md text-on-surface focus:outline-none focus:border-primary transition-all"
+                        />
+                      </div>
+
+                      {/* Category Tabs */}
+                      <div className="flex gap-xs overflow-x-auto pb-xs scrollbar-hide">
+                        {testCategories.map((cat) => {
+                          const isActive = activeCategory === cat;
+                          return (
+                            <button
+                              key={cat}
+                              type="button"
+                              onClick={() => setActiveCategory(cat)}
+                              className={`relative shrink-0 px-md py-xs rounded-full text-xs font-semibold transition-colors duration-200 ${
+                                isActive
+                                  ? 'text-on-primary font-bold'
+                                  : 'bg-surface-container-low text-on-surface-variant hover:bg-secondary-container'
+                              }`}
+                            >
+                              <span className="relative z-10">{cat}</span>
+                              {isActive && (
+                                <motion.div
+                                  layoutId="activeCategoryPillBooking"
+                                  className="absolute inset-0 bg-primary rounded-full shadow-sm"
+                                  transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                                />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Items Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-md max-h-[480px] overflow-y-auto pr-xs">
+                      {filteredItems.map((t) => {
+                        const isSelected = selected.includes(t.name);
+                        return (
+                          <button
+                            key={t.name}
+                            type="button"
+                            onClick={() => toggle(t.name)}
+                            className={`p-md rounded-2xl border-2 text-left transition-all duration-200 ${
+                              isSelected
+                                ? 'border-primary bg-secondary-container shadow-clinical'
+                                : 'border-outline-variant/30 bg-surface-container-lowest hover:border-primary/40'
+                            }`}
+                          >
+                            <div className="flex justify-between items-start gap-xs">
+                              <div>
+                                <span className="font-bold text-body-md text-on-surface block leading-tight">{t.name}</span>
+                                <span className="inline-block px-2 py-0.5 mt-xs rounded bg-surface-container text-[10px] font-semibold text-on-surface-variant">
+                                  {t.badge}
+                                </span>
+                              </div>
+                              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                                isSelected ? 'bg-primary border-primary' : 'border-outline-variant'
+                              }`}>
+                                {isSelected && <span className="material-symbols-outlined text-on-primary text-[14px]">check</span>}
+                              </div>
+                            </div>
+                            <span className="text-body-md font-bold text-primary mt-sm block">₹{t.price}/-</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
 
@@ -474,8 +579,8 @@ export default function Booking() {
                     <p className="text-body-md text-on-surface-variant -mt-1">Tap an option to continue automatically.</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
                       {[
-                        { value: 'home', icon: 'home', title: 'Home Collection', desc: 'Trained phlebotomist visits your home. Free for orders above ₹999.' },
-                        { value: 'walkin', icon: 'local_hospital', title: 'Walk-in to Clinic', desc: 'Visit our clinic at your convenience. No wait time with booking.' },
+                        { value: 'home', icon: 'home', title: 'Home Collection', desc: 'Trained phlebotomist visits your home anywhere in Jhansi. Free home collection (T&C apply).' },
+                        { value: 'walkin', icon: 'local_hospital', title: 'Walk-in to Lab Center', desc: 'Visit our center in front of Kalyan Petrol Pump, Khati Baba. Fast sample collection.' },
                       ].map(({ value, icon, title, desc }) => (
                         <button
                           key={value}
@@ -599,18 +704,32 @@ export default function Booking() {
             <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-clinical p-lg">
               <h3 className="font-bold text-headline-sm text-on-surface mb-md">Order Summary</h3>
               {selected.length === 0 ? (
-                <p className="text-body-md text-on-surface-variant">No tests selected yet.</p>
+                <p className="text-body-md text-on-surface-variant">No tests or packages selected yet.</p>
               ) : (
-                <div className="space-y-sm">
-                  {sampleTests.filter((t) => selected.includes(t.name)).map((t) => (
-                    <div key={t.name} className="flex justify-between items-center text-label-md">
-                      <span className="text-on-surface">{t.name}</span>
-                      <span className="font-bold text-primary">₹{t.price}</span>
-                    </div>
-                  ))}
+                <div className="space-y-sm max-h-[300px] overflow-y-auto pr-xs">
+                  {selected.map((selectedName) => {
+                    const matchedItem = allSelectableItems.find((t) => t.name === selectedName);
+                    const itemPrice = matchedItem ? matchedItem.price : 0;
+                    return (
+                      <div key={selectedName} className="flex justify-between items-center text-label-md py-1 border-b border-outline-variant/10">
+                        <span className="text-on-surface font-medium truncate max-w-[170px]" title={selectedName}>{selectedName}</span>
+                        <div className="flex items-center gap-xs">
+                          <span className="font-bold text-primary">₹{itemPrice}</span>
+                          <button
+                            type="button"
+                            onClick={() => toggle(selectedName)}
+                            className="text-on-surface-variant/50 hover:text-error transition-colors"
+                            title="Remove"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">close</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                   <div className="border-t border-outline-variant/30 pt-sm flex justify-between font-bold text-headline-sm">
-                    <span className="text-on-surface">Total</span>
-                    <span className="text-primary">₹{total}</span>
+                    <span className="text-on-surface">Total Amount</span>
+                    <span className="text-primary">₹{total}/-</span>
                   </div>
                 </div>
               )}

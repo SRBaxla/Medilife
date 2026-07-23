@@ -188,9 +188,9 @@
 
   /* ─── Button styles ─── */
   .btn-primary {
-    @apply px-xl py-sm bg-primary text-on-primary rounded-xl text-label-md font-medium
-           hover:opacity-90 hover:shadow-clinical-lg active:scale-[0.98]
-           transition-all duration-200 flex items-center gap-sm;
+    @apply px-xl py-sm bg-primary text-on-primary rounded-xl text-label-md font-bold
+           shadow-clinical hover:shadow-clinical-lg active:scale-[0.98]
+           transition-all duration-200 inline-flex items-center gap-sm;
   }
   .btn-secondary {
     @apply px-xl py-sm bg-secondary-container text-primary rounded-xl text-label-md font-medium
@@ -200,7 +200,7 @@
   .btn-outline {
     @apply px-xl py-sm border border-outline-variant rounded-xl text-label-md font-medium
            text-primary hover:bg-secondary-container/50 active:scale-[0.98]
-           transition-all duration-200 flex items-center gap-sm;
+           transition-all duration-200 inline-flex items-center gap-sm;
   }
   .btn-admin {
     @apply px-md py-sm bg-clinical-teal text-[#00363d] rounded-lg text-label-md font-medium
