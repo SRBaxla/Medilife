@@ -85,35 +85,35 @@ export default function ClientNav() {
       <header
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-surface/90 backdrop-blur-xl shadow-clinical border-b border-outline-variant/20'
-            : 'bg-transparent'
+            ? 'bg-surface/95 backdrop-blur-xl shadow-clinical border-b border-outline-variant/20'
+            : 'bg-surface/80 backdrop-blur-md border-b border-outline-variant/10'
         }`}
       >
-        <nav className="max-w-[1280px] mx-auto px-lg py-sm flex justify-between items-center h-16">
+        <nav className="max-w-[1280px] mx-auto px-md sm:px-lg flex justify-between items-center h-16 sm:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-sm group shrink-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center shadow-clinical group-hover:shadow-clinical-lg transition-shadow relative shrink-0">
-              <span className="material-symbols-outlined text-on-primary text-[20px]">science</span>
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#E31837] rounded-full border-2 border-surface"></span>
+          <Link to="/" className="flex items-center gap-xs sm:gap-sm group shrink-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center shadow-clinical group-hover:shadow-clinical-lg transition-shadow relative shrink-0">
+              <span className="material-symbols-outlined text-on-primary text-[18px] sm:text-[20px]">science</span>
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#E31837] rounded-full border-2 border-surface"></span>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-[16px] sm:text-[18px] text-primary leading-tight">
+              <span className="font-bold text-[15px] sm:text-[18px] text-primary leading-tight whitespace-nowrap">
                 Medipath<span className="text-[#E31837]"> Diagnostics</span>
               </span>
-              <span className="text-[9px] sm:text-[10px] text-on-surface-variant font-medium leading-none tracking-tight hidden xs:block">
+              <span className="text-[9px] sm:text-[10px] text-on-surface-variant font-medium leading-none tracking-tight hidden md:block">
                 Redcliffe Labs Authorised Collection Center
               </span>
             </div>
           </Link>
 
           {/* Desktop Nav Links (Visible on lg 1024px+) */}
-          <div className="hidden lg:flex items-center gap-md xl:gap-lg">
+          <div className="hidden lg:flex items-center gap-sm xl:gap-md 2xl:gap-lg">
             {/* Home */}
             <NavLink
               to="/"
               end
               className={({ isActive }) =>
-                `font-label-md text-label-md transition-colors duration-200 relative pb-1 whitespace-nowrap ${
+                `font-label-md text-label-md px-xs py-1 transition-colors duration-200 relative whitespace-nowrap ${
                   isActive ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'
                 }`
               }
@@ -141,7 +141,7 @@ export default function ClientNav() {
               <button
                 type="button"
                 onClick={() => setServicesDropdownOpen((v) => !v)}
-                className={`flex items-center gap-xs font-label-md text-label-md transition-colors duration-200 relative pb-1 whitespace-nowrap ${
+                className={`flex items-center gap-xs font-label-md text-label-md px-xs py-1 transition-colors duration-200 relative whitespace-nowrap ${
                   isServicesActive ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'
                 }`}
               >
@@ -197,7 +197,7 @@ export default function ClientNav() {
             <NavLink
               to="/about"
               className={({ isActive }) =>
-                `font-label-md text-label-md transition-colors duration-200 relative pb-1 whitespace-nowrap ${
+                `font-label-md text-label-md px-xs py-1 transition-colors duration-200 relative whitespace-nowrap ${
                   isActive ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'
                 }`
               }
@@ -220,7 +220,7 @@ export default function ClientNav() {
             <NavLink
               to="/contact"
               className={({ isActive }) =>
-                `font-label-md text-label-md transition-colors duration-200 relative pb-1 whitespace-nowrap ${
+                `font-label-md text-label-md px-xs py-1 transition-colors duration-200 relative whitespace-nowrap ${
                   isActive ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'
                 }`
               }
@@ -245,15 +245,16 @@ export default function ClientNav() {
             {/* Phone link */}
             <a
               href="tel:+918299487062"
-              className="hidden xl:flex items-center gap-xs px-sm py-xs text-primary font-label-md hover:text-[#E31837] transition-colors whitespace-nowrap"
+              className="hidden 2xl:flex items-center gap-xs px-2 py-1 text-primary font-label-md hover:text-[#E31837] transition-colors whitespace-nowrap"
             >
-              <span className="material-symbols-outlined text-[18px] text-[#E31837]">call</span>
+              <span className="material-symbols-outlined text-[16px] text-[#E31837]">call</span>
               <span className="text-label-sm font-semibold">+91 8299487062</span>
             </a>
-            {/* Patient Portal / Greeting Button */}
+
+            {/* Patient Portal Link */}
             <Link
               to={portalLink}
-              className={`hidden 2xl:flex items-center gap-xs px-md py-sm rounded-xl transition-all font-label-md text-label-md whitespace-nowrap ${
+              className={`hidden xl:flex items-center gap-xs px-md py-sm rounded-xl transition-all font-label-md text-label-md whitespace-nowrap shrink-0 ${
                 patientUser
                   ? 'bg-secondary-container text-primary border border-primary/30 hover:bg-secondary-container/80'
                   : 'border border-outline-variant text-primary hover:bg-secondary-container/60'
@@ -264,17 +265,20 @@ export default function ClientNav() {
               </span>
               {patientUser ? `Hi, ${firstName}` : 'Patient Portal'}
             </Link>
-            <Link to="/booking" className="btn-primary hidden sm:flex shrink-0 whitespace-nowrap px-md sm:px-xl">
+
+            {/* Book Now (Shown on Desktop 1024px+) */}
+            <Link to="/booking" className="btn-primary hidden lg:inline-flex shrink-0 whitespace-nowrap px-md xl:px-lg py-sm">
               Book Now
-              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             </Link>
-            {/* Hamburger (Shown on screens < 1024px) */}
+
+            {/* Hamburger Button (Shown on Screens < 1024px) */}
             <button
               onClick={() => setMenuOpen((v) => !v)}
-              className="lg:hidden p-sm text-primary hover:bg-secondary-container/50 rounded-lg transition-colors"
-              aria-label="Toggle menu"
+              className="lg:hidden p-sm text-primary hover:bg-secondary-container/50 rounded-xl transition-colors flex items-center justify-center"
+              aria-label="Toggle navigation menu"
             >
-              <span className="material-symbols-outlined">{menuOpen ? 'close' : 'menu'}</span>
+              <span className="material-symbols-outlined text-[24px]">{menuOpen ? 'close' : 'menu'}</span>
             </button>
           </div>
         </nav>
@@ -289,7 +293,7 @@ export default function ClientNav() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
               onClick={() => setMenuOpen(false)}
             />
             <motion.div
@@ -297,9 +301,9 @@ export default function ClientNav() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="fixed top-0 right-0 h-full w-80 bg-surface-container-lowest border-l border-outline-variant/30 z-50 lg:hidden flex flex-col p-lg shadow-clinical-xl overflow-y-auto"
+              className="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-surface-container-lowest border-l border-outline-variant/30 z-50 lg:hidden flex flex-col p-lg shadow-clinical-xl overflow-y-auto"
             >
-              <div className="flex justify-between items-center mb-lg">
+              <div className="flex justify-between items-center mb-lg pb-sm border-b border-outline-variant/20">
                 {patientUser ? (
                   <div className="flex items-center gap-sm">
                     <div className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-primary">
@@ -308,9 +312,9 @@ export default function ClientNav() {
                     <span className="font-bold text-primary text-[16px]">Hi, {firstName}!</span>
                   </div>
                 ) : (
-                  <span className="font-bold text-primary text-[18px]">Medipath <span className="text-[#E31837]">Diagnostics</span></span>
+                  <span className="font-bold text-primary text-[17px]">Medipath <span className="text-[#E31837]">Diagnostics</span></span>
                 )}
-                <button onClick={() => setMenuOpen(false)} className="p-sm text-on-surface-variant hover:text-primary transition-colors">
+                <button onClick={() => setMenuOpen(false)} className="p-sm text-on-surface-variant hover:text-primary transition-colors rounded-lg">
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
@@ -377,16 +381,25 @@ export default function ClientNav() {
                   <span className="material-symbols-outlined text-[20px]">call</span>
                   Contact
                 </NavLink>
+
+                {/* Phone Hotline in Drawer */}
+                <a
+                  href="tel:+918299487062"
+                  className="flex items-center gap-md px-md py-sm rounded-xl font-label-md text-label-md text-primary bg-primary/5 hover:bg-primary/10 transition-all mt-xs"
+                >
+                  <span className="material-symbols-outlined text-[20px] text-[#E31837]">phone_in_talk</span>
+                  +91 8299487062
+                </a>
               </nav>
 
-              <div className="flex flex-col gap-sm mt-lg border-t border-outline-variant/30 pt-lg">
+              <div className="flex flex-col gap-sm mt-lg border-t border-outline-variant/30 pt-lg shrink-0">
                 <Link to={portalLink} onClick={() => setMenuOpen(false)} className="btn-outline justify-center">
                   <span className="material-symbols-outlined text-[18px]">
                     {patientUser ? 'waving_hand' : 'person'}
                   </span>
                   {patientUser ? `Hi, ${firstName}` : 'Patient Portal'}
                 </Link>
-                <Link to="/booking" onClick={() => setMenuOpen(false)} className="btn-primary justify-center">
+                <Link to="/booking" onClick={() => setMenuOpen(false)} className="btn-primary justify-center bg-primary text-white">
                   Book Now
                   <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </Link>

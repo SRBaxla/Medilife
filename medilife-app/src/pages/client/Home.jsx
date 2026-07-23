@@ -445,43 +445,40 @@ export default function Home() {
       {/* ── Why Us ── */}
       <section className="bg-surface-container-low py-xxl">
         <div className="max-w-[1280px] mx-auto px-lg">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-xxl items-center">
-            <motion.div variants={fadeUp} initial="initial" whileInView="animate" viewport={{ once: true }} className="space-y-lg">
-              <span className="badge-primary inline-flex">Why Choose Medipath</span>
-              <h2 className="text-display-lg-mobile sm:text-headline-md font-bold text-on-surface">Redcliffe National Quality Right Here in Jhansi</h2>
-              <p className="text-body-md text-on-surface-variant">
-                Under the leadership of Shivam Sharma, Medipath Diagnostics ensures precision diagnostics, sample integrity, and compassionate patient care.
-              </p>
-              <div className="space-y-md">
-                {[
-                  { title: 'NABL-Standard Quality', desc: 'Samples processed under strict quality controls and calibrated machinery.' },
-                  { title: 'Phlebotomist Doorstep Service', desc: 'Safe, hygienic sample collection right from your residence in Jhansi.' },
-                  { title: 'Digital PDF Dispatch', desc: 'Receive instant report notifications on WhatsApp and view them in your patient portal.' },
-                ].map(({ title, desc }) => (
-                  <div key={title} className="flex gap-md">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-1 font-bold">✓</div>
-                    <div>
-                      <h4 className="font-bold text-on-surface text-body-md">{title}</h4>
-                      <p className="text-body-md text-on-surface-variant">{desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="pt-md">
-                <Link to="/about" className="btn-primary">Learn More About Us</Link>
-              </div>
-            </motion.div>
-            
-            <div className="relative">
-              <div className="aspect-[4/3] rounded-3xl bg-gradient-to-br from-primary to-primary-container p-xl text-on-primary flex flex-col justify-between shadow-clinical-xl">
-                <span className="material-symbols-outlined text-[48px]">local_hospital</span>
-                <div>
-                  <p className="text-headline-sm font-bold">Shivam Sharma</p>
-                  <p className="text-body-md opacity-80">Franchise Owner & Manager, Medipath Diagnostics</p>
-                  <p className="text-body-sm opacity-70 mt-xs">In Front of Kalyan Petrol Pump, Khati Baba, Jhansi</p>
+          <div className="text-center max-w-2xl mx-auto mb-xl space-y-xs">
+            <span className="badge-primary inline-flex">Why Choose Medipath</span>
+            <h2 className="text-display-lg-mobile sm:text-headline-md font-bold text-on-surface">Redcliffe National Quality Right Here in Jhansi</h2>
+            <p className="text-body-md text-on-surface-variant">
+              Under the leadership of Shivam Sharma, Medipath Diagnostics ensures precision diagnostics, sample integrity, and compassionate patient care in Khati Baba, Jhansi.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+            {[
+              { icon: 'verified', title: 'NABL-Standard Quality', desc: 'Samples processed under strict quality controls and state-of-the-art calibrated machinery.' },
+              { icon: 'home_health', title: 'Phlebotomist Doorstep Service', desc: 'Safe, hygienic sample collection right from your residence anywhere in Jhansi.' },
+              { icon: 'send_to_mobile', title: 'Digital PDF Dispatch', desc: 'Receive instant report notifications on WhatsApp and view them in your secure patient portal.' },
+            ].map(({ icon, title, desc }, i) => (
+              <motion.div
+                key={title}
+                custom={i}
+                variants={fadeUp}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true }}
+                className="bg-surface-container-lowest p-lg rounded-2xl border border-outline-variant/30 shadow-clinical flex flex-col items-center text-center space-y-sm"
+              >
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined text-[24px] text-[#E31837]">{icon}</span>
                 </div>
-              </div>
-            </div>
+                <h3 className="font-bold text-on-surface text-headline-sm">{title}</h3>
+                <p className="text-body-md text-on-surface-variant">{desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Link to="/about" className="btn-primary">Learn More About Us</Link>
           </div>
         </div>
       </section>
