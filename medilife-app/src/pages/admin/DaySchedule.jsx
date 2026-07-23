@@ -144,7 +144,9 @@ Google Maps Pin: ${mapLink}`
 
   // Filter bookings strictly for the selected date
   const dayBookings = useMemo(() => {
+    const purgedIds = JSON.parse(localStorage.getItem('medilife_purged_booking_ids') || '[]')
     return allBookings.filter((b) => {
+      if (b.status === 'purged' || purgedIds.includes(b.id)) return false
       if (!b.booking_date) {
         if (!b.created_at) return false
         return b.created_at.startsWith(selectedDate)

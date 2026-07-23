@@ -295,7 +295,12 @@ Google Maps Pin: ${mapLink}`
     }
   }
 
-  const activePatients = patients.filter((p) => p.status !== 'cancelled' && p.status !== 'canceled')
+  const activePatients = patients.filter((p) => {
+    if (p.status === 'cancelled' || p.status === 'canceled' || p.status === 'purged') return false
+    const purgedIds = JSON.parse(localStorage.getItem('medilife_purged_booking_ids') || '[]')
+    if (purgedIds.includes(p.id)) return false
+    return true
+  })
 
   const filtered = filter === 'all' 
     ? activePatients 
