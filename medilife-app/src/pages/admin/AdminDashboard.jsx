@@ -295,9 +295,11 @@ Google Maps Pin: ${mapLink}`
     }
   }
 
+  const activePatients = patients.filter((p) => p.status !== 'cancelled' && p.status !== 'canceled')
+
   const filtered = filter === 'all' 
-    ? patients 
-    : patients.filter((p) => {
+    ? activePatients 
+    : activePatients.filter((p) => {
         if (filter === 'waiting') return p.status === 'waiting' || p.status === 'pending' || p.status === 'scheduled'
         return p.status === filter
       })
