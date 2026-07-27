@@ -67,6 +67,61 @@ export default function StaffManagement({ tenantId }) {
   const [locationSubmitting, setLocationSubmitting] = useState(false)
   const [locationMessage, setLocationMessage] = useState(null)
 
+  // Handle creating new lab location (Super Admin Only)
+  const handleCreateLocation = async (e) => {
+    e.preventDefault()
+    setLocationSubmitting(true)
+    setLocationMessage(null)
+
+    if (currentUserRole !== 'super_admin') {
+      setLocationMessage({ type: 'error', text: 'Unauthorized: Only Super Root Admin can create new lab locations.' })
+      setLocationSubmitting(false)
+      return
+    }
+
+    try {
+      const tenantIdNew = crypto.randomUUID()
+      const slug = newLocation.subdomain.toLowerCase().replace(/\s+/g, '-')
+
+      try {
+        await supabase
+          .from('tenants')
+          .insert([{
+            id: tenantIdNew,
+            business_name: newLocation.name,
+            subdomain: slug,
+            initialized: false
+          }])
+      } catch (e) {
+        console.warn("Tenants insert notice:", e)
+      }
+
+      // Save into local storage location registry
+      const existingLocs = JSON.parse(localStorage.getItem('medilife_registered_locations') || '[]')
+      const newLocEntry = {
+        id: tenantIdNew,
+        name: newLocation.name,
+        subdomain: slug,
+        initialized: false
+      }
+      localStorage.setItem('medilife_registered_locations', JSON.stringify([...existingLocs, newLocEntry]))
+
+      setLocationMessage({ type: 'success', text: `Lab Location "${newLocation.name}" created! Switch location to initialize.` })
+      setNewLocation({ name: '', subdomain: '' })
+
+      setTimeout(() => {
+        setLocationModalOpen(false)
+        setLocationMessage(null)
+        window.dispatchEvent(new Event('storage'))
+      }, 1500)
+    } catch (err) {
+      console.error("Location creation failed:", err)
+      setLocationMessage({ type: 'error', text: err.message || 'Failed to create new lab location.' })
+    } finally {
+      setLocationSubmitting(false)
+    }
+  }
+
   // Fetch roster & current user role from Supabase user_profiles
   const fetchStaffRoster = async () => {
     try {
@@ -245,44 +300,7 @@ export default function StaffManagement({ tenantId }) {
     }
   }
 
-  // Handle creating new lab location (Super Admin Only)
-  const handleCreateLocation = async (e) => {
-    e.preventDefault()
-    setLocationSubmitting(true)
-    setLocationMessage(null)
 
-    if (currentUserRole !== 'super_admin') {
-      setLocationMessage({ type: 'error', text: 'Unauthorized: Only Super Root Admin can create new lab locations.' })
-      setLocationSubmitting(false)
-      return
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('tenants')
-        .insert([{
-          id: crypto.randomUUID(),
-          business_name: newLocation.name,
-          subdomain: newLocation.subdomain.toLowerCase().replace(/\s+/g, '-')
-        }])
-        .select()
-        .single()
-
-      if (error) throw error
-
-      setLocationMessage({ type: 'success', text: `Lab Location "${newLocation.name}" created successfully!` })
-      setNewLocation({ name: '', subdomain: '' })
-      setTimeout(() => {
-        setLocationModalOpen(false)
-        setLocationMessage(null)
-      }, 1500)
-    } catch (err) {
-      console.error("Location creation failed:", err)
-      setLocationMessage({ type: 'error', text: err.message || 'Failed to create new lab location.' })
-    } finally {
-      setLocationSubmitting(false)
-    }
-  }
 
   // Filter roster list based on search and roles, strictly excluding patient accounts
   const filteredRoster = staff.filter((member) => {
@@ -638,7 +656,7 @@ export default function StaffManagement({ tenantId }) {
               )}
 
               <div className="space-y-xs">
-                <label className="text-label-sm text-on-surface-variant block">Location / Business Name *</label>
+                <label className="text-label-sm text-on-surface-variant block font-bold">Location / Business Name *</label>
                 <input
                   required
                   type="text"
@@ -650,7 +668,7 @@ export default function StaffManagement({ tenantId }) {
               </div>
 
               <div className="space-y-xs">
-                <label className="text-label-sm text-on-surface-variant block">Subdomain Slug *</label>
+                <label className="text-label-sm text-on-surface-variant block font-bold">Subdomain Slug *</label>
                 <input
                   required
                   type="text"

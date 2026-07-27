@@ -27,22 +27,36 @@ export default function PatientDashboard() {
 
       if (profile) setUserProfile(profile)
 
+      const isPurgedReportsAll = localStorage.getItem('medilife_reports_purged') === 'true'
+      const purgedBookingIds = JSON.parse(localStorage.getItem('medilife_purged_booking_ids') || '[]')
+      const purgedReportIds = JSON.parse(localStorage.getItem('medilife_purged_report_ids') || '[]')
+
       // Fetch appointments
       const { data: bookings } = await supabase
         .from('bookings')
         .select('*')
         .eq('patient_id', user.id)
+        .neq('status', 'purged')
         .order('created_at', { ascending: false })
 
-      setAppointments(bookings || [])
+      if (isPurgedReportsAll) {
+        setAppointments([])
+      } else {
+        setAppointments((bookings || []).filter(b => b.status !== 'purged' && b.status !== 'cancelled' && b.status !== 'canceled' && !purgedBookingIds.includes(b.id)))
+      }
 
       // Fetch reports
       const { data: reportsData } = await supabase
         .from('patient_reports')
         .select('*, test_catalog(test_name, report_schema)')
         .eq('patient_id', user.id)
+        .neq('status', 'purged')
 
-      setReports(reportsData || [])
+      if (isPurgedReportsAll) {
+        setReports([])
+      } else {
+        setReports((reportsData || []).filter(r => r.status !== 'purged' && !purgedReportIds.includes(r.id)))
+      }
     } catch (err) {
       console.warn("Could not load patient dashboard data:", err)
     } finally {

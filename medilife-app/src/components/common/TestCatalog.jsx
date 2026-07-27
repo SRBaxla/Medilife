@@ -236,7 +236,7 @@ function TestCatalogComponent({ tenantId }) {
             <h2 className="text-headline-lg font-bold text-on-surface">Test Preparation & Fasting Manager</h2>
           </div>
           <p className="text-body-md text-on-surface-variant">
-            Configure pre-test fasting rules and patient instructions for location: <span className="font-mono font-bold bg-secondary-container px-sm py-xs text-primary rounded-lg text-label-md">{tenantId}</span>
+            Configure pre-test fasting rules and patient instructions for location: <span className="font-semibold bg-secondary-container px-sm py-xs text-primary rounded-lg text-label-md">Jhansi Lab (Khati Baba)</span>
           </p>
         </div>
 

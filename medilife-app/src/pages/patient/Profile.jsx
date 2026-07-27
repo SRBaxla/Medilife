@@ -41,14 +41,16 @@ export default function Profile() {
     setPatientPurging(true)
     try {
       if (user?.id) {
-        const { error } = await supabase.from('bookings').delete().eq('patient_id', user.id)
-        if (error) {
-          console.warn("Patient bookings purge by patient_id error, trying fallback by patient_name:", error)
-          await supabase.from('bookings').delete().eq('patient_name', profile.name || 'Patient')
-        }
-      } else if (profile.name) {
-        await supabase.from('bookings').delete().eq('patient_name', profile.name)
+        await supabase.from('bookings').update({ status: 'purged' }).eq('patient_id', user.id)
+        await supabase.from('patient_reports').update({ status: 'purged' }).eq('patient_id', user.id)
+        await supabase.from('bookings').delete().eq('patient_id', user.id)
+        await supabase.from('patient_reports').delete().eq('patient_id', user.id)
       }
+      if (profile.name) {
+        await supabase.from('bookings').update({ status: 'purged' }).eq('patient_name', profile.name)
+        await supabase.from('patient_reports').update({ status: 'purged' }).eq('patient_name', profile.name)
+      }
+      localStorage.setItem('medilife_reports_purged', 'true')
       localStorage.removeItem('medilife_patient_bookings')
       alert("✅ All your appointment history & test reports have been cleared successfully.")
       setPatientPurgeModal(false)

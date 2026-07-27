@@ -22,7 +22,8 @@ import {
   FileText,
   Clock,
   Download,
-  History
+  History,
+  Trash2
 } from 'lucide-react'
 
 export default function SendReport() {
@@ -47,6 +48,13 @@ export default function SendReport() {
       setLoading(true)
       setError(null)
 
+      const isPurgedAll = localStorage.getItem('medilife_reports_purged') === 'true'
+      if (isPurgedAll) {
+        setQueue([])
+        setLoading(false)
+        return
+      }
+
       // Query patient_reports joined with test_catalog and user_profiles
       const { data, error: fetchError } = await supabase
         .from('patient_reports')
@@ -69,14 +77,19 @@ export default function SendReport() {
         .neq('status', 'completed')
         .neq('status', 'complete')
         .neq('status', 'published')
+        .neq('status', 'purged')
 
       if (fetchError) throw fetchError
 
-      if (data && data.length > 0) {
-        const formatted = data.map(item => ({
-          ...item,
-          patient_name: item.user_profiles?.full_name || item.patient_name || 'Patient'
-        }))
+      const purgedIds = JSON.parse(localStorage.getItem('medilife_purged_report_ids') || '[]')
+
+      if (!isPurgedAll && data && data.length > 0) {
+        const formatted = data
+          .filter(item => item.status !== 'purged' && !purgedIds.includes(item.id))
+          .map(item => ({
+            ...item,
+            patient_name: item.user_profiles?.full_name || item.patient_name || 'Patient'
+          }))
         setQueue(formatted)
       } else {
         setQueue([])
@@ -93,6 +106,12 @@ export default function SendReport() {
   // Fetch completed/approved reports history
   const fetchHistoryQueue = async () => {
     try {
+      const isPurgedAll = localStorage.getItem('medilife_reports_purged') === 'true'
+      if (isPurgedAll) {
+        setHistoryQueue([])
+        return
+      }
+
       const { data, error: fetchError } = await supabase
         .from('patient_reports')
         .select(`
@@ -114,24 +133,33 @@ export default function SendReport() {
           )
         `)
         .in('status', ['completed', 'complete', 'published'])
+        .neq('status', 'purged')
         .order('created_at', { ascending: false })
 
       if (fetchError) throw fetchError
 
+      const purgedIds = JSON.parse(localStorage.getItem('medilife_purged_report_ids') || '[]')
+
       if (data && data.length > 0) {
-        const formatted = data.map(item => ({
-          ...item,
-          patient_name: item.user_profiles?.full_name || item.patient_name || 'Patient'
-        }))
+        const formatted = data
+          .filter(item => item.status !== 'purged' && !purgedIds.includes(item.id))
+          .map(item => ({
+            ...item,
+            patient_name: item.user_profiles?.full_name || item.patient_name || 'Patient'
+          }))
         setHistoryQueue(formatted)
-        if (!selectedHistoryReport) {
+        if (formatted.length > 0 && !selectedHistoryReport) {
           setSelectedHistoryReport(formatted[0])
+        } else if (formatted.length === 0) {
+          setSelectedHistoryReport(null)
         }
       } else {
         setHistoryQueue([])
+        setSelectedHistoryReport(null)
       }
     } catch (err) {
       console.warn("Could not fetch history queue:", err)
+      setHistoryQueue([])
     }
   }
 
@@ -271,6 +299,62 @@ export default function SendReport() {
     }
   }
 
+  const handleDeleteSingleReport = async (reportId) => {
+    try {
+      const existingPurged = JSON.parse(localStorage.getItem('medilife_purged_report_ids') || '[]')
+      const updatedPurged = [...new Set([...existingPurged, reportId])]
+      localStorage.setItem('medilife_purged_report_ids', JSON.stringify(updatedPurged))
+
+      try {
+        await supabase.from('patient_reports').update({ status: 'purged' }).eq('id', reportId)
+        await supabase.from('patient_reports').delete().eq('id', reportId)
+      } catch (e) {
+        console.warn("Delete report notice:", e)
+      }
+
+      setHistoryQueue(prev => prev.filter(r => r.id !== reportId))
+      setQueue(prev => prev.filter(r => r.id !== reportId))
+      if (selectedHistoryReport?.id === reportId) {
+        setSelectedHistoryReport(null)
+      }
+      showToast("Report record purged.")
+      window.dispatchEvent(new Event('storage'))
+    } catch (err) {
+      console.warn("Delete report error:", err)
+    }
+  }
+
+  const handleClearAllReports = async () => {
+    if (!window.confirm("Are you sure you want to clear all report history & reset demo queue?")) return
+    try {
+      setLoading(true)
+      const { data: allReports } = await supabase.from('patient_reports').select('id')
+      if (allReports && allReports.length > 0) {
+        const rIds = allReports.map(r => r.id)
+        const existingPurged = JSON.parse(localStorage.getItem('medilife_purged_report_ids') || '[]')
+        localStorage.setItem('medilife_purged_report_ids', JSON.stringify([...new Set([...existingPurged, ...rIds])]))
+      }
+
+      localStorage.setItem('medilife_reports_purged', 'true')
+      await supabase.from('patient_reports').update({ status: 'purged' }).gt('created_at', '1970-01-01T00:00:00Z')
+      await supabase.from('bookings').update({ status: 'purged' }).gt('created_at', '1970-01-01T00:00:00Z')
+
+      setQueue([])
+      setHistoryQueue([])
+      setSelectedHistoryReport(null)
+      window.dispatchEvent(new Event('storage'))
+      showToast("All report history reset successfully.")
+    } catch (err) {
+      console.warn("Report purge notice:", err)
+      localStorage.setItem('medilife_reports_purged', 'true')
+      setQueue([])
+      setHistoryQueue([])
+      setSelectedHistoryReport(null)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const showToast = (message) => {
     setToast({ visible: true, message })
     setTimeout(() => {
@@ -288,14 +372,24 @@ export default function SendReport() {
             <h1 className="text-headline-lg font-bold text-admin-primary">Lab Report Generation Workspace</h1>
             <p className="text-admin-on-surface-variant text-body-md">Analyze laboratory metrics, validate ranges, and sign digital diagnostic charts.</p>
           </div>
-          <button 
-            onClick={fetchPendingQueue} 
-            className="btn-outline !py-sm self-start flex items-center gap-xs"
-            title="Reload pending queue"
-          >
-            <RefreshCwIcon />
-            Sync Queue
-          </button>
+          <div className="flex items-center gap-xs">
+            <button 
+              onClick={handleClearAllReports} 
+              className="px-md py-sm bg-red-500/20 hover:bg-red-500/30 text-red-300 font-bold rounded-xl text-xs border border-red-500/40 transition-all flex items-center gap-xs"
+              title="Clear all report history"
+            >
+              <History className="w-3.5 h-3.5" />
+              Clear Report History
+            </button>
+            <button 
+              onClick={() => { fetchPendingQueue(); fetchHistoryQueue(); }} 
+              className="btn-outline !py-sm flex items-center gap-xs"
+              title="Reload pending queue"
+            >
+              <RefreshCwIcon />
+              Sync Queue
+            </button>
+          </div>
         </div>
 
         {/* Supabase Error warning banner */}
@@ -444,17 +538,26 @@ export default function SendReport() {
                           </div>
                         </div>
 
-                        <button
-                          onClick={() => setSelectedHistoryReport(report)}
-                          className={`flex items-center gap-xs text-label-sm px-md py-xs rounded-xl font-bold transition-all ${
-                            isSelected
-                              ? 'bg-emerald-400 text-emerald-950'
-                              : 'bg-white/10 text-admin-on-surface hover:bg-white/20'
-                          }`}
-                        >
-                          View Report
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="flex items-center gap-xs">
+                          <button
+                            onClick={() => setSelectedHistoryReport(report)}
+                            className={`flex items-center gap-xs text-label-sm px-md py-xs rounded-xl font-bold transition-all ${
+                              isSelected
+                                ? 'bg-emerald-400 text-emerald-950'
+                                : 'bg-white/10 text-admin-on-surface hover:bg-white/20'
+                            }`}
+                          >
+                            View Report
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeleteSingleReport(report.id); }}
+                            className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all"
+                            title="Delete report"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </motion.div>
                     )
                   })}

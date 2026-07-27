@@ -79,7 +79,7 @@ export default function AdminSettings() {
 
       if (purgeModal.type === 'reports' || purgeModal.type === 'all') {
         try {
-          // 1. Fetch current booking IDs to store in local purge registry
+          // 1. Fetch current booking and report IDs to store in local purge registry
           const { data: bookingsToPurge } = await supabase.from('bookings').select('id')
           if (bookingsToPurge && bookingsToPurge.length > 0) {
             const ids = bookingsToPurge.map(b => b.id)
@@ -87,14 +87,24 @@ export default function AdminSettings() {
             localStorage.setItem('medilife_purged_booking_ids', JSON.stringify([...new Set([...existingPurged, ...ids])]))
           }
 
-          // 2. Update status to 'purged' (Always allowed under UPDATE policy!)
+          const { data: reportsToPurge } = await supabase.from('patient_reports').select('id')
+          if (reportsToPurge && reportsToPurge.length > 0) {
+            const rIds = reportsToPurge.map(r => r.id)
+            const existingRPurged = JSON.parse(localStorage.getItem('medilife_purged_report_ids') || '[]')
+            localStorage.setItem('medilife_purged_report_ids', JSON.stringify([...new Set([...existingRPurged, ...rIds])]))
+          }
+
+          // 2. Update status to 'purged' across bookings and patient_reports
           await supabase.from('bookings').update({ status: 'purged' }).gt('created_at', '1970-01-01T00:00:00Z')
           await supabase.from('bookings').update({ status: 'purged' }).eq('tenant_id', '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e')
+          await supabase.from('patient_reports').update({ status: 'purged' }).gt('created_at', '1970-01-01T00:00:00Z')
 
-          // 3. Attempt DELETE
+          // 3. Attempt RPC purge or DELETE queries
+          await supabase.rpc('purge_all_demo_data')
           await supabase.from('bookings').delete().gt('created_at', '1970-01-01T00:00:00Z')
+          await supabase.from('patient_reports').delete().gt('created_at', '1970-01-01T00:00:00Z')
         } catch (e) {
-          console.warn("Bookings purge notice:", e)
+          console.warn("Bookings & reports purge notice:", e)
         }
 
         localStorage.setItem('medilife_reports_purged', 'true')

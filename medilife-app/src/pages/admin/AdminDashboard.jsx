@@ -31,6 +31,212 @@ export default function AdminDashboard() {
   const [dashboardTab, setDashboardTab] = useState('operations') // 'operations' or 'staff'
   const [activeBreak, setActiveBreak] = useState(null)
 
+  const defaultLocation = {
+    id: '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e',
+    name: 'Jhansi Lab (Khati Baba)',
+    subdomain: 'jhansi-medilife-tenant-01',
+    address: 'Khati Baba, Jhansi, UP',
+    gpsCoordinates: '25.4484, 78.5685',
+    openingTime: '07:00 AM',
+    closingTime: '09:00 PM',
+    initialized: true
+  }
+
+  const [activeLocation, setActiveLocation] = useState(defaultLocation)
+  const [availableLocations, setAvailableLocations] = useState([defaultLocation])
+  
+  // First-time location initialization modal state
+  const [initModalOpen, setInitModalOpen] = useState(false)
+  const [pendingLocation, setPendingLocation] = useState(null)
+  const [initForm, setInitForm] = useState({
+    address: '',
+    gpsCoordinates: '',
+    openingTime: '07:00 AM',
+    closingTime: '09:00 PM',
+    headAdminName: '',
+    headAdminEmail: '',
+    headAdminPhone: ''
+  })
+  const [initSubmitting, setInitSubmitting] = useState(false)
+  const [initError, setInitError] = useState(null)
+
+  // Auto-detect current browser GPS coordinates
+  const handleDetectCurrentGPS = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude.toFixed(6)
+          const lng = pos.coords.longitude.toFixed(6)
+          setInitForm(prev => ({ ...prev, gpsCoordinates: `${lat}, ${lng}` }))
+          alert(`📍 Current GPS location detected: ${lat}, ${lng}`)
+        },
+        (err) => {
+          console.warn("GPS detection error:", err)
+          alert("Could not automatically detect GPS location. Please enter coordinates manually (e.g. 28.6315, 77.2167) or paste a Google Maps pin link.")
+        }
+      )
+    } else {
+      alert("Geolocation is not supported by your browser.")
+    }
+  }
+
+  // Load custom registered locations
+  const loadLocations = () => {
+    const saved = JSON.parse(localStorage.getItem('medilife_registered_locations') || '[]')
+    const list = [defaultLocation]
+    saved.forEach(loc => {
+      if (!list.some(l => l.id === loc.id || l.subdomain === loc.subdomain)) {
+        list.push({
+          id: loc.id || crypto.randomUUID(),
+          name: loc.name,
+          subdomain: loc.subdomain,
+          address: loc.address || '',
+          gpsCoordinates: loc.gpsCoordinates || '',
+          openingTime: loc.openingTime || '07:00 AM',
+          closingTime: loc.closingTime || '09:00 PM',
+          initialized: loc.initialized || false
+        })
+      }
+    })
+    setAvailableLocations(list)
+  }
+
+  useEffect(() => {
+    loadLocations()
+    window.addEventListener('storage', loadLocations)
+    return () => window.removeEventListener('storage', loadLocations)
+  }, [])
+
+  const handleDeleteLocation = async (locationId) => {
+    const locToDelete = availableLocations.find(l => l.id === locationId)
+    if (!locToDelete) return
+
+    if (locToDelete.id === defaultLocation.id || locToDelete.subdomain === defaultLocation.subdomain) {
+      alert("🔒 Default primary lab location ('Jhansi Lab') cannot be deleted.")
+      return
+    }
+
+    if (!window.confirm(`Are you sure you want to delete lab location "${locToDelete.name}"? This action will remove the location registration.`)) {
+      return
+    }
+
+    try {
+      // 1. Delete from Supabase tenants table
+      try {
+        await supabase.from('tenants').delete().eq('id', locationId)
+      } catch (err) {
+        console.warn("Tenant deletion notice:", err)
+      }
+
+      // 2. Remove from local storage location registry
+      const saved = JSON.parse(localStorage.getItem('medilife_registered_locations') || '[]')
+      const updated = saved.filter(l => l.id !== locationId && l.subdomain !== locToDelete.subdomain)
+      localStorage.setItem('medilife_registered_locations', JSON.stringify(updated))
+
+      // 3. Switch active location back to default
+      setActiveLocation(defaultLocation)
+      setCurrentTenantSlug(defaultLocation.subdomain)
+      setTenantId(defaultLocation.id)
+      fetchLiveQueue(defaultLocation.id)
+      loadLocations()
+
+      alert(`🗑️ Location "${locToDelete.name}" deleted successfully. Switched back to Jhansi Lab.`)
+    } catch (err) {
+      console.error("Delete location failed:", err)
+      alert("Failed to delete location: " + (err.message || err))
+    }
+  }
+
+  const handleLocationSelect = (targetLoc) => {
+    if (!targetLoc.initialized) {
+      setPendingLocation(targetLoc)
+      setInitForm({
+        address: targetLoc.address || '',
+        gpsCoordinates: targetLoc.gpsCoordinates || '',
+        openingTime: targetLoc.openingTime || '07:00 AM',
+        closingTime: targetLoc.closingTime || '09:00 PM',
+        headAdminName: '',
+        headAdminEmail: '',
+        headAdminPhone: ''
+      })
+      setInitError(null)
+      setInitModalOpen(true)
+    } else {
+      setActiveLocation(targetLoc)
+      setCurrentTenantSlug(targetLoc.subdomain)
+      if (targetLoc.id) {
+        setTenantId(targetLoc.id)
+        fetchLiveQueue(targetLoc.id)
+      }
+    }
+  }
+
+  const handleInitializeLocationSubmit = async (e) => {
+    e.preventDefault()
+    if (!pendingLocation) return
+    setInitSubmitting(true)
+    setInitError(null)
+
+    try {
+      // 1. Create Head Admin Profile in user_profiles
+      const headAdminRecord = {
+        id: crypto.randomUUID(),
+        user_id: crypto.randomUUID(),
+        full_name: initForm.headAdminName || 'Head Admin',
+        email: initForm.headAdminEmail,
+        phone: initForm.headAdminPhone || '+91 9876543210',
+        role: 'admin',
+        tenant_id: pendingLocation.id,
+        status: 'active',
+        created_at: new Date().toISOString()
+      }
+
+      try {
+        await supabase.from('user_profiles').insert([headAdminRecord])
+      } catch (err) {
+        console.warn("Head Admin profile creation notice:", err)
+      }
+
+      // 2. Update location registry state in localStorage
+      const initializedLoc = {
+        ...pendingLocation,
+        address: initForm.address,
+        gpsCoordinates: initForm.gpsCoordinates,
+        openingTime: initForm.openingTime,
+        closingTime: initForm.closingTime,
+        headAdminName: initForm.headAdminName,
+        headAdminEmail: initForm.headAdminEmail,
+        initialized: true
+      }
+
+      const currentSaved = JSON.parse(localStorage.getItem('medilife_registered_locations') || '[]')
+      const updatedSaved = currentSaved.map(l => (l.id === pendingLocation.id || l.subdomain === pendingLocation.subdomain) ? initializedLoc : l)
+      
+      // If not present in array, push
+      if (!updatedSaved.some(l => l.id === pendingLocation.id)) {
+        updatedSaved.push(initializedLoc)
+      }
+
+      localStorage.setItem('medilife_registered_locations', JSON.stringify(updatedSaved))
+
+      // 3. Set active location to the newly initialized location
+      setActiveLocation(initializedLoc)
+      setCurrentTenantSlug(initializedLoc.subdomain)
+      setTenantId(initializedLoc.id)
+      fetchLiveQueue(initializedLoc.id)
+      loadLocations()
+
+      setInitModalOpen(false)
+      setPendingLocation(null)
+      alert(`🎉 Lab Location "${initializedLoc.name}" & Head Admin Profile initialized successfully!`)
+    } catch (err) {
+      console.error("Initialization error:", err)
+      setInitError(err.message || 'Failed to initialize lab location.')
+    } finally {
+      setInitSubmitting(false)
+    }
+  }
+
   useEffect(() => {
     const checkBreak = () => {
       try {
@@ -295,6 +501,8 @@ Google Maps Pin: ${mapLink}`
     }
   }
 
+  const isPurgedReportsAll = localStorage.getItem('medilife_reports_purged') === 'true'
+
   const activePatients = patients.filter((p) => {
     if (p.status === 'cancelled' || p.status === 'canceled' || p.status === 'purged') return false
     const purgedIds = JSON.parse(localStorage.getItem('medilife_purged_booking_ids') || '[]')
@@ -302,9 +510,11 @@ Google Maps Pin: ${mapLink}`
     return true
   })
 
+  const displayActivePatients = isPurgedReportsAll ? [] : activePatients
+
   const filtered = filter === 'all' 
-    ? activePatients 
-    : activePatients.filter((p) => {
+    ? displayActivePatients 
+    : displayActivePatients.filter((p) => {
         if (filter === 'waiting') return p.status === 'waiting' || p.status === 'pending' || p.status === 'scheduled'
         return p.status === filter
       })
@@ -335,10 +545,43 @@ Google Maps Pin: ${mapLink}`
           {/* Location & View Tabs Bar */}
           <div className="flex flex-col sm:flex-row flex-wrap gap-sm items-start sm:items-center max-w-full overflow-x-auto scrollbar-hide">
             <div className="flex items-center gap-xs bg-white/5 border border-white/10 p-1.5 rounded-2xl shrink-0">
-              <span className="text-label-sm text-admin-on-surface-variant px-xs font-semibold uppercase shrink-0">Location:</span>
-              <span className="px-md py-xs rounded-xl text-label-sm font-bold bg-clinical-teal text-[#00363d] shadow-admin-glow shrink-0">
-                Jhansi Lab (Khati Baba)
-              </span>
+              <span className="text-label-sm text-admin-on-surface-variant px-xs font-semibold uppercase shrink-0">Switch Location:</span>
+              <select
+                value={activeLocation.id}
+                onChange={(e) => {
+                  const selected = availableLocations.find(l => l.id === e.target.value)
+                  if (selected) handleLocationSelect(selected)
+                }}
+                className="px-md py-xs rounded-xl text-label-sm font-bold bg-clinical-teal text-[#00363d] shadow-admin-glow shrink-0 outline-none cursor-pointer"
+              >
+                {availableLocations.map(loc => (
+                  <option key={loc.id} value={loc.id} className="bg-[#002026] text-white">
+                    📍 {loc.name} {loc.initialized ? `(${loc.openingTime || '07:00 AM'} - ${loc.closingTime || '09:00 PM'})` : '⚙️ [Uninitialized — Click to Setup]'}
+                  </option>
+                ))}
+              </select>
+
+              {/* Map Directions Link */}
+              <a
+                href={activeLocation.gpsCoordinates ? `https://www.google.com/maps?q=${encodeURIComponent(activeLocation.gpsCoordinates)}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((activeLocation.address || activeLocation.name) + ', Jhansi')}`}
+                target="_blank"
+                rel="noreferrer"
+                className="px-sm py-xs bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 text-xs font-bold rounded-xl border border-blue-400/30 transition-all flex items-center gap-xs shrink-0"
+                title="Get driving directions to this location on Google Maps"
+              >
+                🗺️ Get Directions
+              </a>
+
+              {/* Delete Location Action */}
+              {activeLocation.id !== defaultLocation.id && (
+                <button
+                  onClick={() => handleDeleteLocation(activeLocation.id)}
+                  className="px-sm py-xs bg-red-500/20 hover:bg-red-500/40 text-red-300 text-xs font-bold rounded-xl border border-red-400/30 transition-all flex items-center gap-xs shrink-0"
+                  title="Delete this lab location"
+                >
+                  🗑️ Delete Location
+                </button>
+              )}
             </div>
 
             {/* Dashboard View Selector */}
@@ -373,10 +616,10 @@ Google Maps Pin: ${mapLink}`
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-md">
                 {[
-                  { label: 'Total Today', value: patients.length, icon: 'groups', color: 'text-clinical-teal' },
-                  { label: 'Waiting', value: patients.filter((p) => p.status === 'waiting' || p.status === 'pending' || p.status === 'scheduled').length, icon: 'schedule', color: 'text-amber-400' },
-                  { label: 'In Progress', value: patients.filter((p) => p.status === 'in-progress' || p.status === 'processing').length, icon: 'hourglass_top', color: 'text-blue-400' },
-                  { label: 'Completed', value: patients.filter((p) => p.status === 'done' || p.status === 'completed' || p.status === 'complete').length, icon: 'check_circle', color: 'text-emerald-400' },
+                  { label: 'Total Today', value: displayActivePatients.length, icon: 'groups', color: 'text-clinical-teal' },
+                  { label: 'Waiting', value: displayActivePatients.filter((p) => p.status === 'waiting' || p.status === 'pending' || p.status === 'scheduled').length, icon: 'schedule', color: 'text-amber-400' },
+                  { label: 'In Progress', value: displayActivePatients.filter((p) => p.status === 'in-progress' || p.status === 'processing').length, icon: 'hourglass_top', color: 'text-blue-400' },
+                  { label: 'Completed', value: displayActivePatients.filter((p) => p.status === 'done' || p.status === 'completed' || p.status === 'complete').length, icon: 'check_circle', color: 'text-emerald-400' },
                 ].map(({ label, value, icon, color }, i) => (
                   <motion.div key={label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }} className="card-admin p-lg">
                     <div className="flex justify-between items-start mb-sm">
@@ -501,7 +744,7 @@ Google Maps Pin: ${mapLink}`
               <div className="border-t border-admin-outline-variant/20 pt-xl space-y-md">
                 <div>
                   <h2 className="text-headline-md font-bold text-admin-primary">Lab Pathology Catalog</h2>
-                  <p className="text-admin-on-surface-variant text-body-md">Manage test profiles and report templates for location: <span className="text-clinical-teal font-semibold font-mono">{tenantId}</span></p>
+                  <p className="text-admin-on-surface-variant text-body-md">Manage test profiles and report templates for location: <span className="text-clinical-teal font-semibold font-mono">Jhansi Lab (Khati Baba)</span></p>
                 </div>
 
                 {/* TestCatalog component with resolved UUID */}
@@ -515,6 +758,164 @@ Google Maps Pin: ${mapLink}`
             </div>
           )}
       </div>
+
+      {/* First-Time Location Opening Setup Pop-Up Modal */}
+      {initModalOpen && pendingLocation && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-md">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#002026] border border-clinical-teal/30 rounded-3xl p-xl max-w-lg w-full text-white shadow-2xl space-y-md">
+            <div className="flex justify-between items-start border-b border-white/10 pb-md">
+              <div>
+                <h3 className="text-headline-sm font-bold text-clinical-teal flex items-center gap-xs">
+                  <span>🚀 Initialize Lab Location & Head Admin Setup</span>
+                </h3>
+                <p className="text-body-sm text-admin-on-surface-variant">Configure operating hours, address, and Head Admin credentials for <span className="text-white font-bold">{pendingLocation.name}</span></p>
+              </div>
+              <button onClick={() => setInitModalOpen(false)} className="text-white/60 hover:text-white p-xs text-headline-sm font-bold">✕</button>
+            </div>
+
+            {initError && (
+              <div className="p-sm bg-red-500/20 border border-red-500/40 rounded-xl text-red-200 text-xs">
+                ⚠️ {initError}
+              </div>
+            )}
+
+            <form onSubmit={handleInitializeLocationSubmit} className="space-y-md">
+              {/* Physical Location Address & GPS Coordinates / Map Pin */}
+              <div className="space-y-sm">
+                <div className="space-y-xs">
+                  <label className="text-label-sm font-bold text-admin-on-surface-variant">Location Physical Address *</label>
+                  <input
+                    required
+                    type="text"
+                    placeholder="e.g. Connaught Place, Inner Circle, New Delhi"
+                    value={initForm.address}
+                    onChange={(e) => setInitForm({ ...initForm, address: e.target.value })}
+                    className="w-full px-md py-sm bg-white/5 border border-white/20 rounded-xl text-body-md text-white outline-none focus:border-clinical-teal"
+                  />
+                </div>
+
+                <div className="space-y-xs">
+                  <div className="flex items-center justify-between">
+                    <label className="text-label-sm font-bold text-admin-on-surface-variant">GPS Pin Location / Map Coordinates</label>
+                    <div className="flex items-center gap-xs">
+                      <button
+                        type="button"
+                        onClick={handleDetectCurrentGPS}
+                        className="px-xs py-0.5 bg-clinical-teal/20 hover:bg-clinical-teal/30 text-clinical-teal text-[11px] font-bold rounded-lg border border-clinical-teal/40 transition-all flex items-center gap-xs"
+                      >
+                        📍 Auto-Detect GPS
+                      </button>
+                      <a
+                        href={initForm.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(initForm.address)}` : `https://www.google.com/maps`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-xs py-0.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-[11px] font-bold rounded-lg border border-blue-400/40 transition-all flex items-center gap-xs"
+                      >
+                        🗺️ Open Maps
+                      </a>
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="e.g. 28.6315, 77.2167 or Google Maps Link"
+                    value={initForm.gpsCoordinates}
+                    onChange={(e) => setInitForm({ ...initForm, gpsCoordinates: e.target.value })}
+                    className="w-full px-md py-sm bg-white/5 border border-white/20 rounded-xl text-body-md text-white font-mono outline-none focus:border-clinical-teal text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Opening & Closing Time Periods */}
+              <div className="grid grid-cols-2 gap-md">
+                <div className="space-y-xs">
+                  <label className="text-label-sm font-bold text-admin-on-surface-variant">Opening Time Period *</label>
+                  <input
+                    required
+                    type="text"
+                    placeholder="07:00 AM"
+                    value={initForm.openingTime}
+                    onChange={(e) => setInitForm({ ...initForm, openingTime: e.target.value })}
+                    className="w-full px-md py-sm bg-white/5 border border-white/20 rounded-xl text-body-md text-white font-mono outline-none focus:border-clinical-teal"
+                  />
+                </div>
+
+                <div className="space-y-xs">
+                  <label className="text-label-sm font-bold text-admin-on-surface-variant">Closing Time Period *</label>
+                  <input
+                    required
+                    type="text"
+                    placeholder="09:00 PM"
+                    value={initForm.closingTime}
+                    onChange={(e) => setInitForm({ ...initForm, closingTime: e.target.value })}
+                    className="w-full px-md py-sm bg-white/5 border border-white/20 rounded-xl text-body-md text-white font-mono outline-none focus:border-clinical-teal"
+                  />
+                </div>
+              </div>
+
+              {/* Head Admin Profile Credentials */}
+              <div className="border-t border-white/10 pt-md space-y-sm">
+                <p className="text-label-md font-bold text-clinical-teal flex items-center gap-xs">
+                  👑 Head Admin Profile Credentials (First-Time Opening)
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                  <div className="space-y-xs">
+                    <label className="text-label-sm text-admin-on-surface-variant">Head Admin Full Name *</label>
+                    <input
+                      required
+                      type="text"
+                      placeholder="e.g. Dr. Rajesh Sharma"
+                      value={initForm.headAdminName}
+                      onChange={(e) => setInitForm({ ...initForm, headAdminName: e.target.value })}
+                      className="w-full px-md py-sm bg-white/5 border border-white/20 rounded-xl text-body-md text-white outline-none focus:border-clinical-teal"
+                    />
+                  </div>
+
+                  <div className="space-y-xs">
+                    <label className="text-label-sm text-admin-on-surface-variant">Head Admin Email *</label>
+                    <input
+                      required
+                      type="email"
+                      placeholder="headadmin.delhi@medilife.com"
+                      value={initForm.headAdminEmail}
+                      onChange={(e) => setInitForm({ ...initForm, headAdminEmail: e.target.value })}
+                      className="w-full px-md py-sm bg-white/5 border border-white/20 rounded-xl text-body-md text-white outline-none focus:border-clinical-teal"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-xs">
+                  <label className="text-label-sm text-admin-on-surface-variant">Head Admin Phone Number</label>
+                  <input
+                    type="tel"
+                    placeholder="+91 9876543210"
+                    value={initForm.headAdminPhone}
+                    onChange={(e) => setInitForm({ ...initForm, headAdminPhone: e.target.value })}
+                    className="w-full px-md py-sm bg-white/5 border border-white/20 rounded-xl text-body-md text-white font-mono outline-none focus:border-clinical-teal"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-sm flex justify-end gap-sm">
+                <button
+                  type="button"
+                  onClick={() => setInitModalOpen(false)}
+                  className="px-md py-sm bg-white/10 hover:bg-white/20 text-white rounded-xl text-label-md"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={initSubmitting}
+                  className="px-md py-sm bg-clinical-teal hover:bg-clinical-teal/90 text-[#00363d] font-bold rounded-xl text-label-md transition-all shadow-admin-glow"
+                >
+                  {initSubmitting ? 'Initializing Location...' : '✓ Initialize & Open Location'}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </PageTransition>
   )
 }

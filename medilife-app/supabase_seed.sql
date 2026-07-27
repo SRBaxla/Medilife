@@ -189,3 +189,19 @@ DROP POLICY IF EXISTS "Allow authenticated users to delete audit logs" ON public
 CREATE POLICY "Allow authenticated users to delete audit logs" ON public.audit_logs
 FOR DELETE
 USING (true);
+
+-- 9. RPC Function & Grants for Super Admin Data Reset / Purge
+CREATE OR REPLACE FUNCTION public.purge_all_demo_data()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM public.bookings;
+  DELETE FROM public.patient_reports;
+  DELETE FROM public.audit_logs;
+  DELETE FROM public.staff_break_logs;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION public.purge_all_demo_data() TO anon, authenticated, service_role;
+GRANT ALL ON public.bookings TO anon, authenticated, service_role;
+GRANT ALL ON public.patient_reports TO anon, authenticated, service_role;
+GRANT ALL ON public.audit_logs TO anon, authenticated, service_role;

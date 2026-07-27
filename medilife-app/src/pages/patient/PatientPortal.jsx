@@ -99,24 +99,18 @@ export default function PatientPortal() {
     }
   }
 
-  // Sort Appointments: Active/Upcoming FIRST (ordered by booking_date), Historical/Done/Cancelled SECOND
+  // Filter and Sort Active Upcoming Appointments ONLY (exclude cancelled, completed, and purged)
   const sortedAppointments = React.useMemo(() => {
     if (!appointments || appointments.length === 0) return []
 
-    const isDoneOrCancelled = (status) => {
+    const isExcludedStatus = (status) => {
       const s = (status || '').toLowerCase()
-      return s === 'done' || s === 'completed' || s === 'complete' || s === 'cancelled' || s === 'canceled'
+      return s === 'done' || s === 'completed' || s === 'complete' || s === 'cancelled' || s === 'canceled' || s === 'purged'
     }
 
-    const upcoming = appointments
-      .filter((a) => !isDoneOrCancelled(a.status))
+    return appointments
+      .filter((a) => !isExcludedStatus(a.status))
       .sort((a, b) => new Date(a.booking_date || a.created_at) - new Date(b.booking_date || b.created_at))
-
-    const historical = appointments
-      .filter((a) => isDoneOrCancelled(a.status))
-      .sort((a, b) => new Date(b.booking_date || b.created_at) - new Date(a.booking_date || a.created_at))
-
-    return [...upcoming, ...historical]
   }, [appointments])
 
   // Pagination for Appointments (3 items per page)
@@ -168,16 +162,25 @@ export default function PatientPortal() {
 
         // 3. Query bookings table for user appointments
         // Backend RLS ensures patients can only query bookings where auth.uid() = patient_id
+        const isPurgedReportsAll = localStorage.getItem('medilife_reports_purged') === 'true'
+        const purgedBookingIds = JSON.parse(localStorage.getItem('medilife_purged_booking_ids') || '[]')
+        const purgedReportIds = JSON.parse(localStorage.getItem('medilife_purged_report_ids') || '[]')
+
         const { data: bookingsData, error: bookingsError } = await supabase
           .from('bookings')
           .select('*')
           .eq('patient_id', authUser.id)
+          .neq('status', 'purged')
           .order('booking_date', { ascending: true })
 
         if (bookingsError) throw bookingsError
 
         if (isMounted) {
-          setAppointments(bookingsData || [])
+          if (isPurgedReportsAll) {
+            setAppointments([])
+          } else {
+            setAppointments((bookingsData || []).filter(b => b.status !== 'purged' && b.status !== 'cancelled' && b.status !== 'canceled' && !purgedBookingIds.includes(b.id)))
+          }
         }
 
         // 4. Query test_catalog for pre-test guidelines
@@ -194,9 +197,14 @@ export default function PatientPortal() {
           .from('patient_reports')
           .select('*, test_catalog(test_name, report_schema)')
           .eq('patient_id', authUser.id)
+          .neq('status', 'purged')
 
         if (isMounted) {
-          setReports(reportsData || [])
+          if (isPurgedReportsAll) {
+            setReports([])
+          } else {
+            setReports((reportsData || []).filter(r => r.status !== 'purged' && !purgedReportIds.includes(r.id)))
+          }
         }
 
       } catch (err) {

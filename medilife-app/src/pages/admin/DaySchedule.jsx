@@ -105,10 +105,18 @@ Google Maps Pin: ${mapLink}`
       const { data, error } = await supabase
         .from('bookings')
         .select('*')
+        .neq('status', 'purged')
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setAllBookings(data || [])
+      const isPurgedAll = localStorage.getItem('medilife_reports_purged') === 'true'
+      const purgedIds = JSON.parse(localStorage.getItem('medilife_purged_booking_ids') || '[]')
+
+      if (isPurgedAll) {
+        setAllBookings([])
+      } else {
+        setAllBookings((data || []).filter(b => b.status !== 'purged' && !purgedIds.includes(b.id)))
+      }
     } catch (err) {
       console.warn("Could not fetch bookings database:", err)
       setAllBookings([])
@@ -184,9 +192,19 @@ Google Maps Pin: ${mapLink}`
 
   // Filter audit logs
   const auditLogs = useMemo(() => {
-    if (!searchAudit) return allBookings
+    const isPurgedAll = localStorage.getItem('medilife_reports_purged') === 'true'
+    if (isPurgedAll) return []
+
+    const purgedIds = JSON.parse(localStorage.getItem('medilife_purged_booking_ids') || '[]')
+    const activeLogs = allBookings.filter((b) => {
+      const s = (b.status || '').toLowerCase()
+      if (s === 'purged' || s === 'cancelled' || s === 'canceled' || purgedIds.includes(b.id)) return false
+      return true
+    })
+
+    if (!searchAudit) return activeLogs
     const query = searchAudit.toLowerCase()
-    return allBookings.filter((b) => {
+    return activeLogs.filter((b) => {
       const pName = (b.patient_name || '').toLowerCase()
       const tNames = (Array.isArray(b.tests) ? b.tests.join(' ') : b.test_name || '').toLowerCase()
       const status = (b.status || '').toLowerCase()
