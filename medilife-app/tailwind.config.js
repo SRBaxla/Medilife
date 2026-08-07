@@ -69,6 +69,8 @@ export default {
         'admin-secondary-container': '#00626e',
         'admin-on-secondary-container': '#c3f5ff',
         'clinical-teal': '#00E5FF',
+        // Dynamic Multi-Tenant Franchisee Brand Color
+        brand: 'var(--brand-primary)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

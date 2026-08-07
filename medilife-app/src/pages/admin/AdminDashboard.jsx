@@ -4,6 +4,7 @@ import { supabase } from '../../supabaseClient'
 import PageTransition from '../../components/common/PageTransition'
 import TestCatalog from '../../components/common/TestCatalog'
 import StaffManagement from '../../components/common/StaffManagement'
+import TemplateBuilder from '../../components/common/TemplateBuilder'
 
 const statusConfig = {
   waiting: { label: 'Waiting', color: 'text-amber-400', bg: 'bg-amber-400/10 border-amber-400/20', icon: 'schedule' },
@@ -606,6 +607,16 @@ Google Maps Pin: ${mapLink}`
               >
                 Staff & Roles
               </button>
+              <button
+                onClick={() => setDashboardTab('marketing')}
+                className={`px-md py-xs rounded-lg text-label-sm font-semibold transition-all whitespace-nowrap flex items-center gap-1 ${
+                  dashboardTab === 'marketing'
+                    ? 'bg-clinical-teal text-[#00363d]'
+                    : 'text-admin-on-surface-variant hover:text-white'
+                }`}
+              >
+                💬 WhatsApp Marketing
+              </button>
             </div>
           </div>
         </div>
@@ -751,10 +762,15 @@ Google Maps Pin: ${mapLink}`
                 <TestCatalog tenantId={tenantId} />
               </div>
             </>
-          ) : (
+          ) : dashboardTab === 'staff' ? (
             /* Render new Multi-tenant Staff Role Management Component with resolved UUID */
             <div className="space-y-md">
               <StaffManagement tenantId={tenantId} />
+            </div>
+          ) : (
+            /* Render WhatsApp Marketing Campaign Builder Component */
+            <div className="space-y-md">
+              <TemplateBuilder />
             </div>
           )}
       </div>

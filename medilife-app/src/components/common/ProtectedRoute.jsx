@@ -40,17 +40,33 @@ export default function ProtectedRoute({ children, allowedRoles }) {
         }
 
         // 2. Fetch current authenticated session & validate user
-        const { data: { user }, error: userError } = await supabase.auth.getUser()
-        
-        if (userError && (userError.status === 403 || userError.status === 401 || userError.message?.includes('User not found'))) {
-          console.warn("Session invalid or user deleted on backend. Signing out locally.")
-          await supabase.auth.signOut() // Clears stale token from Local Storage
+        let user = null
+        try {
+          const { data, error: userError } = await supabase.auth.getUser()
+          if (!userError && data?.user) {
+            user = data.user
+          }
+        } catch (uErr) {
+          console.warn("ProtectedRoute getUser network exception:", uErr)
+        }
+
+        // Check for active offline session in sessionStorage
+        const offlineSessionRaw = sessionStorage.getItem('medilife_offline_session')
+        let offlineSession = null
+        if (offlineSessionRaw) {
+          try {
+            offlineSession = JSON.parse(offlineSessionRaw)
+          } catch (e) {}
+        }
+
+        if (!user && offlineSession) {
+          const roleMatched = allowedRoles ? allowedRoles.includes(offlineSession.role) : true
           if (mounted) {
             setAuthState({
               loading: false,
-              authenticated: false,
-              authorized: false,
-              error: 'Session invalid or user deleted',
+              authenticated: true,
+              authorized: roleMatched,
+              error: null,
               resolvedTenantId: resolvedId
             })
           }

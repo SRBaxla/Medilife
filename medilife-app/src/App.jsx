@@ -2,6 +2,15 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-route
 import { AnimatePresence } from 'framer-motion'
 import { lazy, Suspense } from 'react'
 
+// Context & Middleware
+import { TenantProvider } from './context/TenantContext'
+import TenantMiddleware from './components/common/TenantMiddleware'
+
+// Storefront & Tenant Resolution
+import TenantResolver from './components/common/TenantResolver'
+import LabNotFound from './pages/client/LabNotFound'
+const StorefrontHome = lazy(() => import('./pages/client/StorefrontHome'))
+
 // Layouts
 import ClientLayout from './layouts/ClientLayout'
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
@@ -19,8 +28,10 @@ const Faq = lazy(() => import('./pages/client/Faq'))
 import DataPrivacy from './pages/client/DataPrivacy'
 const Terms = lazy(() => import('./pages/client/Terms'))
 
-// Auth
+// Auth & Onboarding
 const Login = lazy(() => import('./pages/auth/Login'))
+const OnboardingWizard = lazy(() => import('./pages/auth/OnboardingWizard'))
+import AccountSuspended from './pages/auth/AccountSuspended'
 const Unauthorized = lazy(() => import('./pages/auth/Unauthorized'))
 import ProtectedRoute from './components/common/ProtectedRoute'
 
@@ -72,6 +83,31 @@ function AnimatedRoutes() {
             <Route path="/terms" element={<Terms />} />
           </Route>
 
+          {/* Automated WaaS Self-Serve Lab Registration & Onboarding */}
+          <Route path="/onboarding" element={<OnboardingWizard />} />
+          <Route path="/register" element={<Navigate to="/onboarding" replace />} />
+          <Route path="/suspended" element={<AccountSuspended />} />
+          <Route path="/404-lab-not-found" element={<LabNotFound />} />
+          <Route path="/:tenantSlug/suspended" element={<AccountSuspended />} />
+
+          {/* Dynamic Multi-Tenant Patient Storefront Route */}
+          <Route 
+            path="/storefront/:tenantSlug" 
+            element={
+              <TenantResolver>
+                <StorefrontHome />
+              </TenantResolver>
+            } 
+          />
+          <Route 
+            path="/lab/:tenantSlug" 
+            element={
+              <TenantResolver>
+                <StorefrontHome />
+              </TenantResolver>
+            } 
+          />
+
           {/* Multi-Tenant Public Login routes */}
           <Route path="/:tenantSlug/admin/login" element={<Login />} />
           <Route path="/:tenantSlug/patient/login" element={<Login />} />
@@ -82,12 +118,16 @@ function AnimatedRoutes() {
           <Route path="/patient/login" element={<Navigate to="/jhansi-medilife-tenant-01/patient/login" replace />} />
           <Route path="/403" element={<Unauthorized />} />
 
-          {/* Protected Admin Portal (Requires 'super_admin', 'admin', 'lab_tech', or 'worker' roles) */}
+          {/* Protected Admin Portal (Wrapped with TenantContext & Subscription Middleware) */}
           <Route 
             path="/:tenantSlug/admin" 
             element={
               <ProtectedRoute allowedRoles={['super_admin', 'admin', 'lab_tech', 'worker']}>
-                <AdminLayout />
+                <TenantProvider>
+                  <TenantMiddleware>
+                    <AdminLayout />
+                  </TenantMiddleware>
+                </TenantProvider>
               </ProtectedRoute>
             }
           >
@@ -103,7 +143,9 @@ function AnimatedRoutes() {
             path="/:tenantSlug/patient" 
             element={
               <ProtectedRoute allowedRoles={['patient']}>
-                <PatientLayout />
+                <TenantProvider>
+                  <PatientLayout />
+                </TenantProvider>
               </ProtectedRoute>
             }
           >
@@ -131,3 +173,4 @@ export default function App() {
     </BrowserRouter>
   )
 }
+
