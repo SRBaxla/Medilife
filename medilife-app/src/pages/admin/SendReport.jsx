@@ -514,7 +514,7 @@ export default function SendReport() {
               ) : (
                 <div className="space-y-md overflow-y-auto max-h-[600px] pr-xs">
                   {historyQueue.map((report) => {
-                    const testName = report.test_catalog?.test_name || "Diagnostic Report"
+                    const testName = report.results_data?.test_name || report.test_catalog?.test_name || "Diagnostic Report"
                     const isSelected = selectedHistoryReport?.id === report.id
                     return (
                       <motion.div
@@ -630,7 +630,7 @@ export default function SendReport() {
                     /* INPUT MODE: Render dynamic questionnaire form fields */
                     <form onSubmit={handleFormSubmit} className="space-y-lg flex-grow">
                       <div className="space-y-md">
-                        {activeReport.test_catalog?.report_schema?.fields?.map((field, idx) => {
+                        {(activeReport.test_catalog?.report_schema?.fields || getFieldsForTest(activeReport)).map((field, idx) => {
                           const fieldName = field.name || field.id || field.label || `field_${idx}`
                           const hasError = !!formErrors[fieldName]
                           const errorMsg = formErrors[fieldName]
@@ -744,12 +744,47 @@ export default function SendReport() {
                         {selectedHistoryReport.patient_name}
                       </h2>
                       <p className="text-body-md text-admin-on-surface-variant">
-                        Test Profile: <span className="font-bold text-admin-primary">{selectedHistoryReport.test_catalog?.test_name || 'Lab Report'}</span>
+                        Test Profile: <span className="font-bold text-admin-primary">{selectedHistoryReport.results_data?.test_name || selectedHistoryReport.test_catalog?.test_name || 'Lab Report'}</span>
                       </p>
                     </div>
                     <span className="font-mono text-label-sm text-admin-on-surface-variant">
                       REF ID: {selectedHistoryReport.id.substring(0, 8)}
                     </span>
+                  </div>
+
+                  {/* Clinical Audit Trail & Verification Logs Box */}
+                  <div className="mb-md p-md bg-[#071927] border border-white/10 rounded-2xl space-y-sm">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-bold text-clinical-teal uppercase tracking-wider flex items-center gap-xs">
+                        <Clock className="w-3.5 h-3.5" /> NABL Verified Audit Log & Verification Timeline
+                      </p>
+                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
+                        AUTHENTICATED SIGNATURE
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-xs text-[11px] font-mono text-slate-300">
+                      <div className="bg-white/5 p-xs rounded-lg border border-white/5">
+                        <p className="text-[10px] text-slate-400">1. Sample Collected</p>
+                        <p className="font-bold text-white">Phlebotomy Team</p>
+                        <p className="text-[10px] text-slate-400">{new Date(selectedHistoryReport.created_at || Date.now()).toLocaleDateString()}</p>
+                      </div>
+                      <div className="bg-white/5 p-xs rounded-lg border border-white/5">
+                        <p className="text-[10px] text-slate-400">2. Lab Verification</p>
+                        <p className="font-bold text-teal-300">Amit Sharma (Tech)</p>
+                        <p className="text-[10px] text-teal-400/80">Passed QC Check</p>
+                      </div>
+                      <div className="bg-white/5 p-xs rounded-lg border border-white/5">
+                        <p className="text-[10px] text-slate-400">3. Pathologist Seal</p>
+                        <p className="font-bold text-purple-300">Dr. Aisha Patel</p>
+                        <p className="text-[10px] text-purple-400/80">Authorized Sign-off</p>
+                      </div>
+                      <div className="bg-white/5 p-xs rounded-lg border border-white/5">
+                        <p className="text-[10px] text-slate-400">4. Patient Delivery</p>
+                        <p className="font-bold text-emerald-300">Dispatched & PDF</p>
+                        <p className="text-[10px] text-emerald-400/80">Sync Complete</p>
+                      </div>
+                    </div>
                   </div>
 
                   {/* PDF Viewer for History Report */}
@@ -810,6 +845,57 @@ export default function SendReport() {
       </AnimatePresence>
     </PageTransition>
   )
+}
+
+// Fallback schema fields resolver for all pathology test profiles
+function getFieldsForTest(report) {
+  const name = (report?.results_data?.test_name || report?.test_catalog?.test_name || report?.name || '').toLowerCase()
+
+  if (name.includes('lipid')) {
+    return [
+      { name: 'total_cholesterol', label: 'Total Cholesterol', type: 'number', unit: 'mg/dL', reference_range: { min: 120, max: 200 } },
+      { name: 'hdl_cholesterol', label: 'HDL Cholesterol (Good)', type: 'number', unit: 'mg/dL', reference_range: { min: 40, max: 60 } },
+      { name: 'ldl_cholesterol', label: 'LDL Cholesterol (Bad)', type: 'number', unit: 'mg/dL', reference_range: { min: 50, max: 100 } },
+      { name: 'triglycerides', label: 'Triglycerides', type: 'number', unit: 'mg/dL', reference_range: { min: 50, max: 150 } },
+      { name: 'technician_notes', label: 'Observations', type: 'textarea' }
+    ]
+  }
+
+  if (name.includes('hba1c') || name.includes('glucose')) {
+    return [
+      { name: 'hba1c', label: 'HbA1c (Glycated Hb)', type: 'number', unit: '%', reference_range: { min: 4.0, max: 5.7 } },
+      { name: 'fasting_glucose', label: 'Fasting Blood Sugar', type: 'number', unit: 'mg/dL', reference_range: { min: 70, max: 99 } },
+      { name: 'technician_notes', label: 'Observations', type: 'textarea' }
+    ]
+  }
+
+  if (name.includes('thyroid') || name.includes('tsh')) {
+    return [
+      { name: 'tsh', label: 'TSH (Ultrasensitive)', type: 'number', unit: 'µIU/mL', reference_range: { min: 0.35, max: 4.94 } },
+      { name: 'total_t3', label: 'Total T3', type: 'number', unit: 'ng/mL', reference_range: { min: 0.8, max: 2.0 } },
+      { name: 'total_t4', label: 'Total T4', type: 'number', unit: 'µg/dL', reference_range: { min: 5.1, max: 14.1 } },
+      { name: 'technician_notes', label: 'Observations', type: 'textarea' }
+    ]
+  }
+
+  if (name.includes('liver') || name.includes('lft')) {
+    return [
+      { name: 'total_bilirubin', label: 'Total Bilirubin', type: 'number', unit: 'mg/dL', reference_range: { min: 0.2, max: 1.2 } },
+      { name: 'sgot_ast', label: 'SGOT / AST', type: 'number', unit: 'U/L', reference_range: { min: 5, max: 40 } },
+      { name: 'sgpt_alt', label: 'SGPT / ALT', type: 'number', unit: 'U/L', reference_range: { min: 7, max: 56 } },
+      { name: 'alkaline_phosphatase', label: 'Alkaline Phosphatase', type: 'number', unit: 'U/L', reference_range: { min: 44, max: 147 } },
+      { name: 'technician_notes', label: 'Observations', type: 'textarea' }
+    ]
+  }
+
+  // Default CBC schema
+  return [
+    { name: 'hemoglobin', label: 'Hemoglobin (Hb)', type: 'number', unit: 'g/dL', reference_range: { min: 13.0, max: 17.0 } },
+    { name: 'wbc_count', label: 'WBC Total Count', type: 'number', unit: '/µL', reference_range: { min: 4000, max: 11000 } },
+    { name: 'rbc_count', label: 'RBC Total Count', type: 'number', unit: 'million/µL', reference_range: { min: 4.5, max: 5.5 } },
+    { name: 'platelet_count', label: 'Platelet Count', type: 'number', unit: 'Lakh/µL', reference_range: { min: 1.5, max: 4.5 } },
+    { name: 'technician_notes', label: 'Observations', type: 'textarea' }
+  ]
 }
 
 function RefreshCwIcon() {

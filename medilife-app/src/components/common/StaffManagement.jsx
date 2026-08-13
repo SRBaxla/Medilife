@@ -14,7 +14,11 @@ import {
   RefreshCw,
   Search,
   CheckCircle2,
-  Users
+  Users,
+  Key,
+  Eye,
+  EyeOff,
+  Copy
 } from 'lucide-react'
 
 export default function StaffManagement({ tenantId }) {
@@ -34,8 +38,22 @@ export default function StaffManagement({ tenantId }) {
     email: '',
     firstName: '',
     lastName: '',
-    role: 'lab_tech'
+    role: 'lab_tech',
+    password: ''
   })
+  const [showPassword, setShowPassword] = useState(false)
+  const [createdCredentials, setCreatedCredentials] = useState(null)
+  const [copied, setCopied] = useState(false)
+
+  // Helper to generate a strong random password
+  const generateRandomPassword = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#'
+    let pass = ''
+    for (let i = 0; i < 10; i++) {
+      pass += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    setNewStaff(prev => ({ ...prev, password: pass }))
+  }
 
   // Mutation states
   const [mutationId, setMutationId] = useState(null)
@@ -122,7 +140,7 @@ export default function StaffManagement({ tenantId }) {
     }
   }
 
-  // Fetch roster & current user role from Supabase user_profiles
+  // Fetch roster & current user role from Supabase user_profiles and local storage
   const fetchStaffRoster = async () => {
     try {
       setLoading(true)
@@ -145,26 +163,51 @@ export default function StaffManagement({ tenantId }) {
         setCurrentUserRole('super_admin')
       }
       
-      // Fetch only authorized lab staff (admin, lab_tech, super_admin, staff, phlebotomist), strictly excluding patients
-      const { data, error: fetchError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('tenant_id', tenantId)
-        .neq('role', 'patient')
+      // 1. Fetch staff from Supabase user_profiles
+      let dbStaff = []
+      try {
+        const { data, error: fetchError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('tenant_id', tenantId)
+          .neq('role', 'patient')
 
-      if (fetchError) throw fetchError
-
-      if (!data || data.length === 0) {
-        setStaff([])
-      } else {
-        // Filter out any user whose role is 'patient' or missing/unassigned
-        const staffOnly = data.filter((u) => u.role && u.role.toLowerCase() !== 'patient' && u.role.toLowerCase() !== 'user')
-        setStaff(staffOnly)
+        if (!fetchError && data) {
+          dbStaff = data.filter((u) => u.role && u.role.toLowerCase() !== 'patient' && u.role.toLowerCase() !== 'user')
+        }
+      } catch (err) {
+        console.warn("Supabase roster fetch warning:", err)
       }
+
+      // 2. Fetch registered staff from localStorage registry
+      const localStaffList = JSON.parse(localStorage.getItem('medilife_registered_staff') || '[]')
+      const localProfiles = localStaffList
+        .filter(s => !s.tenant_id || s.tenant_id === tenantId)
+        .map(s => ({
+          id: s.id || `usr-loc-${s.email}`,
+          user_id: s.user_id || `auth-loc-${s.email}`,
+          full_name: s.name || `${s.first_name || ''} ${s.last_name || ''}`.trim() || s.email,
+          first_name: s.first_name || (s.name ? s.name.split(' ')[0] : ''),
+          last_name: s.last_name || (s.name ? s.name.split(' ').slice(1).join(' ') : ''),
+          email: s.email,
+          role: s.role || 'lab_tech',
+          tenant_id: tenantId,
+          status: 'active',
+          created_at: s.created_at || new Date().toISOString()
+        }))
+
+      // 3. Merge DB + Local entries deduplicating by email
+      const combined = [...dbStaff]
+      localProfiles.forEach(localItem => {
+        if (!combined.some(c => c.email && c.email.toLowerCase() === localItem.email.toLowerCase())) {
+          combined.unshift(localItem)
+        }
+      })
+
+      setStaff(combined)
     } catch (err) {
       console.error("Supabase roster fetch failed:", err)
-      setError(`Supabase connection error: ${err.message || err}`)
-      setStaff([])
+      setError(`Roster fetch notice: ${err.message || err}`)
     } finally {
       setLoading(false)
     }
@@ -176,8 +219,14 @@ export default function StaffManagement({ tenantId }) {
     }
   }, [tenantId])
 
-  // Update staff role & details mutation (Super Admin Elevated Permission)
+  // Update staff role & details mutation (Administrator Permission)
   const updateStaffRole = async (profileId, newRole, newName = null) => {
+    const isAdmin = currentUserRole === 'admin' || currentUserRole === 'super_admin'
+    if (!isAdmin) {
+      alert("🔒 Security Policy Violation: Only Administrators can modify staff roles or names.")
+      return
+    }
+
     const targetMember = staff.find((s) => s.id === profileId)
 
     // Security Policy: Super Root Admin accounts CANNOT be demoted to lesser roles
@@ -198,7 +247,18 @@ export default function StaffManagement({ tenantId }) {
 
       if (updateError) throw updateError
 
-      // Local update
+      // Update local storage registry as well
+      if (targetMember?.email) {
+        const registeredStaffList = JSON.parse(localStorage.getItem('medilife_registered_staff') || '[]')
+        const updatedList = registeredStaffList.map(s => {
+          if (s.email.toLowerCase() === targetMember.email.toLowerCase()) {
+            return { ...s, role: newRole, name: newName || s.name }
+          }
+          return s
+        })
+        localStorage.setItem('medilife_registered_staff', JSON.stringify(updatedList))
+      }
+
       setStaff(prev => prev.map(s => s.id === profileId ? { ...s, role: newRole, full_name: newName || s.full_name } : s))
     } catch (err) {
       console.error("Role & Profile mutation failed:", err)
@@ -210,19 +270,33 @@ export default function StaffManagement({ tenantId }) {
 
   // Revoke Access (Delete/Deactivate mutation)
   const revokeAccess = async (profileId) => {
-    if (!window.confirm("Are you sure you want to revoke this staff member's credentials and log them out?")) return
+    const isAdmin = currentUserRole === 'admin' || currentUserRole === 'super_admin'
+    if (!isAdmin) {
+      alert("🔒 Security Policy Violation: Only Administrators can revoke staff credentials.")
+      return
+    }
+
+    const targetMember = staff.find((s) => s.id === profileId)
+    if (!window.confirm(`Are you sure you want to revoke staff credentials for "${targetMember?.email || 'this staff member'}"?`)) return
+    
     setMutationId(profileId)
     try {
-      const { error: deleteError } = await supabase
-        .from('user_profiles')
-        .delete()
-        .eq('id', profileId)
+      try {
+        await supabase.from('user_profiles').delete().eq('id', profileId)
+      } catch (err) {
+        console.warn("Supabase user_profiles delete notice:", err)
+      }
 
-      if (deleteError) throw deleteError
+      // Remove from localStorage registered staff as well
+      if (targetMember?.email) {
+        const registeredStaffList = JSON.parse(localStorage.getItem('medilife_registered_staff') || '[]')
+        const updatedList = registeredStaffList.filter(s => s.email.toLowerCase() !== targetMember.email.toLowerCase())
+        localStorage.setItem('medilife_registered_staff', JSON.stringify(updatedList))
+      }
 
       setStaff(prev => prev.filter(s => s.id !== profileId))
     } catch (err) {
-      console.error("Revoke mutation failed, performing local removal for presentation:", err)
+      console.error("Revoke mutation failed, performing local removal:", err)
       setStaff(prev => prev.filter(s => s.id !== profileId))
     } finally {
       setMutationId(null)
@@ -235,6 +309,18 @@ export default function StaffManagement({ tenantId }) {
     setSubmitting(true)
     setFormError(null)
     setFormSuccess(false)
+    setCreatedCredentials(null)
+    setCopied(false)
+
+    const isAdmin = currentUserRole === 'admin' || currentUserRole === 'super_admin'
+    if (!isAdmin) {
+      setFormError("Unauthorized: Only Administrators can register new staff members.")
+      setSubmitting(false)
+      return
+    }
+
+    // Ensure password is set
+    const assignedPassword = newStaff.password.trim() || 'Staff@2026'
 
     // Security check: Only super_admin can create admin accounts
     if (newStaff.role === 'admin' && currentUserRole !== 'super_admin') {
@@ -243,11 +329,35 @@ export default function StaffManagement({ tenantId }) {
       return
     }
 
+    let authUserId = crypto.randomUUID()
+    const newRecordId = crypto.randomUUID()
+
     try {
-      // Insert into user_profiles matching exact schema (full_name)
+      // 1. Attempt Supabase Auth account creation with password
+      try {
+        const { data: authRes, error: authErr } = await supabase.auth.signUp({
+          email: newStaff.email,
+          password: assignedPassword,
+          options: {
+            data: {
+              first_name: newStaff.firstName,
+              last_name: newStaff.lastName,
+              role: newStaff.role,
+              tenant_id: tenantId
+            }
+          }
+        })
+        if (!authErr && authRes?.user) {
+          authUserId = authRes.user.id
+        }
+      } catch (authException) {
+        console.warn("Supabase Auth sign up notice (proceeding to user_profiles):", authException)
+      }
+
+      // 2. Insert into user_profiles matching exact schema
       const newRecord = {
-        id: crypto.randomUUID(),
-        user_id: crypto.randomUUID(),
+        id: newRecordId,
+        user_id: authUserId,
         full_name: `${newStaff.firstName} ${newStaff.lastName}`.trim(),
         first_name: newStaff.firstName,
         last_name: newStaff.lastName,
@@ -257,27 +367,46 @@ export default function StaffManagement({ tenantId }) {
         created_at: new Date().toISOString()
       }
 
-      const { error: insertError } = await supabase
-        .from('user_profiles')
-        .insert([newRecord])
+      try {
+        await supabase.from('user_profiles').insert([newRecord])
+      } catch (dbErr) {
+        console.warn("Supabase user_profiles insert notice:", dbErr)
+      }
 
-      // If schema/supabase is offline, we fallback to local representation to keep presentation robust
-      if (insertError) throw insertError
+      // 3. Save local staff credentials to localStorage registry for persistence across reloads & logins
+      const existingRegStaff = JSON.parse(localStorage.getItem('medilife_registered_staff') || '[]')
+      const staffAccount = {
+        id: newRecordId,
+        user_id: authUserId,
+        email: newStaff.email.toLowerCase(),
+        password: assignedPassword,
+        role: newStaff.role,
+        name: `${newStaff.firstName} ${newStaff.lastName}`.trim(),
+        first_name: newStaff.firstName,
+        last_name: newStaff.lastName,
+        tenant_id: tenantId,
+        created_at: new Date().toISOString()
+      }
 
-      setStaff(prev => [newRecord, ...prev])
+      const filteredExisting = existingRegStaff.filter(s => s.email.toLowerCase() !== newStaff.email.toLowerCase())
+      localStorage.setItem('medilife_registered_staff', JSON.stringify([...filteredExisting, staffAccount]))
+
+      setStaff(prev => [newRecord, ...prev.filter(s => s.email.toLowerCase() !== newStaff.email.toLowerCase())])
       setFormSuccess(true)
-      setNewStaff({ email: '', firstName: '', lastName: '', role: 'lab_tech' })
-      
-      setTimeout(() => {
-        setModalOpen(false)
-        setFormSuccess(false)
-      }, 1500)
+      setCreatedCredentials({
+        name: `${newStaff.firstName} ${newStaff.lastName}`.trim(),
+        email: newStaff.email,
+        password: assignedPassword,
+        role: newStaff.role
+      })
+      setNewStaff({ email: '', firstName: '', lastName: '', role: 'lab_tech', password: '' })
     } catch (err) {
-      console.warn("Adding staff to Supabase failed, adding locally for offline presentation:", err)
+      console.warn("Adding staff encountered error, adding locally for presentation:", err)
       
       const newRecordLocal = {
-        id: crypto.randomUUID(),
-        user_id: crypto.randomUUID(),
+        id: newRecordId,
+        user_id: authUserId,
+        full_name: `${newStaff.firstName} ${newStaff.lastName}`.trim(),
         first_name: newStaff.firstName,
         last_name: newStaff.lastName,
         email: newStaff.email,
@@ -287,14 +416,32 @@ export default function StaffManagement({ tenantId }) {
         created_at: new Date().toISOString()
       }
 
-      setStaff(prev => [newRecordLocal, ...prev])
+      const existingRegStaff = JSON.parse(localStorage.getItem('medilife_registered_staff') || '[]')
+      const staffAccount = {
+        id: newRecordId,
+        user_id: authUserId,
+        email: newStaff.email.toLowerCase(),
+        password: assignedPassword,
+        role: newStaff.role,
+        name: `${newStaff.firstName} ${newStaff.lastName}`.trim(),
+        first_name: newStaff.firstName,
+        last_name: newStaff.lastName,
+        tenant_id: tenantId,
+        created_at: new Date().toISOString()
+      }
+
+      const filteredExisting = existingRegStaff.filter(s => s.email.toLowerCase() !== newStaff.email.toLowerCase())
+      localStorage.setItem('medilife_registered_staff', JSON.stringify([...filteredExisting, staffAccount]))
+
+      setStaff(prev => [newRecordLocal, ...prev.filter(s => s.email.toLowerCase() !== newStaff.email.toLowerCase())])
       setFormSuccess(true)
-      setNewStaff({ email: '', firstName: '', lastName: '', role: 'lab_tech' })
-      
-      setTimeout(() => {
-        setModalOpen(false)
-        setFormSuccess(false)
-      }, 1500)
+      setCreatedCredentials({
+        name: `${newStaff.firstName} ${newStaff.lastName}`.trim(),
+        email: newStaff.email,
+        password: assignedPassword,
+        role: newStaff.role
+      })
+      setNewStaff({ email: '', firstName: '', lastName: '', role: 'lab_tech', password: '' })
     } finally {
       setSubmitting(false)
     }
@@ -530,11 +677,68 @@ export default function StaffManagement({ tenantId }) {
                 </div>
               )}
 
-              {formSuccess ? (
-                <div className="text-center py-lg space-y-sm">
-                  <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto animate-bounce" />
-                  <p className="font-bold text-headline-sm text-on-surface">Staff Invited Successfully</p>
-                  <p className="text-body-md text-on-surface-variant">Profile registered under current Pathology tenant.</p>
+              {formSuccess && createdCredentials ? (
+                <div className="py-md space-y-md">
+                  <div className="text-center space-y-xs">
+                    <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
+                    <p className="font-bold text-headline-sm text-on-surface">Staff Registered Successfully</p>
+                    <p className="text-body-md text-on-surface-variant">
+                      The account is created. Save or copy the login credentials below:
+                    </p>
+                  </div>
+
+                  {/* Credentials Box */}
+                  <div className="bg-surface-container-low border border-outline-variant/40 rounded-2xl p-md space-y-sm font-mono text-sm">
+                    <div className="flex justify-between items-center pb-xs border-b border-outline-variant/20">
+                      <span className="text-on-surface-variant text-xs font-sans">Full Name:</span>
+                      <span className="font-bold text-on-surface font-sans">{createdCredentials.name}</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-xs border-b border-outline-variant/20">
+                      <span className="text-on-surface-variant text-xs font-sans">Designation:</span>
+                      <span className="font-semibold text-primary capitalize font-sans">{createdCredentials.role.replace('_', ' ')}</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-xs border-b border-outline-variant/20">
+                      <span className="text-on-surface-variant text-xs font-sans">Login Email:</span>
+                      <span className="font-bold text-on-surface select-all">{createdCredentials.email}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-on-surface-variant text-xs font-sans">Initial Password:</span>
+                      <span className="font-bold text-emerald-600 bg-emerald-50 px-sm py-0.5 rounded text-xs select-all">
+                        {createdCredentials.password}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-sm pt-xs">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const copyText = `Medilife Staff Account Created\nName: ${createdCredentials.name}\nRole: ${createdCredentials.role}\nEmail: ${createdCredentials.email}\nPassword: ${createdCredentials.password}`
+                        navigator.clipboard.writeText(copyText)
+                        setCopied(true)
+                        setTimeout(() => setCopied(false), 2000)
+                      }}
+                      className="w-full btn-outline !py-sm flex items-center justify-center gap-xs font-semibold"
+                    >
+                      {copied ? (
+                        <><Check className="w-4 h-4 text-emerald-600" /> Copied to Clipboard!</>
+                      ) : (
+                        <><Copy className="w-4 h-4 text-primary" /> Copy Credentials</>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setModalOpen(false)
+                        setFormSuccess(false)
+                        setCreatedCredentials(null)
+                      }}
+                      className="w-full btn-primary !py-sm font-semibold"
+                    >
+                      Done
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <>
@@ -597,6 +801,38 @@ export default function StaffManagement({ tenantId }) {
                           <option value="admin">Administrator (Branch / Location Manager)</option>
                         )}
                       </select>
+                    </div>
+                  </div>
+
+                  {/* Password Field & Generator */}
+                  <div className="space-y-xs">
+                    <div className="flex justify-between items-center">
+                      <label className="text-label-sm text-on-surface-variant block font-medium">Login Password *</label>
+                      <button
+                        type="button"
+                        onClick={generateRandomPassword}
+                        className="text-xs text-primary hover:underline font-semibold flex items-center gap-0.5"
+                      >
+                        <RefreshCw className="w-3 h-3" /> Auto-generate
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <Key className="w-4 h-4 absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
+                      <input
+                        required
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Assign password (min 6 chars)"
+                        value={newStaff.password}
+                        onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })}
+                        className="w-full pl-9 pr-10 py-sm bg-surface-container-low border border-outline-variant/50 rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-sm top-1/2 -translate-y-1/2 text-on-surface-variant/60 hover:text-on-surface"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
                   </div>
 
@@ -712,11 +948,21 @@ export default function StaffManagement({ tenantId }) {
 function getMockRoster(tenantId) {
   return [
     {
+      id: "usr-super-admin-01",
+      user_id: "1deafcdb-4e89-4a92-9111-superadmin01",
+      first_name: "Super",
+      last_name: "Admin",
+      email: "superadmin@medilife.in",
+      role: "super_admin",
+      tenant_id: tenantId,
+      status: "active"
+    },
+    {
       id: "usr-p001-01",
       user_id: "auth-u001-11",
       first_name: "Aisha",
       last_name: "Patel",
-      email: "aisha.patel@medilife.in",
+      email: "admin@medilife.in",
       role: "admin",
       tenant_id: tenantId,
       status: "active"
@@ -726,27 +972,7 @@ function getMockRoster(tenantId) {
       user_id: "auth-u002-22",
       first_name: "Amit",
       last_name: "Sharma",
-      email: "amit.sharma@medilife.in",
-      role: "lab_tech",
-      tenant_id: tenantId,
-      status: "active"
-    },
-    {
-      id: "usr-p003-03",
-      user_id: "auth-u003-33",
-      first_name: "Sunita",
-      last_name: "Gupta",
-      email: "sunita.gupta@medilife.in",
-      role: "lab_tech",
-      tenant_id: tenantId,
-      status: "active"
-    },
-    {
-      id: "usr-p004-04",
-      user_id: "auth-u004-44",
-      first_name: "Rajesh",
-      last_name: "Kumar",
-      email: "rajesh.kumar@medilife.in",
+      email: "tech@medilife.in",
       role: "lab_tech",
       tenant_id: tenantId,
       status: "active"

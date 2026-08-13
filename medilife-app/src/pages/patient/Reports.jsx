@@ -109,7 +109,7 @@ export default function Reports() {
   }, [])
 
   const filteredReports = reports.filter((r) => {
-    const name = r.test_catalog?.test_name || r.name || ''
+    const name = r.results_data?.test_name || r.test_catalog?.test_name || r.name || ''
     return name.toLowerCase().includes(searchTerm.toLowerCase())
   })
 
@@ -157,7 +157,7 @@ export default function Reports() {
         ) : (
           <div className="space-y-md">
             {filteredReports.map((r, i) => {
-              const reportName = r.test_catalog?.test_name || r.name || 'Diagnostic Report'
+              const reportName = r.results_data?.test_name || r.test_catalog?.test_name || r.name || 'Diagnostic Report'
               const dateStr = new Date(r.created_at || r.date || Date.now()).toLocaleDateString('en-IN', {
                 day: 'numeric', month: 'short', year: 'numeric'
               })

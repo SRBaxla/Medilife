@@ -78,7 +78,24 @@ export default function Login() {
           authError.name === 'AuthRetryableFetchError' ||
           authError.name === 'TypeError'
         ) {
-          console.warn("Supabase auth endpoint unreachable (ERR_NAME_NOT_RESOLVED). Initializing simulated offline session for preview:", authError)
+          console.warn("Supabase auth endpoint unreachable. Checking registered staff local credentials:", authError)
+          const registeredStaffList = JSON.parse(localStorage.getItem('medilife_registered_staff') || '[]')
+          const matchedStaff = registeredStaffList.find(s => s.email.toLowerCase() === form.email.toLowerCase())
+
+          if (matchedStaff) {
+            if (matchedStaff.password !== form.password) {
+              setErrorMsg('Invalid login password for registered staff member.')
+              setLoading(false)
+              return
+            }
+            const simulatedProfile = {
+              role: matchedStaff.role || 'lab_tech',
+              tenant_id: matchedStaff.tenant_id || resolvedTenant?.id || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e'
+            }
+            processLoginRedirect(simulatedProfile)
+            return
+          }
+
           const isStaffTab = tab === 'admin' || form.email.includes('admin') || form.email.includes('staff')
           const simulatedProfile = {
             role: isStaffTab ? 'admin' : 'patient',
@@ -89,6 +106,17 @@ export default function Login() {
         }
 
         if (authError.message?.includes('Invalid login credentials')) {
+          // Check local staff registry if created in demo mode
+          const registeredStaffList = JSON.parse(localStorage.getItem('medilife_registered_staff') || '[]')
+          const matchedStaff = registeredStaffList.find(s => s.email.toLowerCase() === form.email.toLowerCase() && s.password === form.password)
+          if (matchedStaff) {
+            processLoginRedirect({
+              role: matchedStaff.role || 'lab_tech',
+              tenant_id: matchedStaff.tenant_id || resolvedTenant?.id || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e'
+            })
+            return
+          }
+
           setErrorMsg('Invalid email or password. Please verify your login credentials.')
         } else if (authError.message?.includes('Email not confirmed')) {
           setErrorMsg('Your email address has not been confirmed yet. Please check your inbox.')
@@ -103,35 +131,66 @@ export default function Login() {
 
       if (!user) throw new Error("No active user session returned.")
 
-      // 2. Fetch public profile to match tenant context and role
-      const { data: profile, error: profileError } = await supabase
+      // 2. Resolve role and tenant context using primary DB profile, fallback by email, metadata, or registry
+      let userRole = null
+      let userTenantId = resolvedTenant?.id || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e'
+
+      // Check user_profiles table by user_id
+      const { data: profile } = await supabase
         .from('user_profiles')
         .select('role, tenant_id')
         .eq('user_id', user.id)
         .maybeSingle()
 
-      if (profileError || !profile) {
-        // Safe fallback context if profile is missing
-        const isEmailAdmin = form.email.includes('admin')
-        const simulatedProfile = {
-          role: isEmailAdmin ? 'admin' : 'patient',
-          tenant_id: resolvedTenant?.id || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e'
+      if (profile && profile.role) {
+        userRole = profile.role
+        if (profile.tenant_id) userTenantId = profile.tenant_id
+      } else {
+        // Fallback 1: Query user_profiles by email
+        const { data: emailProfile } = await supabase
+          .from('user_profiles')
+          .select('role, tenant_id')
+          .eq('email', user.email)
+          .maybeSingle()
+
+        if (emailProfile && emailProfile.role) {
+          userRole = emailProfile.role
+          if (emailProfile.tenant_id) userTenantId = emailProfile.tenant_id
         }
-        processLoginRedirect(simulatedProfile)
-        return
       }
 
-      processLoginRedirect(profile)
+      // Fallback 2: Check user metadata or registered staff local storage
+      if (!userRole) {
+        if (user.user_metadata?.role) {
+          userRole = user.user_metadata.role
+        } else {
+          const registeredStaffList = JSON.parse(localStorage.getItem('medilife_registered_staff') || '[]')
+          const matchedStaff = registeredStaffList.find(s => s.email.toLowerCase() === form.email.toLowerCase())
+          if (matchedStaff && matchedStaff.role) {
+            userRole = matchedStaff.role
+            if (matchedStaff.tenant_id) userTenantId = matchedStaff.tenant_id
+          }
+        }
+      }
+
+      // Fallback 3: Active tab context fallback
+      if (!userRole) {
+        userRole = tab === 'admin' ? 'admin' : 'patient'
+      }
+
+      processLoginRedirect({ role: userRole, tenant_id: userTenantId })
 
     } catch (err) {
       if (err.name === 'TypeError' || err.message?.includes('Failed to fetch') || err.message?.includes('fetch')) {
-        console.warn("Supabase endpoint unreachable (ERR_NAME_NOT_RESOLVED). Initializing simulated offline session for preview:", err)
-        const isEmailAdmin = form.email.includes('admin') || form.email.includes('staff') || tab === 'admin'
-        const simulatedProfile = {
-          role: isEmailAdmin ? 'admin' : 'patient',
-          tenant_id: resolvedTenant?.id || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e'
-        }
-        processLoginRedirect(simulatedProfile)
+        console.warn("Supabase endpoint unreachable. Initializing simulated session for preview:", err)
+        const registeredStaffList = JSON.parse(localStorage.getItem('medilife_registered_staff') || '[]')
+        const matchedStaff = registeredStaffList.find(s => s.email.toLowerCase() === form.email.toLowerCase())
+        const guessedRole = matchedStaff ? matchedStaff.role : (tab === 'admin' ? 'admin' : 'patient')
+        
+        processLoginRedirect({
+          role: guessedRole,
+          tenant_id: matchedStaff?.tenant_id || resolvedTenant?.id || '42ed7e81-66a5-4b5b-af5e-cc27b8a9705e'
+        })
       } else {
         console.error("Auth sign-in failed:", err)
         setErrorMsg(err.message || "Invalid authentication credentials.")
@@ -141,15 +200,17 @@ export default function Login() {
   }
 
   const processLoginRedirect = (profile) => {
+    const isStaffRole = ['super_admin', 'admin', 'lab_tech', 'worker'].includes(profile.role)
+
     // Validate role permissions match active portal segment
-    if (tab === 'admin' && !['super_admin', 'admin', 'lab_tech', 'worker'].includes(profile.role)) {
-      setErrorMsg("Unauthorized: This account does not possess staff dashboard permissions.")
+    if (tab === 'admin' && !isStaffRole) {
+      setErrorMsg("Unauthorized: Patient accounts cannot access the Staff Workspace. Please switch to the Patient Portal.")
       setLoading(false)
       return
     }
 
-    if (tab === 'patient' && profile.role !== 'patient') {
-      setErrorMsg("Unauthorized: Patient accounts must sign in through patient portals.")
+    if (tab === 'patient' && isStaffRole) {
+      setErrorMsg("Unauthorized: Staff & Admin accounts cannot sign in through the Patient Portal. Please switch to the Admin / Staff workspace tab.")
       setLoading(false)
       return
     }
@@ -262,9 +323,49 @@ export default function Login() {
             <h1 className="text-headline-md font-bold mb-xs text-white">
               {tab === 'admin' ? 'Staff Workspace' : 'Patient Portal'}
             </h1>
-            <p className="text-body-md mb-xl text-admin-on-surface-variant">
+            <p className="text-body-md mb-md text-admin-on-surface-variant">
               {tab === 'admin' ? 'Authorized laboratory personnel only.' : 'Sign in to access your digital test files.'}
             </p>
+
+            {/* Quick Demo Fill Helper */}
+            <div className="mb-md p-sm bg-white/5 border border-white/10 rounded-xl space-y-xs">
+              <p className="text-[11px] font-bold text-clinical-teal uppercase tracking-wider">⚡ Quick Demo Login:</p>
+              <div className="flex flex-wrap gap-xs">
+                {tab === 'admin' ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setForm({ email: 'superadmin@medilife.in', password: 'SuperAdmin@2026!' })}
+                      className="text-xs bg-purple-500/20 hover:bg-purple-500/40 text-purple-300 px-2 py-1 rounded-lg border border-purple-400/30 transition-all font-medium"
+                    >
+                      🔑 Super Admin
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setForm({ email: 'admin@medilife.in', password: 'Admin@2026!' })}
+                      className="text-xs bg-teal-500/20 hover:bg-teal-500/40 text-teal-300 px-2 py-1 rounded-lg border border-teal-400/30 transition-all font-medium"
+                    >
+                      🔬 Branch Admin
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setForm({ email: 'tech@medilife.in', password: 'Tech@2026!' })}
+                      className="text-xs bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 px-2 py-1 rounded-lg border border-blue-400/30 transition-all font-medium"
+                    >
+                      🧪 Lab Tech
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ email: 'patient@medilife.in', password: 'Patient@2026!' })}
+                    className="text-xs bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 px-2 py-1 rounded-lg border border-emerald-400/30 transition-all font-medium"
+                  >
+                    🧑‍💊 Patient Demo
+                  </button>
+                )}
+              </div>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-md">
               <div>

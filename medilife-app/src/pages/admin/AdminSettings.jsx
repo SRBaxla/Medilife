@@ -25,6 +25,33 @@ export default function AdminSettings() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' })
+  const [currentUserRole, setCurrentUserRole] = useState('admin')
+
+  useEffect(() => {
+    const resolveRole = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data: prof } = await supabase.from('user_profiles').select('role').eq('user_id', user.id).maybeSingle()
+          if (prof?.role) {
+            setCurrentUserRole(prof.role)
+            return
+          }
+          const regStaff = JSON.parse(localStorage.getItem('medilife_registered_staff') || '[]')
+          const matched = regStaff.find(s => s.email.toLowerCase() === (user.email || '').toLowerCase())
+          if (matched?.role) {
+            setCurrentUserRole(matched.role)
+            return
+          }
+        }
+        const offlineSession = JSON.parse(sessionStorage.getItem('medilife_offline_session') || '{}')
+        if (offlineSession?.role) {
+          setCurrentUserRole(offlineSession.role)
+        }
+      } catch (e) {}
+    }
+    resolveRole()
+  }, [])
 
   // Lab Profile Form State
   const [labProfile, setLabProfile] = useState({
@@ -55,6 +82,13 @@ export default function AdminSettings() {
   const [purging, setPurging] = useState(false)
 
   const handleConfirmPurge = async () => {
+    const isAdmin = currentUserRole === 'admin' || currentUserRole === 'super_admin'
+    if (!isAdmin) {
+      alert("🔒 Security Policy Violation: Data Purge operations require Administrator privileges.")
+      setPurgeModal({ open: false, type: 'all' })
+      return
+    }
+
     const expected = purgeModal.type === 'reports' ? 'CLEAR REPORTS' : purgeModal.type === 'audit' ? 'CLEAR LOGS' : 'PURGE ALL DATA'
     if (verifyText.trim().toUpperCase() !== expected) {
       alert(`Verification text mismatch. Please type "${expected}" exactly to confirm deletion.`)

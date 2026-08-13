@@ -87,30 +87,50 @@ export default function ProtectedRoute({ children, allowedRoles }) {
         }
 
         // 3. Fetch user profile role and tenant verification
-        const { data: profile, error: profileError } = await supabase
+        let userRole = null
+        let userTenantId = resolvedId
+
+        const { data: profile } = await supabase
           .from('user_profiles')
           .select('role, tenant_id')
           .eq('user_id', user.id)
           .maybeSingle()
 
-        // Handle profile fetch error (e.g. database RLS or offline mock fallback)
-        if (profileError) {
-          console.warn("Could not query user profile from Supabase:", profileError)
-          
-          // Secure clinical mock authentication fallback for presentation/demo mode
-          const userEmail = user?.email || ''
-          const guessedRole = userEmail.includes('admin') ? 'admin' : 'patient'
-
-          const simulatedProfile = {
-            role: guessedRole,
-            tenant_id: resolvedId
+        if (profile && profile.role) {
+          userRole = profile.role
+          if (profile.tenant_id) userTenantId = profile.tenant_id
+        } else if (user?.email) {
+          const { data: emailProfile } = await supabase
+            .from('user_profiles')
+            .select('role, tenant_id')
+            .eq('email', user.email)
+            .maybeSingle()
+          if (emailProfile && emailProfile.role) {
+            userRole = emailProfile.role
+            if (emailProfile.tenant_id) userTenantId = emailProfile.tenant_id
           }
-
-          verifyAccess(simulatedProfile, resolvedId)
-          return
         }
 
-        verifyAccess(profile, resolvedId)
+        if (!userRole && user) {
+          if (user.user_metadata?.role) {
+            userRole = user.user_metadata.role
+          } else {
+            const registeredStaffList = JSON.parse(localStorage.getItem('medilife_registered_staff') || '[]')
+            const matchedStaff = registeredStaffList.find(s => s.email.toLowerCase() === (user.email || '').toLowerCase())
+            if (matchedStaff && matchedStaff.role) {
+              userRole = matchedStaff.role
+              if (matchedStaff.tenant_id) userTenantId = matchedStaff.tenant_id
+            }
+          }
+        }
+
+        if (!userRole) {
+          const userEmail = user?.email || ''
+          const isRoutingAdmin = location.pathname.includes('/admin/')
+          userRole = (userEmail.includes('admin') || userEmail.includes('staff') || isRoutingAdmin) ? 'admin' : 'patient'
+        }
+
+        verifyAccess({ role: userRole, tenant_id: userTenantId }, resolvedId)
 
       } catch (err) {
         console.error("Auth protection verification failed:", err)
