@@ -172,8 +172,16 @@ export default function PatientDashboard() {
                       <span className="material-symbols-outlined text-[18px]">description</span>
                     </div>
                     <div>
-                      <p className="font-bold text-label-md text-on-surface">{report.test_catalog?.test_name || 'Diagnostic Evaluation'}</p>
-                      <p className="text-label-sm text-on-surface-variant">{report.booking_date || new Date().toLocaleDateString('en-IN')}</p>
+                      <p className="font-bold text-label-md text-on-surface">
+                        {report.results_data?.test_name || report.test_catalog?.test_name || report.name || 'Diagnostic Evaluation'}
+                      </p>
+                      <p className="text-label-sm text-on-surface-variant">
+                        {new Date(report.created_at || report.date || Date.now()).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-sm">
