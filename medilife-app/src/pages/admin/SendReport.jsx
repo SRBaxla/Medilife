@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../../supabaseClient'
 import PageTransition from '../../components/common/PageTransition'
-import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer'
+import { PDFViewer, pdf } from '@react-pdf/renderer'
 import PathologyReportPDF from '../../components/admin/PathologyReportPDF'
 import { 
   FileSpreadsheet, 
@@ -41,6 +41,46 @@ export default function SendReport() {
   const [toast, setToast] = useState({ visible: false, message: '' })
   const [submitting, setSubmitting] = useState(false)
   const [isReviewMode, setIsReviewMode] = useState(false)
+
+  // Mobile check state
+  const [isMobile, setIsMobile] = useState(false)
+  const [generatingPdfId, setGeneratingPdfId] = useState(null)
+
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsMobile(window.innerWidth < 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
+    }
+    checkDevice()
+    window.addEventListener('resize', checkDevice)
+    return () => window.removeEventListener('resize', checkDevice)
+  }, [])
+
+  const downloadReportPDF = async (report) => {
+    if (generatingPdfId) return
+    setGeneratingPdfId(report.id)
+    try {
+      const doc = <PathologyReportPDF report={report} formData={report.results_data || {}} />
+      const blob = await pdf(doc).toBlob()
+      const url = URL.createObjectURL(blob)
+      
+      const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      if (isMobileDevice) {
+        window.open(url, '_blank')
+      } else {
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `Medilife_Report_${(report.patient_name || 'Patient').replace(/\s+/g, '_')}_${(report.id || 'ref').slice(0, 6)}.pdf`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch (err) {
+      console.error("PDF generation failed:", err)
+      alert("Could not generate PDF. Please try again.")
+    } finally {
+      setGeneratingPdfId(null)
+    }
+  }
 
   // Fetch pending reports joined with test_catalog from Supabase
   const fetchPendingQueue = async () => {
@@ -597,9 +637,27 @@ export default function SendReport() {
                     /* REVIEW MODE: render the PDF document preview */
                     <div className="space-y-lg flex-grow flex flex-col">
                       <div className="border border-white/10 rounded-2xl overflow-hidden shadow-inner flex-grow min-h-[420px] bg-white/5 relative">
-                        <PDFViewer width="100%" height="450px" className="border-0">
-                          <PathologyReportPDF report={activeReport} formData={formData} />
-                        </PDFViewer>
+                        {isMobile ? (
+                          <div className="p-xl text-center space-y-md rounded-2xl bg-white/5 flex flex-col items-center justify-center min-h-[300px] absolute inset-0">
+                            <FileText className="w-12 h-12 text-clinical-teal animate-pulse-slow mx-auto" />
+                            <h3 className="font-bold text-admin-on-surface">PDF Preview Not Supported on Mobile</h3>
+                            <p className="text-body-md text-admin-on-surface-variant max-w-xs mx-auto">
+                              Mobile browsers do not support direct PDF inline previews. You can approve and dispatch this report directly, or click below to view the PDF.
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => downloadReportPDF(activeReport)}
+                              className="btn-outline !py-sm !px-md flex items-center gap-xs text-white mt-md mx-auto"
+                            >
+                              <Download className="w-4 h-4" />
+                              View PDF Report
+                            </button>
+                          </div>
+                        ) : (
+                          <PDFViewer width="100%" height="450px" className="border-0">
+                            <PathologyReportPDF report={activeReport} formData={formData} />
+                          </PDFViewer>
+                        )}
                       </div>
 
                       {/* Review Mode CTA Buttons */}
@@ -789,9 +847,19 @@ export default function SendReport() {
 
                   {/* PDF Viewer for History Report */}
                   <div className="border border-white/10 rounded-2xl overflow-hidden shadow-inner flex-grow min-h-[420px] bg-white/5 relative mb-md">
-                    <PDFViewer width="100%" height="450px" className="border-0">
-                      <PathologyReportPDF report={selectedHistoryReport} formData={selectedHistoryReport.results_data || {}} />
-                    </PDFViewer>
+                    {isMobile ? (
+                      <div className="p-xl text-center space-y-md rounded-2xl bg-white/5 flex flex-col items-center justify-center min-h-[300px] absolute inset-0">
+                        <FileText className="w-12 h-12 text-clinical-teal animate-pulse-slow mx-auto" />
+                        <h3 className="font-bold text-admin-on-surface">Report PDF Ready</h3>
+                        <p className="text-body-md text-admin-on-surface-variant max-w-xs mx-auto">
+                          Mobile browsers do not support inline PDF previews. Tap "Download PDF" below to open and view the official report.
+                        </p>
+                      </div>
+                    ) : (
+                      <PDFViewer width="100%" height="450px" className="border-0">
+                        <PathologyReportPDF report={selectedHistoryReport} formData={selectedHistoryReport.results_data || {}} />
+                      </PDFViewer>
+                    )}
                   </div>
 
                   {/* Actions Footer */}
@@ -799,18 +867,14 @@ export default function SendReport() {
                     <span className="text-label-sm text-admin-on-surface-variant font-mono">
                       Logged in Audit Trail • Dispatched to Patient Portal
                     </span>
-                    <PDFDownloadLink
-                      document={<PathologyReportPDF report={selectedHistoryReport} formData={selectedHistoryReport.results_data || {}} />}
-                      fileName={`Medilife_Report_${(selectedHistoryReport.patient_name || 'Patient').replace(/\s+/g, '_')}_${selectedHistoryReport.id.slice(0, 6)}.pdf`}
+                    <button
+                      onClick={() => downloadReportPDF(selectedHistoryReport)}
+                      disabled={generatingPdfId !== null}
                       className="btn-admin !py-sm !px-md flex items-center gap-xs font-semibold shadow-admin-glow text-white"
                     >
-                      {({ loading: pdfLoading }) => (
-                        <>
-                          <Download className="w-4 h-4" />
-                          {pdfLoading ? 'Preparing PDF...' : 'Download Official PDF'}
-                        </>
-                      )}
-                    </PDFDownloadLink>
+                      <Download className="w-4 h-4" />
+                      {generatingPdfId === selectedHistoryReport.id ? 'Preparing PDF...' : 'Download Official PDF'}
+                    </button>
                   </div>
                 </motion.div>
               ) : (

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { PDFDownloadLink } from '@react-pdf/renderer'
+import { pdf } from '@react-pdf/renderer'
 import PageTransition from '../../components/common/PageTransition'
 import PathologyReportPDF from '../../components/admin/PathologyReportPDF'
 import { supabase } from '../../supabaseClient'
@@ -18,6 +18,34 @@ export default function Reports() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [expanded, setExpanded] = useState(null)
+  const [generatingPdfId, setGeneratingPdfId] = useState(null)
+
+  const downloadReportPDF = async (report) => {
+    if (generatingPdfId) return
+    setGeneratingPdfId(report.id)
+    try {
+      const doc = <PathologyReportPDF report={report} formData={report.results_data || {}} />
+      const blob = await pdf(doc).toBlob()
+      const url = URL.createObjectURL(blob)
+      
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      if (isMobile) {
+        window.open(url, '_blank')
+      } else {
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `Medilife_Report_${(report.patient_name || 'Patient').replace(/\s+/g, '_')}_${report.id.slice(0, 6)}.pdf`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch (err) {
+      console.error("PDF generation failed:", err)
+      alert("Could not generate PDF. Please try again.")
+    } finally {
+      setGeneratingPdfId(null)
+    }
+  }
 
   const handleDeletePatientReport = async (reportId) => {
     try {
@@ -186,18 +214,16 @@ export default function Reports() {
                       className="px-lg pb-lg border-t border-outline-variant/30 pt-md"
                     >
                       <div className="flex gap-sm items-center justify-between">
-                        <PDFDownloadLink
-                          document={<PathologyReportPDF report={r} formData={r.results_data || {}} />}
-                          fileName={`Medilife_Report_${(r.patient_name || 'Patient').replace(/\s+/g, '_')}_${r.id.slice(0, 6)}.pdf`}
+                        <button
+                          onClick={() => downloadReportPDF(r)}
+                          disabled={generatingPdfId !== null}
                           className="btn-primary text-[13px] py-xs inline-flex items-center gap-xs text-white"
                         >
-                          {({ loading: pdfLoading }) => (
-                            <>
-                              <span className="material-symbols-outlined text-[16px]">download</span>
-                              {pdfLoading ? 'Preparing PDF...' : 'Download Official PDF'}
-                            </>
-                          )}
-                        </PDFDownloadLink>
+                          <span className={`material-symbols-outlined text-[16px] ${generatingPdfId === r.id ? 'animate-spin' : ''}`}>
+                            {generatingPdfId === r.id ? 'sync' : 'download'}
+                          </span>
+                          {generatingPdfId === r.id ? 'Preparing PDF...' : 'Download Official PDF'}
+                        </button>
 
                         <button
                           onClick={() => handleDeletePatientReport(r.id)}

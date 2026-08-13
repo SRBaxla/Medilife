@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { PDFDownloadLink } from '@react-pdf/renderer'
+import { pdf } from '@react-pdf/renderer'
 import { supabase } from '../../supabaseClient'
 import PageTransition from '../../components/common/PageTransition'
 import PathologyReportPDF from '../../components/admin/PathologyReportPDF'
@@ -11,6 +11,34 @@ export default function PatientDashboard() {
   const [appointments, setAppointments] = useState([])
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
+  const [generatingPdfId, setGeneratingPdfId] = useState(null)
+
+  const downloadReportPDF = async (report) => {
+    if (generatingPdfId) return
+    setGeneratingPdfId(report.id)
+    try {
+      const doc = <PathologyReportPDF report={report} formData={report.results_data || {}} />
+      const blob = await pdf(doc).toBlob()
+      const url = URL.createObjectURL(blob)
+      
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      if (isMobile) {
+        window.open(url, '_blank')
+      } else {
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `Medilife_Report_${(report.patient_name || 'Patient').replace(/\s+/g, '_')}_${(report.id || 'ref').slice(0, 6)}.pdf`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch (err) {
+      console.error("PDF generation failed:", err)
+      alert("Could not generate PDF. Please try again.")
+    } finally {
+      setGeneratingPdfId(null)
+    }
+  }
 
   const fetchDashboardData = async () => {
     try {
@@ -150,18 +178,16 @@ export default function PatientDashboard() {
                   </div>
                   <div className="flex items-center gap-sm">
                     <span className="badge badge-success bg-emerald-50 text-emerald-700 border border-emerald-200">{report.status || 'Final'}</span>
-                    <PDFDownloadLink
-                      document={<PathologyReportPDF report={report} formData={report.results_data || {}} />}
-                      fileName={`Medilife_Report_${(report.patient_name || 'Patient').replace(/\s+/g, '_')}_${(report.id || 'ref').slice(0, 6)}.pdf`}
+                    <button
+                      onClick={() => downloadReportPDF(report)}
+                      disabled={generatingPdfId !== null}
                       className="p-sm text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-secondary-container flex items-center justify-center"
                       title="Download Official PDF"
                     >
-                      {({ loading: pdfLoading }) => (
-                        <span className={`material-symbols-outlined text-[18px] ${pdfLoading ? 'animate-spin text-primary' : ''}`}>
-                          {pdfLoading ? 'sync' : 'download'}
-                        </span>
-                      )}
-                    </PDFDownloadLink>
+                      <span className={`material-symbols-outlined text-[18px] ${generatingPdfId === report.id ? 'animate-spin text-primary' : ''}`}>
+                        {generatingPdfId === report.id ? 'sync' : 'download'}
+                      </span>
+                    </button>
                   </div>
                 </motion.div>
               ))
